@@ -1,21 +1,14 @@
 <template>
     <div id="main-page">
-        <!-- Nav Bar 顯示虛擬幣與玩家資訊，固定在螢幕頂部 -->
-        <nav class="nav-bar" v-if="user">
-            <div class="nav-item coins">Coins: {{ virtualCoins }}</div>
-            <div class="nav-item username">Hi, {{ user.displayName }}</div>
-            <button class="logout-btn" @click="logout">Logout</button>
-        </nav>
-
         <!-- 如果 user 尚未加載，顯示加載提示 -->
-        <div v-else>
+        <div v-if="!user">
             <p>Loading user information...</p>
         </div>
 
         <!-- 寵物顯示區域 -->
         <div class="card pet-display" v-if="user">
             <h2>Your Pet</h2>
-            <img :src="petImage" alt="Pet Image" class="pet-image" />
+            <img src="test1.webp" alt="Pet Image" class="pet-image" />
             <p class="pet-level">Level: {{ petLevel }}</p>
         </div>
 
@@ -27,9 +20,12 @@
                 <li v-for="task in tasks" :key="task.id">
                     <span>{{ task.description }}</span>
                     <span class="task-status-text">Status: {{ task.status }}</span>
-                    <!-- 根據任務狀態顯示相應的按鈕 -->
-                    <button v-if="task.status === 'not started'" @click="acceptTask(task)">Accept Task</button>
-                    <button v-if="task.status === 'in progress'" @click="completeTask(task)">Complete Task</button>
+                    <button v-if="task.status === 'not started'" @click="acceptTask(task)">
+                        Accept Task
+                    </button>
+                    <button v-if="task.status === 'in progress'" @click="completeTask(task)">
+                        Complete Task
+                    </button>
                 </li>
             </ul>
         </div>
@@ -37,99 +33,88 @@
 </template>
 
 <script>
+import { ref, update, onValue } from 'firebase/database';
+import { database } from '../firebase'; // 引入 Firebase Realtime Database
+
 export default {
     data() {
         return {
-            user: null, // 用戶資訊預設為 null
-            virtualCoins: 100, // 假數據: 虛擬幣數量
-            petLevel: 3, // 假數據: 寵物等級
-            petImage: 'test1.webp', // 假數據: 寵物圖片
-            tasks: [ // 假數據: 任務列表
-                { id: 1, description: 'Complete project report', status: 'not started' },
-                { id: 2, description: 'Attend team meeting', status: 'in progress' },
-                { id: 3, description: 'Submit performance review', status: 'not started' }
-            ]
+            user: null, // 用戶資訊
+            petLevel: 1, // 初始寵物等級
+            virtualCoins: 0, // 初始虛擬幣
+            tasks: [], // 任務列表
+            passiveIncomeInterval: null // 用於被動收入的定時器
         };
     },
     mounted() {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            this.user = JSON.parse(storedUser); // 如果有儲存的用戶資料，則初始化
-        } else {
-            this.$router.push('/'); // 如果沒有用戶資料，重定向回登入頁面
-        }
+        this.loadUserData();
     },
     methods: {
+        loadUserData() {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                this.user = JSON.parse(storedUser); // 確保 user 被正確設置
+                const userId = this.user.uid;
+                const userRef = ref(database, `users/${userId}`);
+
+                // 監聽 Firebase Realtime Database 寵物等級和虛擬幣的變化
+                onValue(userRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        this.petLevel = data.petLevel || 1;
+                        this.virtualCoins = data.virtualCoins || 0;
+                        this.tasks = data.tasks || []; // 從 Firebase 加載任務列表
+                    }
+                });
+
+                this.startPassiveIncome(); // 開始被動收入邏輯
+            } else {
+                this.$router.push('/'); // 如果沒有用戶資料，重定向回登入頁面
+            }
+        },
         acceptTask(task) {
-            task.status = 'in progress';
+            task.status = 'in progress'; // 修改任務狀態
+            this.updateTasks();
         },
         completeTask(task) {
-            task.status = 'completed';
-            this.virtualCoins += 10; // 完成任務獲得額外虛擬幣
+            task.status = 'completed'; // 修改任務狀態
+            this.petLevel += 1; // 每完成一個任務提升寵物等級
+            this.virtualCoins += 10; // 完成任務增加虛擬幣
+            this.updateTasks(); // 更新 Firebase 上的數據
         },
-        async logout() {
-            try {
-                localStorage.removeItem('user'); // 移除本地存儲中的用戶資料
-                this.user = null;
-                this.$router.push('/welcome'); // 登出後導回歡迎頁面
-            } catch (error) {
-                console.error('Error during logout:', error);
-            }
+        updateTasks() {
+            // 將資料更新到 Firebase
+            const userId = this.user.uid;
+            const userRef = ref(database, `users/${userId}`);
+            update(userRef, {
+                petLevel: this.petLevel,
+                virtualCoins: this.virtualCoins,
+                tasks: this.tasks // 同步更新任務狀態
+            });
+        },
+        startPassiveIncome() {
+            // 每 10 秒自動賺取虛擬幣
+            this.passiveIncomeInterval = setInterval(() => {
+                this.virtualCoins += 1;
+                const userId = this.user.uid;
+                const userRef = ref(database, `users/${userId}`);
+                update(userRef, {
+                    virtualCoins: this.virtualCoins,
+                });
+            }, 10000); // 10 秒
         }
+    },
+    beforeUnmount() {
+        clearInterval(this.passiveIncomeInterval); // 清除定時器
     }
 };
 </script>
 
+
+
 <style scoped>
-/* 固定 Nav Bar 在螢幕頂部，並保持項目有足夠的間距 */
-.nav-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #2c3e50;
-    color: white;
-    padding: 20px 40px;
-    width: 100vw;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    box-sizing: border-box;
-
-}
-
-.nav-item {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.coins {
-    flex: 1;
-    text-align: left;
-}
-
-.username {
-    flex: 1;
-    text-align: center;
-}
-
-.logout-btn {
-    flex: 1;
-    text-align: right;
-    background-color: #c0392b;
-    color: white;
-    font-size: 14px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    max-width: 80px;
-}
-
 #main-page {
     padding-top: 80px;
-    /* 預留空間給 Nav Bar */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -202,16 +187,6 @@ button:hover {
 }
 
 @media only screen and (max-width: 600px) {
-    .nav-bar {
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    .logout-btn {
-        font-size: 12px;
-        padding: 6px 10px;
-    }
-
     .pet-display img {
         width: 120px;
         height: 120px;
