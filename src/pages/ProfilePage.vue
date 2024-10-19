@@ -329,7 +329,7 @@
   <style scoped>
   .profile-page {
     padding: 20px;
-    margin-top: 30px; /* 加入 margin-top，確保整個頁面向下平移 */
+    margin-top: 40px; /* 加入 margin-top，確保整個頁面向下平移 */
   }
   .employee-info p {
     text-align: left;

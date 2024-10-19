@@ -1,16 +1,12 @@
 <template>
   <div id="shop-page">
-    <nav class="switch-bar">
-      <button class="switch-btn" @click="switchPage">{{ pageName }}</button>
-    </nav>
-    <div v-if="internalPage" style="width: 100%; height: auto; object-fit: cover; display: flex;">
-      <div class="stuff">
-        <div class="product" v-for="product in stuff" :key="product.id">
-          <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
-          <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
-          <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
-          <button @click="purchase(product)" class="buy-btn">Buy</button>
-        </div>
+    <button class="switch-btn" @click="switchPage">{{ pageName }}</button>
+    <div v-if="internalPage" class="stuff">
+      <div class="product" v-for="product in stuff" :key="product.id">
+        <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
+        <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
+        <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
+        <button @click="purchase(product)" class="buy-btn">Buy</button>
       </div>
     </div>
     <div v-else class="external-stuff">
@@ -150,17 +146,22 @@ export default {
 #shop-page {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  /*justify-content: center;*/
   margin-top: 20px;
   padding: 10px;
   box-sizing: border-box;
-  background-color: #ecf0f1;
+  background-color: #d3dadb;
   height: 80%;
   width: 90%;
+  align-items: center;
+  border-radius: 30px;
 }
 
-.switch-bar {
+.switch-btn {
   display: flex;
+  flex-direction: raw;
+  align-items: center;
   justify-content: center;
   height: 55px;
   width: 80%;
@@ -216,13 +217,14 @@ export default {
   top: 1px;
 }
 
-.stuff,
-.external-stuff {
+.stuff {
+  margin-top: 5%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   width: 100%;
   gap: 10px;
   align-items: stretch;
+  height: 60%;
 }
 
 .product {
@@ -243,19 +245,20 @@ export default {
   object-fit: cover;
   border-radius: 5px;
   align-self: stretch;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .buy-btn {
   width: 40%;
   border-radius: 10px;
-  background-color: #3498db;
+  background-color: #1e587e;
   color: white;
   border: 1px solid #3498db;
   padding: 5px 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-top: 5px;
+  margin-top: 5%;
+  margin-bottom: 10%;
 }
 
 .buy-btn:hover {
