@@ -18,6 +18,9 @@
                     <p class="pet-level">Level: {{ petLevel }}</p>
                     <p class="pet-name">Name: {{ petName }}</p>
                 </div>
+                <div class="spann">
+
+                </div>
             </div>
         </div>
 
@@ -95,12 +98,18 @@ export default {
 </script>
 
 <style scoped>
+.spann {
+    height: 350px;
+    padding-bottom: 150px;
+}
+
 .pet-page {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
     margin-top: 50px;
+
 }
 
 .pet-feature {
@@ -115,6 +124,7 @@ export default {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
     height: 350px;
+    padding-bottom: 150px;
     /* 給上半區明確的高度，保證居中對齊 */
 }
 
@@ -143,7 +153,7 @@ export default {
 
 .pet-details {
     position: absolute;
-    bottom: -20px;
+    bottom: 20px;
     /* 保證在圖片的下方 */
     left: 50%;
     transform: translateX(-50%);
@@ -152,6 +162,7 @@ export default {
     /* 半透明背景以提升可讀性 */
     padding: 5px 10px;
     border-radius: 10px;
+
 }
 
 .pet-level,
@@ -159,6 +170,7 @@ export default {
     font-size: 18px;
     font-weight: bold;
     color: #2c3e50;
+
 }
 
 .pet-gallery {
