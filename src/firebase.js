@@ -1,5 +1,4 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database"; // 如果使用 Realtime Database
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth"; // 引入 Google 登入相關方法
 
@@ -18,8 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // 初始化 Firebase 服務
-const db = getFirestore(app);
-const database = getDatabase(app); // 如果使用 Realtime Database
+const database = getDatabase(app); // 使用 Realtime Database
 const auth = getAuth(app);
 
 // Google 登入方法
@@ -28,4 +26,4 @@ function signInWithGoogle() {
   return signInWithPopup(auth, provider);
 }
 
-export { db, auth, database, signInWithGoogle };
+export { database, auth, signInWithGoogle };
