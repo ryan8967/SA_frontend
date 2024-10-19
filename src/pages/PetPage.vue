@@ -1,7 +1,7 @@
 <template>
     <div class="pet-page">
         <!-- 上半部 - 寵物特寫與資訊 -->
-        <div class="pet-feature" @click="showClickGif">
+        <div class="pet-feature" @click="handlePetClick">
             <div class="pet-info">
                 <!-- 用於顯示原始 GIF -->
                 <transition name="fade" mode="out-in">
@@ -13,13 +13,17 @@
                     <img v-if="isClickGif" :src="clickGifImage" alt="Clicked Pet" class="main-pet overlay" />
                 </transition>
 
-                <!-- 寵物等級與名稱 -->
+                <!-- 寵物等級、名稱、經驗值條 -->
                 <div class="pet-details">
-                    <p class="pet-level">Level: {{ petLevel }}</p>
+                    <p class="pet-level">Level: {{ selectedPet.level }}</p>
                     <p class="pet-name">Name: {{ petName }}</p>
-                </div>
-                <div class="spann">
 
+                    <!-- 經驗值進度條 -->
+                    <div class="exp-bar">
+                        <div class="exp-fill" :style="{ width: experiencePercentage + '%' }"></div>
+                    </div>
+                    <p class="experience-text">{{ selectedPet.currentExperience }} / {{ selectedPet.experienceNeeded }}
+                        XP</p>
                 </div>
             </div>
         </div>
@@ -28,9 +32,9 @@
         <div class="pet-gallery">
             <h2>Pet Collection</h2>
             <div class="pet-thumbnails">
-                <!-- 使用 v-for 顯示多個寵物頭像，已擁有的寵物能夠點擊 -->
-                <img v-for="(pet, index) in petCollection" :key="index" :src="pet.src" :alt="`Pet ${index + 1}`"
-                    :class="{ 'pet-thumbnail': true, 'unowned': !pet.owned }" @click="selectPet(index)" />
+                <img v-for="(pet, index) in petStore.petCollection" :key="index" :src="pet.src"
+                    :alt="`Pet ${index + 1}`" :class="{ 'pet-thumbnail': true, 'unowned': !pet.owned }"
+                    @click="selectPet(index)" />
             </div>
         </div>
 
@@ -42,74 +46,111 @@
 </template>
 
 <script>
+import { ref, update, onValue } from 'firebase/database';
+import { database } from '../firebase';
+import { usePetStore } from '../stores/petStore'; // 引入狀態管理
+
 export default {
+    setup() {
+        const petStore = usePetStore();
+
+        return {
+            petStore,
+        };
+    },
     data() {
         return {
-            petLevel: 1, // 寵物等級，初始為 1
-            petName: 'Fluffy', // 假設初始寵物名稱
-            mainPet: { src: 'pet/pet3.png', owned: true }, // 主寵物，初始為 pet3
-            isClickGif: false, // 控制是否顯示 -click.gif
-            petCollection: [
-                { src: 'pet/pet3.png', owned: true }, // 預設已擁有 pet3
-                { src: 'pet/pet5.png', owned: true }, // 預設已擁有 pet5
-                { src: 'pet/pet1.png', owned: false }, // 未擁有寵物
-                { src: 'pet/pet2.png', owned: false }, // 未擁有寵物
-                { src: 'pet/pet4.png', owned: false }, // 未擁有寵物
-                { src: 'pet/pet6.png', owned: false }, // 新增的 pet6，未擁有
-            ], // 預設圖鑑中的寵物頭像
+            petName: 'Fluffy',
+            mainPet: { src: 'pet/pet3.png', owned: true },
+            isClickGif: false,
+            selectedPetIndex: 0, // 追蹤選中的寵物索引
         };
     },
     computed: {
-        // 根據主寵物編號動態選擇顯示 gif 或 png，並控制是否顯示 -click.gif
-        mainPetImage() {
-            if (this.mainPet && this.mainPet.src) {
-                const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
-                if (petFileName === 'pet3' || petFileName === 'pet5') {
-                    return `pet/${petFileName}.gif`; // 顯示正常的 gif
-                }
-                return this.mainPet.src; // 其他情況顯示 png
-            }
-            return ''; // 若未定義，返回空字串
+        // 從 petStore 中取得選中的寵物
+        selectedPet() {
+            return this.petStore.selectedPet;
         },
-        // 返回 -click.gif 的圖片路徑
+        mainPetImage() {
+            const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+            return `pet/${petFileName}.gif`;
+        },
         clickGifImage() {
-            const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
+            const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
             return `pet/${petFileName}-click.gif`;
+        },
+        experiencePercentage() {
+            return (this.selectedPet.currentExperience / this.selectedPet.experienceNeeded) * 100;
         }
     },
     methods: {
-        // 當用戶點擊上方主寵物區域，顯示 -click.gif，並在數秒後恢復正常 gif
-        showClickGif() {
-            if (this.mainPet.src.includes('pet3') || this.mainPet.src.includes('pet5')) {
-                this.isClickGif = true;
-                setTimeout(() => {
-                    this.isClickGif = false; // 恢復正常的 gif
-                }, 1500); // 顯示 -click.gif 1.5秒後恢復
-            }
+        handlePetClick() {
+            this.isClickGif = true;
+            this.petStore.addExperience(1); // 增加當前選中寵物的經驗值
+            setTimeout(() => {
+                this.isClickGif = false;
+            }, 1500);
         },
-        // 選擇新的主寵物並更新圖片
         selectPet(index) {
-            if (this.petCollection[index].owned) { // 只有擁有的寵物才能被選中
-                this.mainPet = { ...this.petCollection[index] }; // 設置主寵物為選中的寵物
-            }
+            this.petStore.selectPet(index); // 更新選中的寵物
         },
+        updatePetData() {
+            const userId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).uid : null;
+            if (userId) {
+                const userRef = ref(database, `users/${userId}/pets`);
+                update(userRef, {
+                    petCollection: this.petStore.petCollection, // 同步整個寵物集合到 Firebase
+                });
+            }
+        }
+    },
+    mounted() {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const userId = JSON.parse(storedUser).uid;
+            const userRef = ref(database, `users/${userId}/pets`);
+            onValue(userRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.petCollection) {
+                    this.petStore.updatePetCollection(data.petCollection);
+                }
+            });
+        }
     },
 };
 </script>
 
 <style scoped>
-.spann {
-    height: 350px;
-    padding-bottom: 150px;
+/* 經驗值條樣式 */
+.exp-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
 }
 
+.exp-fill {
+    height: 100%;
+    background-color: #3498db;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.experience-text {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+/* 其他樣式保持不變 */
 .pet-page {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
     margin-top: 50px;
-
 }
 
 .pet-feature {
@@ -123,9 +164,7 @@ export default {
     width: 100%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
-    height: 350px;
-    padding-bottom: 150px;
-    /* 給上半區明確的高度，保證居中對齊 */
+    height: 500px;
 }
 
 .main-pet,
@@ -134,7 +173,7 @@ export default {
     height: 250px;
     object-fit: cover;
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     transition: opacity 0.5s ease-in-out;
@@ -154,15 +193,12 @@ export default {
 .pet-details {
     position: absolute;
     bottom: 20px;
-    /* 保證在圖片的下方 */
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
     background-color: rgba(255, 255, 255, 0.8);
-    /* 半透明背景以提升可讀性 */
     padding: 5px 10px;
     border-radius: 10px;
-
 }
 
 .pet-level,
@@ -170,7 +206,6 @@ export default {
     font-size: 18px;
     font-weight: bold;
     color: #2c3e50;
-
 }
 
 .pet-gallery {

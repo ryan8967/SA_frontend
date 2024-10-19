@@ -8,6 +8,13 @@
         <!-- 寵物顯示區域 -->
         <div class="card pet-display" v-if="user" @click="showClickGif">
             <h2>Your Pet</h2>
+
+            <div v-if="showBubble" :key="floatingTextIndex" class="floating-text">
+                {{ floatingTexts[floatingTextIndex] }}
+            </div>
+            <div v-else style="height: 48px;">
+                &nbsp;
+            </div>
             <!-- 寵物圖片顯示與過渡效果 -->
             <div class="pet-info">
                 <transition name="fade" mode="out-in">
@@ -15,15 +22,19 @@
                 </transition>
 
                 <transition name="fade" mode="out-in">
-                    <img v-if="isClickGif" :src="clickGifImage" alt="Clicked Pet" class="pet-image overlay" />
+                    <img v-if="isClickGif" :src="clickGifImage" alt="Clicked Pet" class="pet-image overlay"
+                        @click="showTextBubble" />
                 </transition>
 
                 <div class="pet-details">
                     <p class="pet-level">Level: {{ petLevel }}</p>
+
+
                     <p class="pet-name">Name: {{ petName }}</p>
                 </div>
             </div>
         </div>
+
 
         <!-- 任務狀態顯示 -->
         <div class="card task-status" v-if="user">
@@ -48,39 +59,46 @@
 <script>
 import { ref, update, onValue } from 'firebase/database';
 import { database } from '../firebase'; // 引入 Firebase Realtime Database
+import OpenAI from "openai";
+import { usePetStore } from '../stores/petStore'; // 引入狀態管理
 
 export default {
+    setup() {
+        const petStore = usePetStore();
+        return {
+            petStore,
+        };
+    },
     data() {
         return {
             user: null, // 用戶資訊
-            petLevel: 1, // 初始寵物等級
-            petName: 'Fluffy', // 初始寵物名稱
-            mainPet: { src: 'pet/pet3.png', owned: true }, // 初始主寵物
             isClickGif: false, // 控制是否顯示 -click.gif
             tasks: [], // 任務列表
-            passiveIncomeInterval: null // 用於被動收入的定時器
         };
     },
     computed: {
-        // 根據主寵物編號動態選擇顯示 gif 或 png，並控制是否顯示 -click.gif
-        mainPetImage() {
-            if (this.mainPet && this.mainPet.src) {
-                const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
-                if (petFileName === 'pet3' || petFileName === 'pet5') {
-                    return `pet/${petFileName}.gif`; // 顯示正常的 gif
-                }
-                return this.mainPet.src; // 其他情況顯示 png
-            }
-            return ''; // 若未定義，返回空字串
+        // 從 petStore 取出主寵物的圖片和其他屬性
+        selectedPet() {
+            return this.petStore.selectedPet;
         },
-        // 返回 -click.gif 的圖片路徑
+        petName() {
+            return this.selectedPet.name || 'Fluffy';
+        },
+        petLevel() {
+            return this.selectedPet.level || 1;
+        },
+        mainPetImage() {
+            const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+            return `pet/${petFileName}.gif`;
+        },
         clickGifImage() {
-            const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
+            const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
             return `pet/${petFileName}-click.gif`;
-        }
+        },
     },
     mounted() {
         this.loadUserData();
+        this.getMessageFromChatGPT();
     },
     methods: {
         loadUserData() {
@@ -94,9 +112,6 @@ export default {
                 onValue(userRef, (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
-                        this.petLevel = data.petLevel || 1;
-                        this.petName = data.petName || 'Fluffy';
-                        this.mainPet = data.mainPet || { src: 'pet/pet3.png', owned: true };
                         this.tasks = data.tasks || [];
                     }
                 });
@@ -110,27 +125,79 @@ export default {
         },
         completeTask(task) {
             task.status = 'completed';
-            this.petLevel += 1; // 每完成一個任務提升寵物等級
+            this.petStore.addExperience(10); // 完成任務提升經驗值
             this.updateTasks();
         },
         updateTasks() {
             const userId = this.user.uid;
             const userRef = ref(database, `users/${userId}`);
             update(userRef, {
-                petLevel: this.petLevel,
-                tasks: this.tasks
+                tasks: this.tasks,
             });
         },
-        // 當用戶點擊寵物，顯示 -click.gif，並在 1.5 秒後恢復正常 gif
         showClickGif() {
-            if (this.mainPet.src.includes('pet3') || this.mainPet.src.includes('pet5')) {
-                this.isClickGif = true;
-                setTimeout(() => {
-                    this.isClickGif = false;
-                }, 1500);
+            this.isClickGif = true;
+            setTimeout(() => {
+                this.isClickGif = false;
+            }, 1500);
+        },
+        showTextBubble() {
+            console.log("show text tttt")
+            this.showBubble = true;
+            // this.floatingTextIndex = Math.floor(Math.random() * this.floatingTexts.length);
+            this.floatingTextIndex = (this.floatingTextIndex + 1) % this.floatingTexts.length;
+            // Hide the bubble after 5 seconds
+            setTimeout(() => {
+                this.showBubble = false;
+            }, 5000);
+        },
+        async getMessageFromChatGPT() {
+
+            const storedUser = localStorage.getItem('user');
+            let displayUserName = "Kevin";
+            if (storedUser) {
+                this.user = JSON.parse(storedUser);
+                displayUserName = this.user.displayName
+
             }
-        }
-    }
+
+            console.log(displayUserName)
+
+            let kkk =
+                "c2stM1VhNDUwUHhhdjNnVVNNLUNmSHVTQ25ySUI3YUZGZjU1d0RRaE92SEZSVDNCbGJrRkowUkVpazRGWmN3QnIwZXIyX2xUU1BsbWV5dFZzQWpnYmpNS1puLVRfNEE=";
+            const decodedStr = atob(kkk);
+            // console.log(decodedStr);
+
+            const openai = new OpenAI({
+                apiKey: decodedStr,
+                dangerouslyAllowBrowser: true,
+            });
+
+            const thread = await openai.beta.threads.create();
+
+            console.log("loading GPT");
+            let prompt = `Please address the user as ${displayUserName}. The user has a premium account.First greeting to user with his name. Then say something to encourage him to work, give me five sentences. Separate each sentence with commas. Each sentence should cotent user name and not exceed 10 words. there shoudn't be comma after name. Answer in Traditional Chinese.`
+            let run = await openai.beta.threads.runs.createAndPoll(thread.id, {
+                assistant_id: "asst_8GkyxwRkgLuvSkUcvhkFIFKT",
+                instructions: prompt
+
+            });
+
+            if (run.status === "completed") {
+
+                const messages = await openai.beta.threads.messages.list(run.thread_id);
+                for (const message of messages.data.reverse()) {
+                    console.log(`${message.role} > ${message.content[0].text.value}`);
+                    this.mes = message.content[0].text.value;
+                    this.floatingTexts = this.mes.split("，");
+                    console.log(this.floatingTexts);
+                }
+            } else {
+                console.log(run.status);
+            }
+
+        },
+    },
 };
 </script>
 
@@ -258,6 +325,38 @@ button:hover {
 
     #main-page {
         padding: 10px;
+    }
+}
+
+.floating-text {
+
+    background-color: rgba(255, 255, 255, 0.7);
+    color: rgb(0, 0, 0);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 14px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeOut 3s forwards;
+    transform: translateY(-50px);
+    opacity: 0;
+    max-width: 80%;
+    /* Limit the maximum width to keep it readable */
+
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: translateY(-20px);
+    }
+
+    90% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-60px);
     }
 }
 </style>
