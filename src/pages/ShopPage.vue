@@ -1,9 +1,11 @@
 <template>
   <div id="shop-page">
-    <nav class="switch-bar">
-      <button class="switch-btn" @click="switchPage">{{ pageName }}</button>
-    </nav>
-    <div v-if="internalPage" style="width: 100%; height: auto; object-fit: cover; display: flex;">
+    <button class="switch-btn" @click="switchPage">{{ pageName }}</button>
+    <div v-if="internalPage">
+      <div class="diamond-exchange">
+        <p class="diamond-desc" style="margin: 0 0; margin-top: 5%;">10 Diamonds for 100 coins</p>
+        <button @click="purchaseDiamonds" class="buy-btn">100 coins</button>
+      </div>
       <div class="stuff">
         <div class="product" v-for="product in stuff" :key="product.id">
           <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
@@ -13,13 +15,7 @@
         </div>
       </div>
     </div>
-    <div v-else class="external-stuff">
-      <div class="diamond-exchange">
-        <h2 class="exchange-title">Buy Diamonds</h2>
-        <p class="diamond-desc">10 Diamonds for 100 coins</p>
-        <button @click="purchaseDiamonds" class="buy-btn">Buy Now</button>
-      </div>
-    </div>
+    <div v-else class="external-stuff"></div>
   </div>
 </template>
 
@@ -150,17 +146,22 @@ export default {
 #shop-page {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  /*justify-content: center;*/
   margin-top: 20px;
   padding: 10px;
   box-sizing: border-box;
-  background-color: #ecf0f1;
+  background-color: #d3dadb;
   height: 80%;
   width: 90%;
+  align-items: center;
+  border-radius: 30px;
 }
 
-.switch-bar {
+.switch-btn {
   display: flex;
+  flex-direction: raw;
+  align-items: center;
   justify-content: center;
   height: 55px;
   width: 80%;
@@ -216,13 +217,14 @@ export default {
   top: 1px;
 }
 
-.stuff,
-.external-stuff {
+.stuff {
+  margin-top: 5%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   width: 100%;
   gap: 10px;
   align-items: stretch;
+  height: 60%;
 }
 
 .product {
@@ -243,19 +245,20 @@ export default {
   object-fit: cover;
   border-radius: 5px;
   align-self: stretch;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .buy-btn {
   width: 40%;
   border-radius: 10px;
-  background-color: #3498db;
+  background-color: #1e587e;
   color: white;
   border: 1px solid #3498db;
   padding: 5px 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-top: 5px;
+  margin-top: 5%;
+  margin-bottom: 10%;
 }
 
 .buy-btn:hover {
@@ -267,15 +270,39 @@ export default {
   align-items: center;
 }
 
-.diamond-exchange {
+.diamond-exchange { 
   width: 100%;
-  border-radius: 10px;
-  background-color: #2c3e50;
-  color: white;
-  box-sizing: border-box;
-  padding: 5px;
-  text-align: center;
-  object-fit: cover;
-  height: 100%;
+  height: 23%;
+  background: linear-gradient(135deg, #3498db, #8e44ad);
+  border-radius: 15px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  align-items: center;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  margin-top: 5%;
+}
+
+.diamond-exchange::before {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+}
+
+.diamond-exchange:hover::before {
+  top: -20%;
+  left: -20%;
+}
+
+.diamond-exchange:hover {
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3);
+
 }
 </style>

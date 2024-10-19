@@ -7,6 +7,9 @@ import TaskPage from "@/pages/TaskPage.vue";
 import ProfilePage from "@/pages/ProfilePage.vue";
 import New1TaskPage from "@/pages/New1TaskPage.vue";
 import Testing1Page from "@/pages/Testing1Page.vue";
+import TestPopup from "@/pages/TestPopup.vue";
+import SocialPage from "@/pages/SocialPage.vue";
+
 import New2TaskPage from "@/pages/New2TaskPage.vue";
 
 
@@ -62,6 +65,18 @@ const routes = [
     path: "/test2",
     name: "test2",
     component: New2TaskPage,
+    meta: { requiresAuth: true }, // 需要登入的頁面
+  },
+  {
+    path: "/testpopup",
+    name: "testpopup",
+    component: TestPopup,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/social",
+    name: "Social",
+    component: SocialPage,
     meta: { requiresAuth: true }, // 需要登入的頁面
   },
 ];
