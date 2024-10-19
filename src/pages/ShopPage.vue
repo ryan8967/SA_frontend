@@ -32,7 +32,8 @@ export default {
         { id: 1, img: 'egg1.png', name: '初級寵物蛋', price: 200 },
         { id: 2, img: 'egg2.png', name: '中級寵物蛋', price: 500 },
         { id: 3, img: 'egg3.png', name: '高級寵物蛋', price: 1000 },
-        { id: 4, img: 'bottle.png', name: 'bottle', price: 100 },
+        // { id: 4, img: 'bottle.png', name: 'bottle', price: 100 },
+        { id: 4, img: 'upgrade.png', name: '寵物突破', price: 1200 },
       ],
       coins: 0,
       diamonds: 0,
@@ -270,7 +271,7 @@ export default {
   align-items: center;
 }
 
-.diamond-exchange { 
+.diamond-exchange {
   width: 100%;
   height: 23%;
   background: linear-gradient(135deg, #3498db, #8e44ad);
