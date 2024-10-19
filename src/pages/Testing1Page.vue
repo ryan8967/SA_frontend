@@ -24,6 +24,7 @@
         <div class="task-description">{{ task.description }}</div>
         <button @click="updateTaskStatus(task.id, 'in progress')" class="btn btn-primary">Start the Event</button>
         <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
+          <font-awesome-icon :icon="['fas', 'user']" class="icon" />
           {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
         </button>
       </div>
@@ -38,6 +39,7 @@
         <div class="task-description">{{ task.description }}</div>
         <button @click="updateTaskStatus(task.id, 'completed')" class="btn btn-primary">End the Event</button>
         <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
+          <font-awesome-icon :icon="['fas', 'user']" class="icon" />
           {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
         </button>
       </div>
@@ -51,6 +53,7 @@
         </div>
         <div class="task-description">{{ task.description }}</div>
         <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
+          <font-awesome-icon :icon="['fas', 'user']" class="icon" />
           {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
         </button>
       </div>
@@ -173,13 +176,14 @@ export default {
 <style scoped>
 /* General Layout */
 .task-page {
-  margin-top: 80px; /* Space for NavBar */
-  margin-bottom: 60px; /* Space for BottomBar */
+  margin-top: 200px; /* Space for NavBar */
+  margin-bottom: 200px; /* Space for BottomBar */
   padding: 20px;
   background-color: #f4f7fa;
   min-height: 100vh;
   box-sizing: border-box;
   width: 100vw;
+  height: 80%;
 }
 
 /* Add Task Button */
