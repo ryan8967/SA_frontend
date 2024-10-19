@@ -15,7 +15,16 @@
         </div>
       </div>
     </div>
-    <div v-else class="external-stuff"></div>
+    <div v-else>
+      <div class="stuff external">
+        <div class="product external-stuff" v-for="product in outStuff" :key="product.id">
+          <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
+          <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
+          <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
+          <button @click="purchase(product)" class="buy-btn">Buy</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -33,6 +42,10 @@ export default {
         { id: 2, img: 'egg2.png', name: '中級寵物蛋', price: 500 },
         { id: 3, img: 'egg3.png', name: '高級寵物蛋', price: 1000 },
         { id: 4, img: 'bottle.png', name: 'bottle', price: 100 },
+      ],
+      outStuff: [
+        { id: 10, img: 'coupon1.png', name: '餐卷', price: 300 },
+        { id: 11, img: 'coupon2.png', name: '餐卷', price: 500 },
       ],
       coins: 0,
       diamonds: 0,
@@ -223,11 +236,11 @@ export default {
   grid-template-columns: repeat(2, 1fr);
   width: 100%;
   gap: 10px;
-  align-items: stretch;
-  height: 60%;
+  align-items: stretch;;
 }
-
 .product {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   border-radius: 10px;
   background-color: #2c3e50;
@@ -236,15 +249,15 @@ export default {
   padding: 5px;
   text-align: center;
   object-fit: cover;
-  height: 90%;
+  height: 100%;
+  align-items: center;
 }
-
 .product-img {
   width: 40%;
-  height: 40%;
+  height: auto;
   object-fit: cover;
   border-radius: 5px;
-  align-self: stretch;
+  align-self: center;
   margin-top: 10px;
 }
 
@@ -258,7 +271,7 @@ export default {
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-top: 5%;
-  margin-bottom: 10%;
+  margin-bottom: 5%;
 }
 
 .buy-btn:hover {
