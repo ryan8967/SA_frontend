@@ -6,6 +6,7 @@ export const useUserStore = defineStore("user", {
     virtualCoins: 0,
     diamonds: 50, // 新增鑽石屬性
     petLevel: 1,
+    selectedPetIndex: 0, // 用來保存當前選中的寵物索引
   }),
   actions: {
     setUser(user) {
@@ -33,6 +34,9 @@ export const useUserStore = defineStore("user", {
       this.virtualCoins = 0;
       this.diamonds = 0; // 登出後清空鑽石
       this.petLevel = 1;
+    },
+    setSelectedPet(index) {
+      this.selectedPetIndex = index;
     },
   },
 });
