@@ -1,21 +1,21 @@
 <template>
   <div id="shop-page">
     <button class="switch-btn" @click="switchPage">{{ pageName }}</button>
-    <div v-if="internalPage" class="stuff">
-      <div class="product" v-for="product in stuff" :key="product.id">
-        <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
-        <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
-        <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
-        <button @click="purchase(product)" class="buy-btn">Buy</button>
-      </div>
-    </div>
-    <div v-else class="external-stuff">
+    <div v-if="internalPage">
       <div class="diamond-exchange">
-        <h2 class="exchange-title">Buy Diamonds</h2>
-        <p class="diamond-desc">10 Diamonds for 100 coins</p>
-        <button @click="purchaseDiamonds" class="buy-btn">Buy Now</button>
+        <p class="diamond-desc" style="margin: 0 0; margin-top: 5%;">10 Diamonds for 100 coins</p>
+        <button @click="purchaseDiamonds" class="buy-btn">100 coins</button>
+      </div>
+      <div class="stuff">
+        <div class="product" v-for="product in stuff" :key="product.id">
+          <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
+          <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
+          <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
+          <button @click="purchase(product)" class="buy-btn">Buy</button>
+        </div>
       </div>
     </div>
+    <div v-else class="external-stuff"></div>
   </div>
 </template>
 
@@ -270,15 +270,39 @@ export default {
   align-items: center;
 }
 
-.diamond-exchange {
+.diamond-exchange { 
   width: 100%;
-  border-radius: 10px;
-  background-color: #2c3e50;
-  color: white;
-  box-sizing: border-box;
-  padding: 5px;
-  text-align: center;
-  object-fit: cover;
-  height: 100%;
+  height: 23%;
+  background: linear-gradient(135deg, #3498db, #8e44ad);
+  border-radius: 15px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  align-items: center;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  margin-top: 5%;
+}
+
+.diamond-exchange::before {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+}
+
+.diamond-exchange:hover::before {
+  top: -20%;
+  left: -20%;
+}
+
+.diamond-exchange:hover {
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3);
+
 }
 </style>
