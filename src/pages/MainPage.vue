@@ -48,36 +48,41 @@
 <script>
 import { ref, update, onValue } from 'firebase/database';
 import { database } from '../firebase'; // 引入 Firebase Realtime Database
+import { usePetStore } from '../stores/petStore'; // 引入狀態管理
 
 export default {
+    setup() {
+        const petStore = usePetStore();
+        return {
+            petStore,
+        };
+    },
     data() {
         return {
             user: null, // 用戶資訊
-            petLevel: 1, // 初始寵物等級
-            petName: 'Fluffy', // 初始寵物名稱
-            mainPet: { src: 'pet/pet3.png', owned: true }, // 初始主寵物
             isClickGif: false, // 控制是否顯示 -click.gif
             tasks: [], // 任務列表
-            passiveIncomeInterval: null // 用於被動收入的定時器
         };
     },
     computed: {
-        // 根據主寵物編號動態選擇顯示 gif 或 png，並控制是否顯示 -click.gif
-        mainPetImage() {
-            if (this.mainPet && this.mainPet.src) {
-                const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
-                if (petFileName === 'pet3' || petFileName === 'pet5') {
-                    return `pet/${petFileName}.gif`; // 顯示正常的 gif
-                }
-                return this.mainPet.src; // 其他情況顯示 png
-            }
-            return ''; // 若未定義，返回空字串
+        // 從 petStore 取出主寵物的圖片和其他屬性
+        selectedPet() {
+            return this.petStore.selectedPet;
         },
-        // 返回 -click.gif 的圖片路徑
+        petName() {
+            return this.selectedPet.name || 'Fluffy';
+        },
+        petLevel() {
+            return this.selectedPet.level || 1;
+        },
+        mainPetImage() {
+            const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+            return `pet/${petFileName}.gif`;
+        },
         clickGifImage() {
-            const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
+            const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
             return `pet/${petFileName}-click.gif`;
-        }
+        },
     },
     mounted() {
         this.loadUserData();
@@ -94,9 +99,6 @@ export default {
                 onValue(userRef, (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
-                        this.petLevel = data.petLevel || 1;
-                        this.petName = data.petName || 'Fluffy';
-                        this.mainPet = data.mainPet || { src: 'pet/pet3.png', owned: true };
                         this.tasks = data.tasks || [];
                     }
                 });
@@ -110,27 +112,23 @@ export default {
         },
         completeTask(task) {
             task.status = 'completed';
-            this.petLevel += 1; // 每完成一個任務提升寵物等級
+            this.petStore.addExperience(10); // 完成任務提升經驗值
             this.updateTasks();
         },
         updateTasks() {
             const userId = this.user.uid;
             const userRef = ref(database, `users/${userId}`);
             update(userRef, {
-                petLevel: this.petLevel,
-                tasks: this.tasks
+                tasks: this.tasks,
             });
         },
-        // 當用戶點擊寵物，顯示 -click.gif，並在 1.5 秒後恢復正常 gif
         showClickGif() {
-            if (this.mainPet.src.includes('pet3') || this.mainPet.src.includes('pet5')) {
-                this.isClickGif = true;
-                setTimeout(() => {
-                    this.isClickGif = false;
-                }, 1500);
-            }
-        }
-    }
+            this.isClickGif = true;
+            setTimeout(() => {
+                this.isClickGif = false;
+            }, 1500);
+        },
+    },
 };
 </script>
 
