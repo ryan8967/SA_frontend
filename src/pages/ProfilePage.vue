@@ -1,5 +1,6 @@
 <template>
     <div class="profile-page">
+      <div v-show="achievements.length > 0" style="margin-top: 500px;"></div>
       <h1 class="title">個人資料頁面</h1>
   
       <!-- 初始化成就按鈕 -->
@@ -54,7 +55,7 @@
             @click="showAchievementDetails(achievement)"
           >
             <img :src="achievement.icon" :alt="achievement.description" class="achievement-icon" />
-            <span>{{ achievement.name }}</span>
+            <p>{{ achievement.name }}</p>
             <p>{{ achievement.description }}</p>
           </div>
         </div>
@@ -69,7 +70,7 @@
             @click="completeAchievement(achievement)" 
           >
             <img :src="achievement.icon" :alt="achievement.description" :class="{'incomplete-icon': !achievement.completed}" class="achievement-icon" />
-            <span>{{ achievement.name }}</span>
+            <p>{{ achievement.name }}</p>
             <p>{{ achievement.description }}</p>
           </div>
         </div>
@@ -397,8 +398,8 @@
   }
   
   .achievement-icon {
-    width: 50px;
-    height: 50px;
+    width: 150px;
+    height: 150px;
   }
   
   .completed {
