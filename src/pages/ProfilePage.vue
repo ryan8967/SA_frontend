@@ -22,7 +22,20 @@
         <p><strong>員工 ID：</strong> {{ employeeId }}</p>
         <p><strong>姓名：</strong> {{ name }}</p>
         <p><strong>聘用日期：</strong> {{ hiringDate }}</p>
+        <p><strong>職位：</strong>
+          <span v-if="position">{{ position }}</span>
+          <span v-else>
+            <select v-model="selectedPosition" class="pos-select">
+              <option value="">請選擇職位</option>
+              <option v-for="pos in allPositions" :key="pos" :value="pos">{{ pos }}</option>
+            </select>
+            <button class="pos-save-btn" @click="pushPosition">儲存</button>
+          </span>
+        </p>
         <p><strong>生日：</strong> {{ birthdate }}</p>
+
+        <!-- 直屬-->
+         <p><strong>直屬：</strong> {{ mentor }}</p>
 
         <!-- 新增請心理假的按鈕 -->
         <button @click="openLeaveCalendar" class="leave-btn">申請心理假</button>
@@ -82,21 +95,57 @@
   
   <script>
   import { ref, computed, onMounted } from 'vue'; // 確保引入 onMounted
-  import { ref as firebaseRef, update, onValue } from 'firebase/database'; // 引入 Firebase 相關 API
+  import { ref as firebaseRef, update, onValue, set } from 'firebase/database'; // 引入 Firebase 相關 API
   import { database } from '@/firebase'; // 引入初始化的 Firebase 服務
-  
+
   export default {
+    data() {
+      return {
+        selectedPosition: '', // 用來暫存選擇的職位
+        position: null, // 用來顯示職位
+      };
+    },
+    mounted() {
+      const userId = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).uid : null;
+      if (userId) {
+        const userPosRef = firebaseRef(database, `users/${userId}/position`);
+        onValue(userPosRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            this.position = data;
+            this.selectedPosition = data;
+          }
+          // console.log('職位資料已載入：', data);
+        });
+      }
+    },
     setup() {
       const userAvatar = ref("/default-avatar.png"); // 預設頭像
       const achievements = ref([]); // 用來存儲成就資料
       const diamonds = ref(0); // 紀錄用戶的鑽石數量
+      const position = ref(null); // 用戶的職位
   
       // 員工資料，寫死在前端
       const employeeId = ref("123456"); // 6 位數的員工ID
       const hiringDate = ref("2020-05-01"); // 聘用日期
       const name = ref("John Doe"); // 員工姓名
       const birthdate = ref("1990-01-15"); // 員工生日
-  
+
+      const allPositions = [
+        'Software Engineer',
+        'Frontend Engineer',
+        'Backend Engineer',
+        'Full Stack Engineer',
+        'DevOps Engineer',
+        'Data Engineer',
+        'Machine Learning Engineer',
+        'AI Engineer',
+        'Cloud Engineer',
+        'Security Engineer'
+      ];
+      // 新增直屬
+      const mentor = ref("Mentor Name"); // 直屬姓名
+
       const completedAchievements = computed(() =>
         achievements.value.filter(achievement => achievement.completed)
       );
@@ -118,6 +167,7 @@
           const data = snapshot.val();
           if (data) {
             diamonds.value = data.diamonds || 0; // 獲取當前鑽石數量
+            position.value = data.position || null; // 獲取職位資料
           }
         });
       };
@@ -229,11 +279,14 @@
       });
   
       return {
+        
         userAvatar,
         employeeId,
         hiringDate,
         name,
         birthdate,
+        mentor, // 新增直屬
+        allPositions, // 新增職位選項
         achievements,
         completedAchievements,
         incompleteAchievements,
@@ -252,6 +305,24 @@
         leaveDate,
       };
     },
+    methods: {
+      pushPosition() {
+        const userId =JSON.parse(localStorage.getItem("user")).uid;
+        if (userId) {
+          const userPosRef = firebaseRef(database, `users/${userId}/position`);
+          this.selectedPosition;
+          set(userPosRef, this.selectedPosition)
+            .then(() => {
+              console.log("Position updated successfully!");
+              this.position = this.selectedPosition;
+            })
+            .catch((error) => {
+              console.error("Error updating position:", error);
+              alert("Error updating position. Please try again later.");
+            });
+        }
+      },
+    },
   };
   </script>
   
@@ -260,6 +331,35 @@
     padding: 20px;
     margin-top: 30px; /* 加入 margin-top，確保整個頁面向下平移 */
   }
+  .employee-info p {
+    text-align: left;
+  }
+  /* button 樣式 */
+  .pos-save-btn {
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  padding: 3px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.pos-save-btn:hover {
+  background-color: #2980b9;
+}
+
+.pos-save-btn:active {
+  background-color: #217dbb;
+  transform: scale(0.98);
+}
+
+.pos-save-btn:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
   
   .avatar-section {
     margin-bottom: 20px;
