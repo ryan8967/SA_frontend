@@ -13,6 +13,15 @@
         <input type="file" id="avatar-upload" @change="uploadAvatar" accept="image/*" class="avatar-input" />
       </div>
   
+      <!-- 顯示員工資訊 -->
+      <div class="employee-info">
+        <h2>員工資訊</h2>
+        <p><strong>員工 ID：</strong> {{ employeeId }}</p>
+        <p><strong>姓名：</strong> {{ name }}</p>
+        <p><strong>聘用日期：</strong> {{ hiringDate }}</p>
+        <p><strong>生日：</strong> {{ birthdate }}</p>
+      </div>
+  
       <div class="achievements">
         <h2>Achievements</h2>
   
@@ -40,7 +49,6 @@
             class="achievement-item"
             @click="showAchievementDetails(achievement)"
           >
-            <!-- 使用 class 動態控制圖像透明度 -->
             <img :src="achievement.icon" :alt="achievement.description" :class="{'incomplete-icon': !achievement.completed}" class="achievement-icon" />
             <span>{{ achievement.name }}</span>
             <p>{{ achievement.description }}</p>
@@ -58,14 +66,18 @@
   </template>
   
   <script>
-  import { ref as firebaseRef, onValue, update } from 'firebase/database';
-  import { ref, computed, onMounted } from 'vue';
-  import { database } from '../firebase'; // 引入 Firebase 初始化
+  import { ref, computed } from 'vue'; // 移除 Firebase 相關的 import
   
   export default {
     setup() {
       const userAvatar = ref("/default-avatar.png"); // 預設頭像
-      const achievements = ref([]); // 用來存儲從 Firebase 拿到的成就資料
+      const achievements = ref([]); // 用來存儲成就資料
+  
+      // 員工資料，寫死在前端
+      const employeeId = ref("123456"); // 6 位數的員工ID
+      const hiringDate = ref("2020-05-01"); // 聘用日期
+      const name = ref("John Doe"); // 員工姓名
+      const birthdate = ref("1990-01-15"); // 員工生日
   
       const completedAchievements = computed(() =>
         achievements.value.filter(achievement => achievement.completed)
@@ -77,19 +89,6 @@
       const showDialog = ref(false);
       const dialogContent = ref("");
   
-      // 載入 Firebase 中的成就資料
-      const loadAchievements = async (userId) => {
-        const achievementsRef = firebaseRef(database, `users/${userId}/achievements`);
-  
-        // 從 Firebase 中加載成就資料
-        onValue(achievementsRef, (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            achievements.value = Object.values(data); // 將成就資料更新到前端
-          }
-        });
-      };
-  
       // 更換頭像及完成成就
       const uploadAvatar = async (event) => {
         const file = event.target.files[0];
@@ -98,58 +97,44 @@
           const firstAvatarChange = achievements.value.find((achievement) => achievement.id === 'first-avatar-change');
           if (firstAvatarChange && !firstAvatarChange.completed) {
             firstAvatarChange.completed = true;
-            await updateFirebaseAchievement(firstAvatarChange);
+            updateAchievements(); // 更新前端資料，不需要 Firebase 更新
           }
         }
       };
   
-      // 更新成就到 Firebase
-      const updateFirebaseAchievement = async (achievement) => {
-        const userId = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).uid : null;
-        if (userId) {
-          const achievementRef = firebaseRef(database, `users/${userId}/achievements/${achievement.id}`);
-          await update(achievementRef, {
-            completed: achievement.completed
-          });
-          console.log(`成就 ${achievement.name} 已更新至 Firebase`);
-        }
+      // 更新成就資料，不需要 Firebase
+      const updateAchievements = () => {
+        achievements.value = [...achievements.value];
       };
   
-      // 初始化按鈕：初始化成就到 Firebase
-      const initializeAchievements = async () => {
-        const userId = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).uid : null;
-        if (userId) {
-          const achievementsRef = firebaseRef(database, `users/${userId}/achievements`);
+      // 初始化按鈕：初始化成就
+      const initializeAchievements = () => {
+        const defaultAchievements = [
+          {
+            id: 'login-three-times',
+            name: '登入三次',
+            description: '登入三次的成就',
+            completed: false,
+            icon: 'badge/login-three-times-badge.png',
+          },
+          {
+            id: 'first-avatar-change',
+            name: '第一次換頭像',
+            description: '首次更換頭像的成就',
+            completed: false,
+            icon: 'badge/firstTime.webp',
+          },
+          {
+            id: 'employee-of-the-year',
+            name: '年度最佳員工',
+            description: '獲得年度最佳員工的成就',
+            completed: false,
+            icon: 'badge/employOfTheYear.png',
+          }
+        ];
   
-          const defaultAchievements = {
-            'login-three-times': {
-              id: 'login-three-times',
-              name: '登入三次',
-              description: '登入三次的成就',
-              completed: false,
-              icon: 'badge/login-three-times-badge.png',
-            },
-            'first-avatar-change': {
-              id: 'first-avatar-change',
-              name: '第一次換頭像',
-              description: '首次更換頭像的成就',
-              completed: false,
-              icon: 'badge/firstTime.webp',
-            },
-            'employee-of-the-year': {
-              id: 'employee-of-the-year',
-              name: '年度最佳員工',
-              description: '獲得年度最佳員工的成就',
-              completed: false,
-              icon: 'badge/employOfTheYear.png',
-            }
-          };
-  
-          await update(achievementsRef, defaultAchievements);
-          alert("成就資料初始化完成！");
-        } else {
-          console.error("無法取得用戶 ID，請先登入");
-        }
+        achievements.value = defaultAchievements;
+        alert("成就資料初始化完成！");
       };
   
       const showAchievementDetails = (achievement) => {
@@ -161,16 +146,12 @@
         showDialog.value = false;
       };
   
-      // 初始加載 Firebase 資料
-      onMounted(() => {
-        const userId = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).uid : null;
-        if (userId) {
-          loadAchievements(userId);
-        }
-      });
-  
       return {
         userAvatar,
+        employeeId,
+        hiringDate,
+        name,
+        birthdate,
         achievements,
         completedAchievements,
         incompleteAchievements,
@@ -256,6 +237,15 @@
   }
   .initialize-btn:hover {
     background-color: #2980b9;
+  }
+  
+  /* 員工資料樣式 */
+  .employee-info {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
   }
   </style>
   
