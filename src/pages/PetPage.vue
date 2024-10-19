@@ -23,7 +23,7 @@
         </div>
 
         <!-- 寵物初始化按鈕 -->
-        <button class="initialize-button" @click="initializeDefaultPets(userId)">
+        <button class="initialize-button" @click="initializeDefaultPets">
             寵物初始化
         </button>
     </div>
@@ -46,6 +46,7 @@ export default {
                 { src: 'pet/pet1.png', owned: false }, // 未擁有寵物
                 { src: 'pet/pet2.png', owned: false }, // 未擁有寵物
                 { src: 'pet/pet4.png', owned: false }, // 未擁有寵物
+                { src: 'pet/pet6.png', owned: false }, // 新增的 pet6，未擁有
             ], // 預設圖鑑中的寵物頭像
             userId: null, // 使用者ID
         };
@@ -76,7 +77,7 @@ export default {
                     const data = snapshot.val();
                     if (!data) {
                         // 如果沒有數據，進行初始化
-                        this.initializeDefaultPets(userId);
+                        this.initializeDefaultPets();
                     } else {
                         // 如果有數據，更新寵物數據
                         this.petLevel = data.petLevel || 1;
@@ -87,17 +88,18 @@ export default {
                 });
             }
         },
-        initializeDefaultPets(userId) {
+        initializeDefaultPets() {
             const defaultPets = [
                 { src: 'pet/pet3.png', owned: true },
                 { src: 'pet/pet5.png', owned: true },
                 { src: 'pet/pet1.png', owned: false },
                 { src: 'pet/pet2.png', owned: false },
                 { src: 'pet/pet4.png', owned: false },
+                { src: 'pet/pet6.png', owned: false }, // 添加 pet6
             ];
 
             // 初始化 Firebase 中的預設寵物數據
-            const userPetRef = ref(database, `users/${userId}/pets`);
+            const userPetRef = ref(database, `users/${this.userId}/pets`);
             set(userPetRef, {
                 petLevel: this.petLevel,
                 petName: this.petName,
@@ -111,8 +113,8 @@ export default {
         updatePetCollection(userPets) {
             // 更新用戶的寵物圖鑑，從 Firebase 獲取數據
             const updatedCollection = this.petCollection.map((pet) => {
-                const isOwned = userPets && userPets.some((userPet) => userPet.src === pet.src);
-                return { ...pet, owned: isOwned || pet.owned }; // 確保預設的 pet3 和 pet5 保持已擁有
+                const isOwned = userPets && userPets.some((userPet) => userPet.src === pet.src && userPet.owned === true);
+                return { ...pet, owned: isOwned }; // 保持從 Firebase 獲得的擁有狀態
             });
             this.petCollection = updatedCollection;
         },
