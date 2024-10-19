@@ -31,6 +31,7 @@
 <script>
 import { onValue, ref, update, set } from "firebase/database";
 import { database } from "../firebase"; // 引入 Firebase Realtime Database
+import { usePetStore } from "@/stores/petStore";
 // import { useUserStore } from "@/stores/userStore";
 export default {
   data() {
@@ -41,7 +42,8 @@ export default {
         { id: 1, img: 'egg1.png', name: '初級寵物蛋', price: 200 },
         { id: 2, img: 'egg2.png', name: '中級寵物蛋', price: 500 },
         { id: 3, img: 'egg3.png', name: '高級寵物蛋', price: 1000 },
-        { id: 4, img: 'bottle.png', name: 'bottle', price: 100 },
+        // { id: 4, img: 'bottle.png', name: 'bottle', price: 100 },
+        { id: 4, img: 'upgrade.png', name: '寵物突破', price: 1 },
       ],
       outStuff: [
         { id: 10, img: 'coupon1.png', name: '餐卷', price: 300 },
@@ -50,6 +52,13 @@ export default {
       coins: 0,
       diamonds: 0,
       lastExchangeDate: '',
+    };
+  },
+  setup() {
+    const petStore = usePetStore(); // 使用 PetStore 來管理突破狀態
+
+    return {
+      petStore,
     };
   },
   mounted() {
@@ -73,6 +82,11 @@ export default {
     purchase(product) {
       console.log(product);
       if (this.checkCoins(product.price)) {
+        if (product.id === 4) {
+          this.petStore.hasBrokenThrough = true; // 設置突破狀態
+          this.petStore.syncBreakthroughStatus(); // 同步突破狀態到 Firebase
+          alert("突破成功！你已經達到了突破狀態！");
+        }
 
         // update user's virtualCoins
         const newCoins = this.coins - product.price;
@@ -283,7 +297,7 @@ export default {
   align-items: center;
 }
 
-.diamond-exchange { 
+.diamond-exchange {
   width: 100%;
   height: 23%;
   background: linear-gradient(135deg, #3498db, #8e44ad);

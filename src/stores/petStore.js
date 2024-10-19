@@ -49,6 +49,7 @@ export const usePetStore = defineStore("petStore", {
       },
     ],
     selectedPetIndex: 0, // 跟踪當前選中的寵物
+    hasBrokenThrough: false, // 新增全域變數，紀錄是否突破
   }),
   getters: {
     selectedPet(state) {
@@ -75,7 +76,33 @@ export const usePetStore = defineStore("petStore", {
       selectedPet.level += 1;
       selectedPet.currentExperience = 0;
       selectedPet.experienceNeeded += 50;
+      this.checkBreakthrough(); // 每次升級檢查是否達到突破條件
       this.syncPetDataToFirebase(); // 升級後也要同步更新到 Firebase
+    },
+    checkBreakthrough() {
+      // 設定一個突破條件，例如當寵物達到 10 級時算作突破
+      const breakthroughLevel = 10;
+      const hasAnyPetBrokenThrough = this.petCollection.some(
+        (pet) => pet.level >= breakthroughLevel
+      );
+
+      if (hasAnyPetBrokenThrough && !this.hasBrokenThrough) {
+        // 如果有寵物達到突破條件，且還沒標記突破過，更新變數並同步到 Firebase
+        this.hasBrokenThrough = true;
+        this.syncBreakthroughStatus(); // 同步突破狀態
+      }
+    },
+    syncBreakthroughStatus() {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const userId = JSON.parse(storedUser).uid;
+        const userRef = ref(database, `users/${userId}/hasBrokenThrough`);
+
+        // 同步突破狀態到 Firebase
+        update(userRef, {
+          hasBrokenThrough: this.hasBrokenThrough,
+        });
+      }
     },
     updatePetCollection(petCollection) {
       this.petCollection = petCollection;
