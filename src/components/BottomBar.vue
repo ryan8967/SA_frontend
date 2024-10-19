@@ -18,11 +18,8 @@
             <font-awesome-icon :icon="['fas', 'store']" class="icon" />
         </button>
 
-        <!-- <button class="nav-item" @click="navigateTo('Profile')">
+        <button class="nav-item" @click="navigateTo('Profile')">
             <font-awesome-icon :icon="['fas', 'user']" class="icon" />
-        </button> -->
-        <button class="nav-item" @click="navigateTo('CreateActivity')">
-            <font-awesome-icon :icon="['fas', 'users']" class="icon" />
         </button>
     </nav>
 </template>
