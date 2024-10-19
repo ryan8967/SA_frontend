@@ -22,6 +22,7 @@
 <script>
 import { onValue, ref, update, set } from "firebase/database";
 import { database } from "../firebase"; // 引入 Firebase Realtime Database
+import { usePetStore } from "@/stores/petStore";
 // import { useUserStore } from "@/stores/userStore";
 export default {
   data() {
@@ -38,6 +39,13 @@ export default {
       coins: 0,
       diamonds: 0,
       lastExchangeDate: '',
+    };
+  },
+  setup() {
+    const petStore = usePetStore(); // 使用 PetStore 來管理突破狀態
+
+    return {
+      petStore,
     };
   },
   mounted() {
@@ -61,6 +69,11 @@ export default {
     purchase(product) {
       console.log(product);
       if (this.checkCoins(product.price)) {
+        if (product.id === 4) {
+          this.petStore.hasBrokenThrough = true; // 設置突破狀態
+          this.petStore.syncBreakthroughStatus(); // 同步突破狀態到 Firebase
+          alert("突破成功！你已經達到了突破狀態！");
+        }
 
         // update user's virtualCoins
         const newCoins = this.coins - product.price;
