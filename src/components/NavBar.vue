@@ -174,7 +174,7 @@ export default {
     align-items: center;
     background-color: #2c3e50;
     color: white;
-    padding: 20px 40px;
+    padding: 25px 25px;
     width: 100vw;
     position: fixed;
     top: 0;
