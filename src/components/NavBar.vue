@@ -1,6 +1,7 @@
 <template>
     <nav class="nav-bar">
         <div class="nav-item coins">Coins: {{ virtualCoins }}</div>
+        <div class="nav-item diamonds">Diamonds: {{ diamonds }}</div> <!-- 顯示鑽石 -->
         <div class="nav-item username">Hi, {{ user ? user.displayName : 'Guest' }}</div>
         <button class="logout-btn" @click="handleLogout" v-if="user">Logout</button>
     </nav>
@@ -17,6 +18,7 @@ export default {
         // 使用 computed 讓數據變成響應式
         const user = computed(() => userStore.user);
         const virtualCoins = computed(() => userStore.virtualCoins);
+        const diamonds = computed(() => userStore.diamonds); // 新增對鑽石的計算
 
         const handleLogout = () => {
             userStore.logout();
@@ -25,6 +27,7 @@ export default {
         return {
             user,
             virtualCoins,
+            diamonds, // 返回鑽石數據
             handleLogout,
         };
     },
@@ -56,6 +59,12 @@ export default {
 .coins {
     flex: 1;
     text-align: left;
+}
+
+.diamonds {
+    flex: 1;
+    text-align: left;
+    /* 調整顯示鑽石的樣式 */
 }
 
 .username {
