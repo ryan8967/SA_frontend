@@ -14,7 +14,6 @@ import {
   faCoins, // 新增金錢圖標
   faGem, // 新增鑽石圖標
   faPlus,
-  faUsers
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -36,7 +35,18 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 //   faEnvelope, // 用於邀請或通知
 //   faPlus,
 // );
-library.add(faPaw, faTasks, faHome, faStore, faUser, faCoins, faGem, faUsers,faPlus, faUsers);
+library.add(
+  faPaw,
+  faTasks,
+  faHome,
+  faStore,
+  faUser,
+  faCoins,
+  faGem,
+  faUsers,
+  faPlus,
+  faUsers
+);
 
 const app = createApp(App);
 const pinia = createPinia();

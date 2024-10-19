@@ -11,20 +11,24 @@
         <div class="nav-item username">
             Hi, {{ user ? user.displayName : 'Guest' }}
         </div>
-        <button class="logout-btn" @click="handleLogout" v-if="user">Logout</button>
+        <!-- <button class="logout-btn" @click="handleLogout" v-if="user">Logout</button> -->
+        <button class="nav-item2" @click="navigateTo('Profile')">
+            <font-awesome-icon :icon="['fas', 'user']" class="icon" />
+        </button>
     </nav>
 </template>
 
 <script>
 import { useUserStore } from "@/stores/userStore";
-import { computed, ref, watch, onMounted, nextTick  } from 'vue'; // 引入 computed
+import { computed, ref, watch, onMounted, nextTick } from 'vue'; // 引入 computed
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // 引入 FontAwesomeIcon
+import { useRouter } from 'vue-router'; // 引入 vue-router
 import gsap from 'gsap'; // 引入 gsap
 export default {
     components: {
         FontAwesomeIcon, // 註冊 FontAwesomeIcon 組件
     },
-  
+
     setup() {
         const userStore = useUserStore();
         const addCoinAnime = ref(null);
@@ -36,17 +40,23 @@ export default {
         const user = computed(() => userStore.user);
         const virtualCoins = computed(() => userStore.virtualCoins);
         const diamonds = computed(() => userStore.diamonds); // 新增對鑽石的計算
+        const router = useRouter();
+
+        const navigateTo = (path) => {
+            router.push({ name: path });
+        };
 
         const handleLogout = () => {
             userStore.logout();
         };
 
         // 動畫效果
+
         const triggerCoinAnimation = () => {
             if (!addCoinAnime.value) return;
             addCoinAnime.value.style.display = 'block';
             gsap.fromTo(
-            addCoinAnime.value,
+                addCoinAnime.value,
                 { opacity: 0, y: -20 },
                 { opacity: 1, y: 0, duration: 0.5, ease: "power1.out" }
             );
@@ -62,7 +72,7 @@ export default {
                     if (addCoinAnime.value) {
                         addCoinAnime.value.style.display = 'none';
                     }
-        
+
                 }
             });
         };
@@ -73,8 +83,8 @@ export default {
             addDimondAnime.value.style.display = 'block';
             gsap.fromTo(
                 addDimondAnime.value,
-                    { opacity: 0, y: -20 },
-                    { opacity: 1, y: 0, duration: 0.5, ease: "power1.out" }
+                { opacity: 0, y: -20 },
+                { opacity: 1, y: 0, duration: 0.5, ease: "power1.out" }
             );
 
             // 隱藏動畫效果
@@ -88,7 +98,7 @@ export default {
                     if (addDimondAnime.value) {
                         addDimondAnime.value.style.display = 'none';
                     }
-        
+
                 }
             });
         };
@@ -128,15 +138,36 @@ export default {
             addCoinAnime,
             addCoinAmount,
             addDimondAnime,
-            addDimondAmount
+            addDimondAmount,
+            navigateTo
         };
-    },
 
+
+    },
+    // methods: {
+    //     navigateTo(path) {
+    //         this.$router.push(path);
+    //     }
+    // }
 
 };
 </script>
 
 <style scoped>
+.nav-item2 {
+    display: flex;
+    align-items: center;
+    color: white;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.nav-item2:hover {
+    color: #3498db;
+}
+
 .nav-bar {
     display: flex;
     justify-content: space-between;
@@ -173,12 +204,13 @@ export default {
 
 .add-coin-anime {
 
-  color: yellow;
-  font-weight: bold;
-  font-size: 14px;
-  padding-left: 5%;
-  pointer-events: none;
-  opacity: 0; /* 初始狀態隱藏 */
+    color: yellow;
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 5%;
+    pointer-events: none;
+    opacity: 0;
+    /* 初始狀態隱藏 */
 }
 
 .add-dimond-anime {
@@ -188,7 +220,8 @@ export default {
     font-size: 14px;
     padding-left: 5%;
     pointer-events: none;
-    opacity: 0; /* 初始狀態隱藏 */
+    opacity: 0;
+    /* 初始狀態隱藏 */
 }
 
 
@@ -216,5 +249,4 @@ export default {
     font-size: 20px;
     /* 調整 icon 大小 */
 }
-
 </style>
