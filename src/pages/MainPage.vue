@@ -74,6 +74,11 @@ export default {
             user: null, // 用戶資訊
             isClickGif: false, // 控制是否顯示 -click.gif
             tasks: [], // 任務列表
+            passiveIncomeInterval: null, // 用於被動收入的定時器
+            showBubble: false,
+            floatingTexts: ["你超棒", "明日新星就是你", "又完成一個任務了", "加油加油", "你是最棒的"],
+            floatingTextIndex: 0
+
         };
     },
     computed: {
@@ -195,7 +200,6 @@ export default {
             } else {
                 console.log(run.status);
             }
-
         },
     },
 };

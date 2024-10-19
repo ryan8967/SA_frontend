@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import { ref, update, onValue } from "firebase/database";
+import { database } from "../firebase"; // 引入 Firebase Realtime Database
 
 export const usePetStore = defineStore("petStore", {
   state: () => ({
@@ -57,6 +59,7 @@ export const usePetStore = defineStore("petStore", {
     selectPet(index) {
       if (this.petCollection[index].owned) {
         this.selectedPetIndex = index;
+        this.saveSelectedPetIndex(); // 保存選中的寵物索引到 Firebase
       }
     },
     addExperience(amount) {
@@ -74,6 +77,27 @@ export const usePetStore = defineStore("petStore", {
     },
     updatePetCollection(petCollection) {
       this.petCollection = petCollection;
+    },
+    loadSelectedPetIndex() {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const userId = JSON.parse(storedUser).uid;
+        const userRef = ref(database, `users/${userId}/selectedPetIndex`);
+        onValue(userRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data !== null) {
+            this.selectedPetIndex = data;
+          }
+        });
+      }
+    },
+    saveSelectedPetIndex() {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const userId = JSON.parse(storedUser).uid;
+        const userRef = ref(database, `users/${userId}/selectedPetIndex`);
+        update(userRef, { selectedPetIndex: this.selectedPetIndex });
+      }
     },
   },
 });
