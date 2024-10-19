@@ -19,6 +19,7 @@ import {
   faCalendarCheck, // 這裡選擇 faCalendarCheck 代表確認好的活動
   faBullhorn, // 這裡選擇 faBullhorn 代表公告活動
   faEnvelope, // 這裡選擇 faEnvelope 作為邀請或活動通知的圖標
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -36,7 +37,8 @@ library.add(
   faHandshake, // 如果偏向合作活動
   faCalendarCheck, // 如果代表已計劃的活動
   faBullhorn, // 如果偏向公告活動
-  faEnvelope // 用於邀請或通知
+  faEnvelope, // 用於邀請或通知
+  faPlus,
 );
 
 const app = createApp(App);
