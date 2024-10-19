@@ -152,7 +152,7 @@ export default {
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    padding-top: 80px;
+    margin-top: 20vh;
     /* 上方增加空白以容納 NavBar */
 }
 
