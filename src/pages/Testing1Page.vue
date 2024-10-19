@@ -3,6 +3,7 @@
     <!-- Task Input Popup -->
     <div v-if="showPopup" class="popup">
       <div class="popup-content">
+        <input v-model="newTaskTitle" placeholder="Task title..." class="input-title" />
         <textarea v-model="newTaskDescription" placeholder="Describe your task..." class="input-textarea"></textarea>
         <div class="popup-actions">
           <button @click="addTask" class="btn btn-primary">Add Task</button>
@@ -13,8 +14,32 @@
 
     <!-- Task List -->
     <div class="task-list">
-      <div v-for="task in tasks" :key="task.id" class="task-item">
+      <h2>Not Started</h2>
+      <div v-for="task in tasks.filter(task => task.status === 'not started')" :key="task.id" class="task-item">
         <div class="task-header">
+          <span class="task-title">{{ task.title }}</span>
+          <span class="task-username">{{ task.username }}</span>
+          <span class="task-time">{{ task.time }}</span>
+        </div>
+        <div class="task-description">{{ task.description }}</div>
+        <button @click="updateTaskStatus(task.id, 'in progress')" class="btn btn-primary">Start the Event</button>
+      </div>
+
+      <h2>In Progress</h2>
+      <div v-for="task in tasks.filter(task => task.status === 'in progress')" :key="task.id" class="task-item">
+        <div class="task-header">
+          <span class="task-title">{{ task.title }}</span>
+          <span class="task-username">{{ task.username }}</span>
+          <span class="task-time">{{ task.time }}</span>
+        </div>
+        <div class="task-description">{{ task.description }}</div>
+        <button @click="updateTaskStatus(task.id, 'completed')" class="btn btn-primary">End the Event</button>
+      </div>
+
+      <h2>Completed</h2>
+      <div v-for="task in tasks.filter(task => task.status === 'completed')" :key="task.id" class="task-item">
+        <div class="task-header">
+          <span class="task-title">{{ task.title }}</span>
           <span class="task-username">{{ task.username }}</span>
           <span class="task-time">{{ task.time }}</span>
         </div>
@@ -30,7 +55,7 @@
 </template>
 
 <script>
-import { ref, push, onValue } from "firebase/database";
+import { ref, push, onValue, update } from "firebase/database";
 import { database } from "../firebase";
 import { useUserStore } from "@/stores/userStore";
 
@@ -46,8 +71,8 @@ export default {
   },
   data() {
     return {
+      newTaskTitle: "",
       newTaskDescription: "",
-      newTaskUsername: "",
       tasks: [],
       showPopup: false, // Controls the visibility of the popup modal
     };
@@ -61,8 +86,9 @@ export default {
     },
     addTask() {
       const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const tasksRef = ref(database, `users/${userId}/tasks`);
+      const tasksRef = ref(database, `tasks`);//users/${userId}/
       const newTask = {
+        title: this.newTaskTitle,
         description: this.newTaskDescription,
         username: this.user ? this.user.displayName : "Anonymous", // Fallback for displayName
         time: new Date().toISOString().split('T')[0], // yyyy-mm-dd format
@@ -72,8 +98,8 @@ export default {
       // Push new task to Firebase
       push(tasksRef, newTask)
         .then(() => {
+          this.newTaskTitle = "";
           this.newTaskDescription = "";
-          this.newTaskUsername = "";
           this.showPopup = false; // Hide the popup after adding task
         })
         .catch((error) => {
@@ -82,7 +108,7 @@ export default {
     },
     loadTasks() {
       const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const tasksRef = ref(database, `users/${userId}/tasks`);
+      const tasksRef = ref(database, `tasks`);//users/${userId}/
 
       onValue(tasksRef, (snapshot) => {
         const data = snapshot.val();
@@ -98,13 +124,25 @@ export default {
         this.tasks = tasksArray;
       });
     },
+    updateTaskStatus(taskId, newStatus) {
+      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const taskRef = ref(database, `tasks/${taskId}`);//users/${userId}/
+      
+      update(taskRef, { status: newStatus }).catch((error) => {
+        console.error("Error updating task status:", error);
+      });
+    },
     cancelTask() {
+      this.newTaskTitle = "";
       this.newTaskDescription = "";
       this.showPopup = false;
     },
   },
 };
 </script>
+
+
+
 <style scoped>
 /* General Layout */
 .task-page {

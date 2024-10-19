@@ -1,11 +1,10 @@
 <template>
   <div id="shop-page">
     <nav class="switch-bar">
-      <button class="switch-btn" 
-              @click="switchPage">{{ pageName }}</button>
+      <button class="switch-btn" @click="switchPage">{{ pageName }}</button>
     </nav>
     <div v-if="internalPage" style="width: 100%; height: auto; object-fit: cover; display: flex;">
-       <div class="stuff">
+      <div class="stuff">
         <div class="product" v-for="product in stuff" :key="product.id">
           <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
           <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
@@ -16,11 +15,10 @@
     </div>
     <div v-else class="external-stuff">
       <div class="diamond-exchange">
-        <h2>Buy Diamonds</h2>
-        <button @click="purchaseDiamonds" class="buy-btn">Buy</button>
+        <h2 class="exchange-title">Buy Diamonds</h2>
+        <p class="diamond-desc">10 Diamonds for 100 coins</p>
+        <button @click="purchaseDiamonds" class="buy-btn">Buy Now</button>
       </div>
-      <div class="external-product">
-      </div> 
     </div>
   </div>
 </template>
@@ -32,7 +30,7 @@ import { database } from "../firebase"; // 引入 Firebase Realtime Database
 export default {
   data() {
     return {
-      internalPage : true, // default page
+      internalPage: true, // default page
       pageName: '內部商城',
       stuff: [
         { id: 1, img: 'egg1.png', name: '初級寵物蛋', price: 200 },
@@ -65,12 +63,12 @@ export default {
     },
     purchase(product) {
       console.log(product);
-      if(this.checkCoins(product.price)) {
+      if (this.checkCoins(product.price)) {
 
         // update user's virtualCoins
         const newCoins = this.coins - product.price;
         const userRef = ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}`);
-        update(userRef, {virtualCoins: newCoins})
+        update(userRef, { virtualCoins: newCoins })
           .then(() => {
             console.log("Coins updated successfully!");
           })
@@ -80,7 +78,7 @@ export default {
           });
         console.log("You bought " + product.name + " for $" + product.price);
         alert(`You bought ${product.name} for $${product.price}`);
-        
+
       }
     },
     checkCoins(price) {
@@ -117,7 +115,7 @@ export default {
             console.error("Error updating diamonds:", error);
             alert("Error updating diamonds. Please try again later.");
           });
-        update(this.userRef, {virtualCoins: newVirtualCoins, diamonds: newDiamonds})
+        update(this.userRef, { virtualCoins: newVirtualCoins, diamonds: newDiamonds })
           .then(() => {
             console.log("Diamonds updated successfully!");
           })
@@ -129,8 +127,10 @@ export default {
         const newDiamonds = this.diamonds + 10;
         const newVirtualCoins = this.coins - 100;
         const userRef = ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}`);
-        update(userRef, {virtualCoins: newVirtualCoins, diamonds: newDiamonds, 
-          lastExchangeDate: today})
+        update(userRef, {
+          virtualCoins: newVirtualCoins, diamonds: newDiamonds,
+          lastExchangeDate: today
+        })
           .then(() => {
             console.log("Diamonds updated successfully!");
           })
@@ -138,7 +138,7 @@ export default {
             console.error("Error updating diamonds:", error);
             alert("Error updating diamonds. Please try again later.");
           });
-        
+
         alert("You bought 10 diamonds");
       }
     }
@@ -148,121 +148,134 @@ export default {
 
 <style scoped>
 #shop-page {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 20px;
-    padding: 10px;
-    box-sizing: border-box;
-    background-color: #ecf0f1;
-    height: 80%;
-    width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #ecf0f1;
+  height: 80%;
+  width: 90%;
 }
+
 .switch-bar {
-    display: flex;
-    justify-content: center;
-    height: 55px;
-    width: 80%;
-    background-color: ecf0f1;
-    border-radius: 10px;
-    margin-bottom: 1%;
+  display: flex;
+  justify-content: center;
+  height: 55px;
+  width: 80%;
+  background-color: ecf0f1;
+  border-radius: 10px;
+  margin-bottom: 1%;
 }
 
 .switch-btn,
 .switch-btn:focus {
-    position: relative;
-    min-width: 200px;
-    height: 50px;
-    background-color: #2c3e50;
-    border-radius: 4em;
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition-duration: 0.4s;
-    padding: 10px 20px;
+  position: relative;
+  min-width: 200px;
+  height: 50px;
+  background-color: #2c3e50;
+  border-radius: 4em;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition-duration: 0.4s;
+  padding: 10px 20px;
 }
+
 .switch-btn:hover {
-    background-color: #2c3e50;
-    color: white;
-    transition-duration: 0.1s;
+  background-color: #2c3e50;
+  color: white;
+  transition-duration: 0.1s;
 }
+
 .switch-btn:after {
-    content: "";
-    display: block;
-    position: absolute;
-    left: 0;
-    top:0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: all 0.5s;
-    box-shadow: 0 0 10px 40px white;
-    border-radius: 4em;
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.5s;
+  box-shadow: 0 0 10px 40px white;
+  border-radius: 4em;
 }
+
 .switch-btn:active:after {
-    opacity: 1;
-    transition: 0s;
-    box-shadow: 0 0 0 0 white;
+  opacity: 1;
+  transition: 0s;
+  box-shadow: 0 0 0 0 white;
 }
+
 .switch-btn:active {
-    top: 1px;
+  top: 1px;
 }
-.stuff, .external-stuff {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    width: 100%;
-    gap: 10px;
-    align-items: stretch;
-}
-.product {
-    width: 100%;
-    border-radius: 10px;
-    background-color: #2c3e50;
-    color: white;
-    box-sizing: border-box;
-    padding: 5px;
-    text-align: center;  
-    object-fit: cover;
-    height: 90%;
-}
-.product-img {
-    width: 40%;
-    height: 40%;
-    object-fit: cover;
-    border-radius: 5px;
-    align-self: stretch;
-    margin-top: 5px;
-}
-.buy-btn {
-    width: 40%;
-    border-radius: 10px;
-    background-color: #3498db;
-    color: white;
-    border: 1px solid #3498db;
-    padding: 5px 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 5px;
-}
-.buy-btn:hover {
-    background-color: #2980b9;
-}
+
+.stuff,
 .external-stuff {
-    display: flex;
-    align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+  gap: 10px;
+  align-items: stretch;
 }
+
+.product {
+  width: 100%;
+  border-radius: 10px;
+  background-color: #2c3e50;
+  color: white;
+  box-sizing: border-box;
+  padding: 5px;
+  text-align: center;
+  object-fit: cover;
+  height: 90%;
+}
+
+.product-img {
+  width: 40%;
+  height: 40%;
+  object-fit: cover;
+  border-radius: 5px;
+  align-self: stretch;
+  margin-top: 5px;
+}
+
+.buy-btn {
+  width: 40%;
+  border-radius: 10px;
+  background-color: #3498db;
+  color: white;
+  border: 1px solid #3498db;
+  padding: 5px 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 5px;
+}
+
+.buy-btn:hover {
+  background-color: #2980b9;
+}
+
+.external-stuff {
+  display: flex;
+  align-items: center;
+}
+
 .diamond-exchange {
-    width: 100%;
-    border-radius: 10px;
-    background-color: #2c3e50;
-    color: white;
-    box-sizing: border-box;
-    padding: 5px;
-    text-align: center;  
-    object-fit: cover;
-    height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  background-color: #2c3e50;
+  color: white;
+  box-sizing: border-box;
+  padding: 5px;
+  text-align: center;
+  object-fit: cover;
+  height: 100%;
 }
 </style>

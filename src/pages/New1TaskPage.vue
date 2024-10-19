@@ -139,7 +139,7 @@ export default {
         },
         loadTasks() {
             const userId = JSON.parse(localStorage.getItem("user")).uid;
-            const tasksRef = ref(database, `users/${userId}/tasks`);
+            const tasksRef = ref(database, `tasks`);//users/${userId}/
 
             onValue(tasksRef, (snapshot) => {
                 const data = snapshot.val();
