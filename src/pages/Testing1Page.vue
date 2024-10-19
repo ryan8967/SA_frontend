@@ -94,7 +94,7 @@ export default {
       this.showPopup = !this.showPopup;
     },
     addTask() {
-      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      // const userId = JSON.parse(localStorage.getItem("user")).uid;
       const tasksRef = ref(database, `tasks`); //users/${userId}/
       const newTask = {
         title: this.newTaskTitle,
@@ -117,7 +117,7 @@ export default {
         });
     },
     loadTasks() {
-      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      // const userId = JSON.parse(localStorage.getItem("user")).uid;
       const tasksRef = ref(database, `tasks`); //users/${userId}/
 
       onValue(tasksRef, (snapshot) => {
@@ -135,7 +135,7 @@ export default {
       });
     },
     updateTaskStatus(taskId, newStatus) {
-      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      // const userId = JSON.parse(localStorage.getItem("user")).uid;
       const taskRef = ref(database, `tasks/${taskId}`); //users/${userId}/
 
       update(taskRef, { status: newStatus }).catch((error) => {
