@@ -26,7 +26,7 @@ export default {
   },
   mounted() {
     this.initializeUserData();
-    this.setupPassiveIncome(); // 被動產生虛擬幣
+    this.setupPassiveIncome(); // 被動產生虛擬幣和鑽石
   },
   methods: {
     initializeUserData() {
@@ -48,6 +48,7 @@ export default {
         const data = snapshot.val();
         if (data) {
           userStore.setVirtualCoins(data.virtualCoins);
+          userStore.setDiamonds(data.diamonds || 0); // 同步鑽石
           userStore.setPetLevel(data.petLevel || 1);
         }
       });
@@ -58,8 +59,9 @@ export default {
           const data = snapshot.val();
           if (data) {
             userStore.setVirtualCoins(data.virtualCoins);
+            userStore.setDiamonds(data.diamonds || 0); // 定時同步鑽石
             userStore.setPetLevel(data.petLevel || 1);
-            console.log('Data updated from Firebase:', data.virtualCoins);
+            console.log('Data updated from Firebase:', data.virtualCoins, data.diamonds);
           }
         });
 
@@ -72,16 +74,19 @@ export default {
       if (userId) {
         const userRef = ref(database, `users/${userId}`);
 
-        // 每隔 10 秒自動增加虛擬幣
+        // 每隔 10 秒自動增加虛擬幣和鑽石
         setInterval(() => {
           const newCoins = userStore.virtualCoins + 1;
+          const newDiamonds = userStore.diamonds + 1; // 增加鑽石
           userStore.setVirtualCoins(newCoins);
+          userStore.setDiamonds(newDiamonds); // 更新鑽石
 
           // 同步到 Firebase
           update(userRef, {
             virtualCoins: newCoins,
+            diamonds: newDiamonds, // 同步鑽石
           });
-        }, 10000); // 每10秒增加 1 個虛擬幣
+        }, 10000); // 每10秒增加1個虛擬幣和1個鑽石
       }
     }
   }
