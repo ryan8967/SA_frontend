@@ -8,8 +8,17 @@
         <!-- 寵物顯示區域 -->
         <div class="card pet-display" v-if="user">
             <h2>Your Pet</h2>
-            <img src="pet/pet5.gif" alt="Pet Image" class="pet-image" />
+
+            <div v-if="showBubble" :key="floatingTextIndex" class="floating-text">
+                {{ floatingTexts[floatingTextIndex] }}
+            </div>
+            <div v-else style="height: 48px;">
+                &nbsp;
+            </div>
+            <img src="pet/pet5.gif" alt="Pet Image" class="pet-image"  @click="showTextBubble"/>
             <p class="pet-level">Level: {{ petLevel }}</p>
+            
+        
         </div>
 
         <!-- 任務狀態顯示 -->
@@ -43,7 +52,10 @@ export default {
             petLevel: 1, // 初始寵物等級
             virtualCoins: 0, // 初始虛擬幣
             tasks: [], // 任務列表
-            passiveIncomeInterval: null // 用於被動收入的定時器
+            passiveIncomeInterval: null, // 用於被動收入的定時器
+            showBubble: false,
+            floatingTexts: ["你超棒", "明日新星就是你", "又完成一個任務了", "加油加油", "你是最棒的"],  
+            floatingTextIndex: 0
         };
     },
     mounted() {
@@ -102,6 +114,15 @@ export default {
                     virtualCoins: this.virtualCoins,
                 });
             }, 10000); // 10 秒
+        },
+        showTextBubble() {
+            console.log("show text tttt")
+            this.showBubble = true;
+            this.floatingTextIndex = Math.floor(Math.random() * this.floatingTexts.length);
+            // Hide the bubble after 5 seconds
+            setTimeout(() => {
+                this.showBubble = false;
+            }, 5000);
         }
     },
     beforeUnmount() {
@@ -204,4 +225,34 @@ button:hover {
         padding: 10px;
     }
 }
+
+.floating-text {
+
+    background-color: rgba(255, 255, 255, 0.7);
+    color: rgb(0, 0, 0);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 14px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeOut 3s forwards;
+    transform: translateY(-50px);
+    opacity: 0;
+    max-width: 80%; /* Limit the maximum width to keep it readable */
+
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: translateY(-20px);
+    }
+    90% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-60px);
+    }
+}
+
 </style>
