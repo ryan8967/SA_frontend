@@ -6,10 +6,23 @@
         </div>
 
         <!-- 寵物顯示區域 -->
-        <div class="card pet-display" v-if="user">
+        <div class="card pet-display" v-if="user" @click="showClickGif">
             <h2>Your Pet</h2>
-            <img src="pet/pet5.gif" alt="Pet Image" class="pet-image" />
-            <p class="pet-level">Level: {{ petLevel }}</p>
+            <!-- 寵物圖片顯示與過渡效果 -->
+            <div class="pet-info">
+                <transition name="fade" mode="out-in">
+                    <img :src="mainPetImage" alt="Main Pet" class="pet-image" v-if="!isClickGif" />
+                </transition>
+
+                <transition name="fade" mode="out-in">
+                    <img v-if="isClickGif" :src="clickGifImage" alt="Clicked Pet" class="pet-image overlay" />
+                </transition>
+
+                <div class="pet-details">
+                    <p class="pet-level">Level: {{ petLevel }}</p>
+                    <p class="pet-name">Name: {{ petName }}</p>
+                </div>
+            </div>
         </div>
 
         <!-- 任務狀態顯示 -->
@@ -41,10 +54,30 @@ export default {
         return {
             user: null, // 用戶資訊
             petLevel: 1, // 初始寵物等級
-            virtualCoins: 0, // 初始虛擬幣
+            petName: 'Fluffy', // 初始寵物名稱
+            mainPet: { src: 'pet/pet3.png', owned: true }, // 初始主寵物
+            isClickGif: false, // 控制是否顯示 -click.gif
             tasks: [], // 任務列表
             passiveIncomeInterval: null // 用於被動收入的定時器
         };
+    },
+    computed: {
+        // 根據主寵物編號動態選擇顯示 gif 或 png，並控制是否顯示 -click.gif
+        mainPetImage() {
+            if (this.mainPet && this.mainPet.src) {
+                const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
+                if (petFileName === 'pet3' || petFileName === 'pet5') {
+                    return `pet/${petFileName}.gif`; // 顯示正常的 gif
+                }
+                return this.mainPet.src; // 其他情況顯示 png
+            }
+            return ''; // 若未定義，返回空字串
+        },
+        // 返回 -click.gif 的圖片路徑
+        clickGifImage() {
+            const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
+            return `pet/${petFileName}-click.gif`;
+        }
     },
     mounted() {
         this.loadUserData();
@@ -53,64 +86,53 @@ export default {
         loadUserData() {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
-                this.user = JSON.parse(storedUser); // 確保 user 被正確設置
+                this.user = JSON.parse(storedUser);
                 const userId = this.user.uid;
                 const userRef = ref(database, `users/${userId}`);
 
-                // 監聽 Firebase Realtime Database 寵物等級和虛擬幣的變化
+                // 監聽 Firebase Realtime Database 的變化
                 onValue(userRef, (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         this.petLevel = data.petLevel || 1;
-                        this.virtualCoins = data.virtualCoins || 0;
-                        this.tasks = data.tasks || []; // 從 Firebase 加載任務列表
+                        this.petName = data.petName || 'Fluffy';
+                        this.mainPet = data.mainPet || { src: 'pet/pet3.png', owned: true };
+                        this.tasks = data.tasks || [];
                     }
                 });
-
-                this.startPassiveIncome(); // 開始被動收入邏輯
             } else {
                 this.$router.push('/'); // 如果沒有用戶資料，重定向回登入頁面
             }
         },
         acceptTask(task) {
-            task.status = 'in progress'; // 修改任務狀態
+            task.status = 'in progress';
             this.updateTasks();
         },
         completeTask(task) {
-            task.status = 'completed'; // 修改任務狀態
+            task.status = 'completed';
             this.petLevel += 1; // 每完成一個任務提升寵物等級
-            this.virtualCoins += 10; // 完成任務增加虛擬幣
-            this.updateTasks(); // 更新 Firebase 上的數據
+            this.updateTasks();
         },
         updateTasks() {
-            // 將資料更新到 Firebase
             const userId = this.user.uid;
             const userRef = ref(database, `users/${userId}`);
             update(userRef, {
                 petLevel: this.petLevel,
-                virtualCoins: this.virtualCoins,
-                tasks: this.tasks // 同步更新任務狀態
+                tasks: this.tasks
             });
         },
-        startPassiveIncome() {
-            // 每 10 秒自動賺取虛擬幣
-            this.passiveIncomeInterval = setInterval(() => {
-                this.virtualCoins += 1;
-                const userId = this.user.uid;
-                const userRef = ref(database, `users/${userId}`);
-                update(userRef, {
-                    virtualCoins: this.virtualCoins,
-                });
-            }, 10000); // 10 秒
+        // 當用戶點擊寵物，顯示 -click.gif，並在 1.5 秒後恢復正常 gif
+        showClickGif() {
+            if (this.mainPet.src.includes('pet3') || this.mainPet.src.includes('pet5')) {
+                this.isClickGif = true;
+                setTimeout(() => {
+                    this.isClickGif = false;
+                }, 1500);
+            }
         }
-    },
-    beforeUnmount() {
-        clearInterval(this.passiveIncomeInterval); // 清除定時器
     }
 };
 </script>
-
-
 
 <style scoped>
 #main-page {
@@ -120,6 +142,7 @@ export default {
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
+    width: 100%;
 }
 
 .card {
@@ -129,19 +152,52 @@ export default {
     padding: 20px;
     text-align: center;
     width: 100%;
-    max-width: 500px;
+
     margin-bottom: 20px;
 }
 
-.pet-display img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 15px;
+/* 寵物顯示區域樣式 */
+.pet-info {
+    position: relative;
+    height: 250px;
+    width: 100%;
 }
 
-.pet-level {
+.pet-image,
+.overlay {
+    width: 350px;
+    height: 350px;
+    object-fit: cover;
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s ease-in-out;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease-in-out;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.pet-details {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+.pet-level,
+.pet-name {
     font-size: 18px;
     font-weight: bold;
     color: #2c3e50;
@@ -187,9 +243,9 @@ button:hover {
 }
 
 @media only screen and (max-width: 600px) {
-    .pet-display img {
-        width: 120px;
-        height: 120px;
+    .pet-image {
+        width: 150px;
+        height: 150px;
     }
 
     .card {
