@@ -3,12 +3,10 @@
     <nav class="switch-bar">
       <button class="switch-btn" 
               @click="switchPage">{{ pageName }}</button>
-      <!-- Sliding indicator bar -->
-      <!--div class="indicator" :style="indicatorStyle"></div-->
     </nav>
-    <div v-if="internalPage" style="width: 100%;">
-       <div class="stuff" v-for="product in stuff" :key="product.id">
-        <div class="product">
+    <div v-if="internalPage" style="width: 100%; height: auto; object-fit: cover; display: flex;">
+       <div class="stuff">
+        <div class="product" v-for="product in stuff" :key="product.id">
           <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
           <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
           <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
@@ -16,51 +14,57 @@
         </div>
       </div>
     </div>
-    <div v-else>
-      <div class="external-stuff">
-        <div class="diamonds">
-          <h2>Buy Diamonds</h2>
-          <button @click="purchaseDiamonds" class="buy-btn">Buy</button>
-        </div>
-        <div class="external-product">
-          <img class="product-img" src="product_img/bottle.png" alt="Image" />
-          <h2 class="product-name">Product 1</h2>
-          <p>Price: $10</p>
-        </div> 
-       </div>
+    <div v-else class="external-stuff">
+      <div class="diamonds">
+        <h2>Buy Diamonds</h2>
+        <button @click="purchaseDiamonds" class="buy-btn">Buy</button>
+      </div>
+      <div class="external-product">
+      </div> 
     </div>
   </div>
 </template>
 
 <script>
-import { onValue, ref, update } from "firebase/database";
+import { onValue, ref, update, set } from "firebase/database";
 import { database } from "../firebase"; // 引入 Firebase Realtime Database
-import { useUserStore } from "@/stores/userStore";
+// import { useUserStore } from "@/stores/userStore";
 export default {
   data() {
     return {
       internalPage : true, // default page
       pageName: '內部商城',
       stuff: [
-        { id: 1, img: 'bottle.png', name: 'bottle', price: 10 },
-        { id: 2, img: 'path', name: 'Product 2', price: 20 },
-        { id: 3, img: 'path', name: 'Product 3', price: 30 }
+        { id: 1, img: 'egg1.png', name: '初級寵物蛋', price: 200 },
+        { id: 2, img: 'egg2.png', name: '中級寵物蛋', price: 500 },
+        { id: 3, img: 'egg3.png', name: '高級寵物蛋', price: 1000 },
+        { id: 4, img: 'bottle.png', name: 'bottle', price: 100 },
       ],
-      coins: useUserStore().virtualCoins,
-      Diamonds: useUserStore().diamonds,
-      userRef: ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}`)
+      coins: 0,
+      diamonds: 0,
+      lastExchangeDate: '',
+      userRef: null,
     };
   },
   mounted() {
-    this.loadCoins();
-    this.loadDiamonds();
+    this.loadUserData();
   },
   methods: {
+    loadUserData() {
+      this.userRef = ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}`);
+      onValue(this.userRef, (snapshot) => {
+        const data = snapshot.val();
+        this.coins = data.virtualCoins;
+        this.diamonds = data.diamonds;
+        this.lastExchangeDate = data.lastExchangeDate;
+      });
+    },
     switchPage() {
       this.internalPage = !this.internalPage;
       this.pageName = this.internalPage ? '內部商城' : '外部商城';
     },
     purchase(product) {
+      console.log(product);
       if(this.checkCoins(product.price)) {
 
         // update user's virtualCoins
@@ -78,43 +82,64 @@ export default {
         
       }
     },
-    loadCoins() {
-      onValue(this.userRef, (snapshot) => {
-        const data = snapshot.val();
-        this.coins = data.virtualCoins;
-      });
-    },
-    loadDiamonds() {
-      onValue(this.userRef, (snapshot) => {
-        const data = snapshot.val();
-        this.diamonds = data.diamonds;
-      });
-    },
     checkCoins(price) {
       if (this.coins >= price) {
         return true;
       } else {
-        alert("You don't have enough coins!\n You have " + this.coins + " coins.");
+        // alert("You don't have enough coins!\n You have " + this.coins + " coins.");
         return false;
       }
     },
     purchaseDiamonds() {
+      // check last time user bought diamonds
+      const today = new Date().toISOString().split('T')[0];
+      if (this.lastExchangeDate === today) {
+        alert("You can only buy diamonds once a day!");
+        return;
+      }
+
       // check if user has enough coins
       if (!this.checkCoins(100)) {
-        alert("You don't have enough coins to buy diamonds!");
+        //alert("You don't have enough coins to buy diamonds!");
         return;
       }
       // update user's diamonds
       const newDiamonds = this.diamonds + 10;
-      update(this.userRef, {diamonds: newDiamonds})
-        .then(() => {
-          console.log("Diamonds updated successfully!");
-        })
-        .catch((error) => {
-          console.error("Error updating diamonds:", error);
-          alert("Error updating diamonds. Please try again later.");
-        });
-      alert("You bought 10 diamonds");
+      const newVirtualCoins = this.coins - 100;
+      if (this.lastExchangeDate === undefined) {
+        const dateRef = ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}/lastExchangeDate`);
+        set(dateRef, today)
+          .then(() => {
+            console.log("update lastExchangeDate successfully!");
+          })
+          .catch((error) => {
+            console.error("Error updating diamonds:", error);
+            alert("Error updating diamonds. Please try again later.");
+          });
+        update(this.userRef, {virtualCoins: newVirtualCoins, diamonds: newDiamonds})
+          .then(() => {
+            console.log("Diamonds updated successfully!");
+          })
+          .catch((error) => {
+            console.error("Error updating diamonds:", error);
+            alert("Error updating diamonds. Please try again later.");
+          });
+      } else {
+        const newDiamonds = this.diamonds + 10;
+        const newVirtualCoins = this.coins - 100;
+        
+        update(this.userRef, {virtualCoins: newVirtualCoins, diamonds: newDiamonds, 
+          lastExchangeDate: today})
+          .then(() => {
+            console.log("Diamonds updated successfully!");
+          })
+          .catch((error) => {
+            console.error("Error updating diamonds:", error);
+            alert("Error updating diamonds. Please try again later.");
+          });
+        
+        alert("You bought 10 diamonds");
+      }
     }
   }
 };
@@ -125,7 +150,6 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: normal;
     margin-top: 20px;
     padding: 10px;
     box-sizing: border-box;
@@ -136,16 +160,18 @@ export default {
 .switch-bar {
     display: flex;
     justify-content: center;
-    height: 40px;
+    height: 55px;
     width: 80%;
     background-color: ecf0f1;
     border-radius: 10px;
+    margin-bottom: 1%;
 }
 
 .switch-btn,
 .switch-btn:focus {
     position: relative;
     min-width: 200px;
+    height: 50px;
     background-color: #2c3e50;
     border-radius: 4em;
     color: white;
@@ -183,39 +209,39 @@ export default {
 .switch-btn:active {
     top: 1px;
 }
-
 .stuff, .external-stuff {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     width: 100%;
-    justify-content: flex-start;
     gap: 10px;
+    align-items: stretch;
 }
 .product {
-    flex: 1 1 calc(50% - 10px); /* 讓每個商品佔 50% 的寬度，減去 gap 的大小 */
-    max-width: calc(50% - 10px); /* 確保每個商品的最大寬度是 50% 減去 gap */
+    width: 100%;
     border-radius: 10px;
-    width: 50%;
-    max-width: 50%;
-    height: 30%;
     background-color: #2c3e50;
     color: white;
     box-sizing: border-box;
     padding: 5px;
     text-align: center;  
+    object-fit: cover;
+    height: 90%;
 }
 .product-img {
-    width: 50%;
-    height: 50%;
+    width: 40%;
+    height: 40%;
     object-fit: cover;
     border-radius: 5px;
+    align-self: stretch;
+    margin-top: 5px;
 }
 .buy-btn {
+    width: 40%;
+    border-radius: 10px;
     background-color: #3498db;
     color: white;
-    border: none;
-    padding: 10px 20px;
+    border: 1px solid #3498db;
+    padding: 5px 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin-top: 5px;
