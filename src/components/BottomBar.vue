@@ -82,4 +82,9 @@ export default {
     align-items: center;
     justify-content: center;
 }
+
+.nav-item:hover .icon {
+    transform: scale(1.5);
+    transition: transform 0.02s ease;
+}
 </style>
