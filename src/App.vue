@@ -1,8 +1,9 @@
 <template>
-  <div id="app">
+  <div id="app"  @click="createParticles">
     <NavBar v-if="!isWelcomePage" />
     <router-view></router-view> <!-- 渲染當前路由的頁面 -->
     <BottomBar v-if="!isWelcomePage" />
+    <div class="particles" id="particles-js"></div> <!-- 添加粒子容器 -->
   </div>
 </template>
 
@@ -13,7 +14,7 @@ import { useUserStore } from '@/stores/userStore';
 import { usePetStore } from './stores/petStore';
 import { ref, onValue, update } from 'firebase/database'; // 引入 Firebase 相關 API
 import { database } from '@/firebase'; // 引入初始化的 Firebase 服務
-
+import gsap from 'gsap'; // 引入 gsap
 export default {
   name: 'App',
   components: {
@@ -95,9 +96,46 @@ export default {
           });
         }, 10000); // 每10秒增加1個虛擬幣和1個鑽石
       }
+    },
+    // 創建粒子效果
+    createParticles(event) {
+      console.log('createParticles');
+      const particlesCount = 30; // 粒子數量
+      const particlesContainer = document.getElementById('particles-js'); // 粒子容器
+      if (!particlesContainer) {
+        console.error('Particles container not found');
+        return; // 如果找不到容器，停止執行
+      }
+
+      const x = event.clientX; // 點擊的 X 坐標
+      const y = event.clientY; // 點擊的 Y 坐標
+
+      for (let i = 0; i < particlesCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle'; // 設定類別
+        particle.style.left = `${x}px`; // 粒子初始位置
+        particle.style.top = `${y}px`;
+        particlesContainer.appendChild(particle); // 將粒子添加到容器
+
+        const randomX = Math.random() * 200 - 100; // 隨機 X 偏移量
+        const randomY = Math.random() * 200 - 100; // 隨機 Y 偏移量
+
+        // 使用 GSAP 進行動畫
+        gsap.to(particle, {
+          x: randomX,
+          y: randomY,
+          opacity: 0, // 逐漸隱藏
+          duration: 0.5,
+          onComplete: () => particle.remove() // 動畫完成後移除粒子
+        });
+      }
     }
+    
+
   }
 };
+
+
 </script>
 
 <style>
@@ -110,5 +148,23 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #ff8cdb; /* 粒子顏色 */
+  pointer-events: none;
 }
 </style>
