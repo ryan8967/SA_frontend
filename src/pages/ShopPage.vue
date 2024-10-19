@@ -43,7 +43,6 @@ export default {
       coins: 0,
       diamonds: 0,
       lastExchangeDate: '',
-      userRef: null,
     };
   },
   mounted() {
@@ -51,8 +50,9 @@ export default {
   },
   methods: {
     loadUserData() {
-      this.userRef = ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}`);
-      onValue(this.userRef, (snapshot) => {
+      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const userRef = ref(database, `users/${userId}`);
+      onValue(userRef, (snapshot) => {
         const data = snapshot.val();
         this.coins = data.virtualCoins;
         this.diamonds = data.diamonds;
@@ -69,8 +69,8 @@ export default {
 
         // update user's virtualCoins
         const newCoins = this.coins - product.price;
-        
-        update(this.userRef, {virtualCoins: newCoins})
+        const userRef = ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}`);
+        update(userRef, {virtualCoins: newCoins})
           .then(() => {
             console.log("Coins updated successfully!");
           })
@@ -78,6 +78,7 @@ export default {
             console.error("Error updating coins:", error);
             alert("Error updating coins. Please try again later.");
           });
+        console.log("You bought " + product.name + " for $" + product.price);
         alert(`You bought ${product.name} for $${product.price}`);
         
       }
