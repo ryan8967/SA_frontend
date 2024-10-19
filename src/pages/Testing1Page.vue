@@ -34,7 +34,7 @@ import { ref, push, onValue } from "firebase/database";
 import { database } from "../firebase";
 import { useUserStore } from "@/stores/userStore";
 
-export default {
+export default {//
   setup() {
     const userStore = useUserStore();
     // Making user reactive via computed
