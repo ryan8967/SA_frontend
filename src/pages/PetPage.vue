@@ -1,10 +1,19 @@
 <template>
     <div class="pet-page">
         <!-- 上半部 - 寵物特寫與資訊 -->
-        <div class="pet-feature">
+        <div class="pet-feature" @click="showClickGif">
             <div class="pet-info">
-                <!-- 根據主寵物類型動態顯示 gif 或 png -->
-                <img :src="mainPetImage" alt="Main Pet" class="main-pet" />
+                <!-- 用於顯示原始 GIF -->
+                <transition name="fade" mode="out-in">
+                    <img :src="mainPetImage" alt="Main Pet" class="main-pet overlay" v-if="!isClickGif" />
+                </transition>
+
+                <!-- 顯示 -click.gif，過渡效果 -->
+                <transition name="fade" mode="out-in">
+                    <img v-if="isClickGif" :src="clickGifImage" alt="Clicked Pet" class="main-pet overlay" />
+                </transition>
+
+                <!-- 寵物等級與名稱 -->
                 <div class="pet-details">
                     <p class="pet-level">Level: {{ petLevel }}</p>
                     <p class="pet-name">Name: {{ petName }}</p>
@@ -30,16 +39,13 @@
 </template>
 
 <script>
-import { ref, onValue, update, set } from 'firebase/database';
-import { database } from '@/firebase'; // 引入已經初始化的 Firebase Realtime Database
-import { useUserStore } from '@/stores/userStore';
-
 export default {
     data() {
         return {
             petLevel: 1, // 寵物等級，初始為 1
             petName: 'Fluffy', // 假設初始寵物名稱
-            mainPet: 'pet3', // 主寵物編號，預設為 pet3
+            mainPet: { src: 'pet/pet3.png', owned: true }, // 主寵物，初始為 pet3
+            isClickGif: false, // 控制是否顯示 -click.gif
             petCollection: [
                 { src: 'pet/pet3.png', owned: true }, // 預設已擁有 pet3
                 { src: 'pet/pet5.png', owned: true }, // 預設已擁有 pet5
@@ -48,98 +54,40 @@ export default {
                 { src: 'pet/pet4.png', owned: false }, // 未擁有寵物
                 { src: 'pet/pet6.png', owned: false }, // 新增的 pet6，未擁有
             ], // 預設圖鑑中的寵物頭像
-            userId: null, // 使用者ID
         };
     },
     computed: {
-        // 根據主寵物編號動態選擇顯示 gif 或 png
+        // 根據主寵物編號動態選擇顯示 gif 或 png，並控制是否顯示 -click.gif
         mainPetImage() {
-            if (this.mainPet === 'pet3' || this.mainPet === 'pet5') {
-                return `pet/${this.mainPet}.gif`; // 若主寵物是 pet3 或 pet5，顯示 gif
+            if (this.mainPet && this.mainPet.src) {
+                const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
+                if (petFileName === 'pet3' || petFileName === 'pet5') {
+                    return `pet/${petFileName}.gif`; // 顯示正常的 gif
+                }
+                return this.mainPet.src; // 其他情況顯示 png
             }
-            return `pet/${this.mainPet}.png`; // 其他情況顯示 png
+            return ''; // 若未定義，返回空字串
         },
-    },
-    mounted() {
-        this.initializePetData();
+        // 返回 -click.gif 的圖片路徑
+        clickGifImage() {
+            const petFileName = this.mainPet.src.split('/').pop().split('.')[0];
+            return `pet/${petFileName}-click.gif`;
+        }
     },
     methods: {
-        initializePetData() {
-            const userStore = useUserStore();
-            const userId = userStore.user ? userStore.user.uid : null;
-            this.userId = userId; // 保存使用者ID
-
-            if (userId) {
-                const userPetRef = ref(database, `users/${userId}/pets`);
-
-                // 檢查 Firebase 中是否有該用戶的寵物數據
-                onValue(userPetRef, (snapshot) => {
-                    const data = snapshot.val();
-                    if (!data) {
-                        // 如果沒有數據，進行初始化
-                        this.initializeDefaultPets();
-                    } else {
-                        // 如果有數據，更新寵物數據
-                        this.petLevel = data.petLevel || 1;
-                        this.petName = data.petName || 'Fluffy';
-                        this.mainPet = data.mainPet || 'pet3';
-                        this.updatePetCollection(data.pets);
-                    }
-                });
-            }
-        },
-        initializeDefaultPets() {
-            const defaultPets = [
-                { src: 'pet/pet3.png', owned: true },
-                { src: 'pet/pet5.png', owned: true },
-                { src: 'pet/pet1.png', owned: false },
-                { src: 'pet/pet2.png', owned: false },
-                { src: 'pet/pet4.png', owned: false },
-                { src: 'pet/pet6.png', owned: false }, // 添加 pet6
-            ];
-
-            // 初始化 Firebase 中的預設寵物數據
-            const userPetRef = ref(database, `users/${this.userId}/pets`);
-            set(userPetRef, {
-                petLevel: this.petLevel,
-                petName: this.petName,
-                mainPet: this.mainPet,
-                pets: defaultPets,
-            });
-
-            // 更新本地 petCollection 狀態
-            this.petCollection = defaultPets;
-        },
-        updatePetCollection(userPets) {
-            // 更新用戶的寵物圖鑑，從 Firebase 獲取數據
-            const updatedCollection = this.petCollection.map((pet) => {
-                const isOwned = userPets && userPets.some((userPet) => userPet.src === pet.src && userPet.owned === true);
-                return { ...pet, owned: isOwned }; // 保持從 Firebase 獲得的擁有狀態
-            });
-            this.petCollection = updatedCollection;
-        },
-        savePetData() {
-            const userStore = useUserStore();
-            const userId = userStore.user ? userStore.user.uid : null;
-
-            if (userId) {
-                const userPetRef = ref(database, `users/${userId}/pets`);
-
-                // 將當前的寵物數據保存到 Firebase
-                update(userPetRef, {
-                    petLevel: this.petLevel,
-                    petName: this.petName,
-                    mainPet: this.mainPet,
-                    pets: this.petCollection,
-                });
+        // 當用戶點擊上方主寵物區域，顯示 -click.gif，並在數秒後恢復正常 gif
+        showClickGif() {
+            if (this.mainPet.src.includes('pet3') || this.mainPet.src.includes('pet5')) {
+                this.isClickGif = true;
+                setTimeout(() => {
+                    this.isClickGif = false; // 恢復正常的 gif
+                }, 1500); // 顯示 -click.gif 1.5秒後恢復
             }
         },
         // 選擇新的主寵物並更新圖片
         selectPet(index) {
             if (this.petCollection[index].owned) { // 只有擁有的寵物才能被選中
-                const petFileName = this.petCollection[index].src.split('/').pop().split('.')[0]; // 提取圖片名稱
-                this.mainPet = petFileName; // 設置主寵物為選中的寵物
-                this.savePetData(); // 保存變更到 Firebase
+                this.mainPet = { ...this.petCollection[index] }; // 設置主寵物為選中的寵物
             }
         },
     },
@@ -152,31 +100,58 @@ export default {
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    margin-top: 20vh;
-    /* 上方增加空白以容納 NavBar */
+    margin-top: 50px;
 }
 
 .pet-feature {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #f0f4f8;
+    justify-content: center;
+    background-color: white;
     border-radius: 15px;
     padding: 20px;
     width: 100%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    height: 350px;
+    /* 給上半區明確的高度，保證居中對齊 */
 }
 
-.main-pet {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
+.main-pet,
+.overlay {
+    width: 250px;
+    height: 250px;
     object-fit: cover;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s ease-in-out;
+    z-index: 1;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease-in-out;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 
 .pet-details {
-    margin-top: 10px;
+    position: absolute;
+    bottom: -20px;
+    /* 保證在圖片的下方 */
+    left: 50%;
+    transform: translateX(-50%);
     text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    /* 半透明背景以提升可讀性 */
+    padding: 5px 10px;
+    border-radius: 10px;
 }
 
 .pet-level,
@@ -208,7 +183,6 @@ export default {
 
 .pet-thumbnail.unowned {
     filter: grayscale(100%);
-    /* 若未擁有，顯示為灰色 */
     cursor: not-allowed;
 }
 
@@ -217,7 +191,6 @@ export default {
     transition: transform 0.3s ease;
 }
 
-/* 初始化按鈕樣式 */
 .initialize-button {
     margin-top: 20px;
     padding: 10px 20px;
