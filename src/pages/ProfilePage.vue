@@ -62,21 +62,21 @@
       const achievements = ref([
         {
           id: 'login-three-times',
-          icon: '/login-three-times-badge.png',
+          icon: 'badge/login-three-times-badge.png',
           description: '登入三次的成就',
           completed: true,
         },
         {
           id: 'employee-of-the-year',
           //name: '年度最佳員工',
-          icon: '/employOfTheYear.png',
+          icon: 'badge/employOfTheYear.png',
           description: '獲得年度最佳員工的成就',
           completed: false,
         },
         {
           id: 'first-avatar-change',
           //name: '第一次換頭像',
-          icon: '/firstTime.webp',
+          icon: 'badge/firstTime.webp',
           description: '首次更換頭像的成就',
           completed: false,
         },
