@@ -180,7 +180,7 @@ export default {
   /*margin-bottom: 200px;*/ /* Space for BottomBar */
   display: flex;
   flex-direction: column;
-  justify-items: top;
+  justify-items: center;
   flex-wrap: wrap;
   padding: 0;
   background-color: #f4f7fa;
@@ -213,7 +213,7 @@ export default {
 
 /* Task List */
 .task-list {
-  margin-top: 20%;
+  padding: 20% 0%;
 }
 
 .task-item {
