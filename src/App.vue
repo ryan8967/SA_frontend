@@ -10,6 +10,7 @@
 import BottomBar from '@/components/BottomBar.vue';
 import NavBar from '@/components/NavBar.vue';
 import { useUserStore } from '@/stores/userStore';
+import { usePetStore } from './stores/petStore';
 import { ref, onValue, update } from 'firebase/database'; // 引入 Firebase 相關 API
 import { database } from '@/firebase'; // 引入初始化的 Firebase 服務
 
@@ -37,12 +38,14 @@ export default {
         const user = JSON.parse(storedUser);
         userStore.setUser(user);
         this.setupFirebaseSync(user.uid);
+
       }
     },
     setupFirebaseSync(userId) {
       const userStore = useUserStore();
-      const userRef = ref(database, `users/${userId}`);
 
+      const userRef = ref(database, `users/${userId}`);
+      const petStore = usePetStore();
       // 監聽 Firebase 的數據變化
       onValue(userRef, (snapshot) => {
         const data = snapshot.val();
@@ -50,6 +53,10 @@ export default {
           userStore.setVirtualCoins(data.virtualCoins);
           userStore.setDiamonds(data.diamonds || 0); // 同步鑽石
           userStore.setPetLevel(data.petLevel || 1);
+
+          petStore.selectPet(data.selectedPetIndex.selectedPetIndex);
+          console.log('selectedPetIndex:', data.selectedPetIndex.selectedPetIndex);
+          console.log('Data updated from Firebase:', data.virtualCoins, data.diamonds);
         }
       });
 
