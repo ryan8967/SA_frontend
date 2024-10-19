@@ -138,7 +138,7 @@ export default {
                 });
         },
         loadTasks() {
-            const userId = JSON.parse(localStorage.getItem("user")).uid;
+            //const userId = JSON.parse(localStorage.getItem("user")).uid;
             const tasksRef = ref(database, `tasks`);//users/${userId}/
 
             onValue(tasksRef, (snapshot) => {

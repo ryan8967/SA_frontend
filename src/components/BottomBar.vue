@@ -4,7 +4,7 @@
             <font-awesome-icon :icon="['fas', 'paw']" class="icon" />
         </button>
 
-        <button class="nav-item" @click="navigateTo('Task')">
+        <button class="nav-item" @click="navigateTo('NewTask')">
             <font-awesome-icon :icon="['fas', 'tasks']" class="icon" />
         </button>
 
@@ -21,7 +21,7 @@
         <!-- <button class="nav-item" @click="navigateTo('Profile')">
             <font-awesome-icon :icon="['fas', 'user']" class="icon" />
         </button> -->
-        <button class="nav-item" @click="navigateTo('CreateActivity')">
+        <button class="nav-item" @click="navigateTo('test')">
             <font-awesome-icon :icon="['fas', 'users']" class="icon" />
         </button>
     </nav>
