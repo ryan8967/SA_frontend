@@ -23,6 +23,9 @@
         <p><strong>姓名：</strong> {{ name }}</p>
         <p><strong>聘用日期：</strong> {{ hiringDate }}</p>
         <p><strong>生日：</strong> {{ birthdate }}</p>
+
+        <!-- 新增請心理假的按鈕 -->
+        <button @click="openLeaveCalendar" class="leave-btn">申請心理假</button>
       </div>
   
       <div class="achievements">
@@ -65,6 +68,15 @@
           <button @click="closeDialog">關閉</button>
         </div>
       </div>
+
+      <!-- 心理假日期選擇彈窗 -->
+      <div v-if="showCalendar" class="calendar-overlay">
+        <div class="calendar-dialog">
+          <input type="date" v-model="leaveDate" class="calendar-input" />
+          <button @click="submitLeaveRequest" class="calendar-submit-btn">送出申請</button>
+          <button @click="closeCalendar" class="calendar-close-btn">取消</button>
+        </div>
+      </div>
     </div>
   </template>
   
@@ -94,6 +106,10 @@
   
       const showDialog = ref(false);
       const dialogContent = ref("");
+
+      // 心理假相關狀態
+      const showCalendar = ref(false);
+      const leaveDate = ref(null);
   
       // 初始化 Firebase 上的用戶數據，包含鑽石數量
       const initializeUserData = (userId) => {
@@ -185,6 +201,24 @@
       const closeDialog = () => {
         showDialog.value = false;
       };
+
+      // 申請心理假功能
+      const openLeaveCalendar = () => {
+        showCalendar.value = true;
+      };
+
+      const closeCalendar = () => {
+        showCalendar.value = false;
+      };
+
+      const submitLeaveRequest = () => {
+        if (leaveDate.value) {
+          alert(`心理假申請已送出，選擇的日期為：${leaveDate.value}，請等待管理員批准。`);
+          showCalendar.value = false;
+        } else {
+          alert("請選擇一個日期。");
+        }
+      };
   
       // 初始化用戶數據，獲取當前的鑽石數量
       onMounted(() => {
@@ -211,6 +245,11 @@
         closeDialog,
         initializeAchievements,
         completeAchievement,
+        openLeaveCalendar, // 開啟心理假日曆選擇
+        closeCalendar, // 關閉心理假日曆選擇
+        submitLeaveRequest, // 提交心理假申請
+        showCalendar,
+        leaveDate,
       };
     },
   };
@@ -317,5 +356,74 @@
   .employee-info .avatar-section {
     margin-bottom: 10px;
   }
+
+  .leave-btn {
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+  }
+
+  .leave-btn:hover {
+    background-color: #c0392b;
+  }
+
+  .calendar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .calendar-dialog {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+  }
+
+  .calendar-input {
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  .calendar-submit-btn {
+    padding: 10px 20px;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+
+  .calendar-submit-btn:hover {
+    background-color: #219150;
+  }
+
+  .calendar-close-btn {
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .calendar-close-btn:hover {
+    background-color: #c0392b;
+  }
   </style>
-  
