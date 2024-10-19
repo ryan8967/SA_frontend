@@ -8,7 +8,7 @@
         <!-- 寵物顯示區域 -->
         <div class="card pet-display" v-if="user">
             <h2>Your Pet</h2>
-            <img src="test1.webp" alt="Pet Image" class="pet-image" />
+            <img src="pet/pet5.gif" alt="Pet Image" class="pet-image" />
             <p class="pet-level">Level: {{ petLevel }}</p>
         </div>
 

@@ -1,8 +1,14 @@
 <template>
     <nav class="nav-bar">
-        <div class="nav-item coins">Coins: {{ virtualCoins }}</div>
-        <div class="nav-item diamonds">Diamonds: {{ diamonds }}</div> <!-- 顯示鑽石 -->
-        <div class="nav-item username">Hi, {{ user ? user.displayName : 'Guest' }}</div>
+        <div class="nav-item coins">
+            <font-awesome-icon :icon="['fas', 'coins']" class="icon" />{{ virtualCoins }}
+        </div>
+        <div class="nav-item diamonds">
+            <font-awesome-icon :icon="['fas', 'gem']" class="icon" /> {{ diamonds }}
+        </div> <!-- 顯示鑽石 -->
+        <div class="nav-item username">
+            Hi, {{ user ? user.displayName : 'Guest' }}
+        </div>
         <button class="logout-btn" @click="handleLogout" v-if="user">Logout</button>
     </nav>
 </template>
@@ -10,8 +16,12 @@
 <script>
 import { useUserStore } from "@/stores/userStore";
 import { computed } from 'vue'; // 引入 computed
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // 引入 FontAwesomeIcon
 
 export default {
+    components: {
+        FontAwesomeIcon, // 註冊 FontAwesomeIcon 組件
+    },
     setup() {
         const userStore = useUserStore();
 
@@ -54,6 +64,9 @@ export default {
     font-size: 16px;
     font-weight: bold;
     text-align: center;
+    display: flex;
+    align-items: center;
+    /* 將文字和 icon 垂直對齊 */
 }
 
 .coins {
@@ -64,7 +77,6 @@ export default {
 .diamonds {
     flex: 1;
     text-align: left;
-    /* 調整顯示鑽石的樣式 */
 }
 
 .username {
@@ -83,5 +95,12 @@ export default {
     border-radius: 10px;
     cursor: pointer;
     max-width: 80px;
+}
+
+.icon {
+    margin-right: 8px;
+    /* 調整 icon 與文字之間的間距 */
+    font-size: 20px;
+    /* 調整 icon 大小 */
 }
 </style>
