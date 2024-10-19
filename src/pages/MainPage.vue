@@ -92,12 +92,35 @@ export default {
         petLevel() {
             return this.selectedPet.level || 1;
         },
+        // mainPetImage() {
+        //     if (this.petStore.hasBrokenThrough) {
+        //         return 'pet/upgrade.gif'; // 突破後的主圖片
+        //     } else {
+        //         const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+        //         return `pet/${petFileName}.gif`;
+        //     }
+        // },
+        // clickGifImage() {
+        //     if (this.petStore.hasBrokenThrough) {
+        //         return 'pet/upgrade-click.gif'; // 突破後的點擊圖片
+        //     } else {
+        //         const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+        //         return `pet/${petFileName}-click.gif`;
+        //     }
+        // }
+
         mainPetImage() {
             const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+            if (this.petStore.hasBrokenThrough && petFileName == 'pet3') {
+                return 'pet/upgrade.gif'; // 突破後的主圖片
+            }
             return `pet/${petFileName}.gif`;
         },
         clickGifImage() {
             const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+            if (this.petStore.hasBrokenThrough && petFileName == 'pet3') {
+                return 'pet/upgrade-click.gif'; // 突破後的主圖片
+            }
             return `pet/${petFileName}-click.gif`;
         },
     },

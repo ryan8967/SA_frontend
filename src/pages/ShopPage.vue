@@ -34,7 +34,7 @@ export default {
         { id: 2, img: 'egg2.png', name: '中級寵物蛋', price: 500 },
         { id: 3, img: 'egg3.png', name: '高級寵物蛋', price: 1000 },
         // { id: 4, img: 'bottle.png', name: 'bottle', price: 100 },
-        { id: 4, img: 'upgrade.png', name: '寵物突破', price: 1200 },
+        { id: 4, img: 'upgrade.png', name: '寵物突破', price: 1 },
       ],
       coins: 0,
       diamonds: 0,
