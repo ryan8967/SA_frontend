@@ -68,15 +68,29 @@ export const usePetStore = defineStore("petStore", {
       if (selectedPet.currentExperience >= selectedPet.experienceNeeded) {
         this.levelUp();
       }
+      this.syncPetDataToFirebase(); // 同步更新經驗值到 Firebase
     },
     levelUp() {
       const selectedPet = this.selectedPet;
       selectedPet.level += 1;
       selectedPet.currentExperience = 0;
       selectedPet.experienceNeeded += 50;
+      this.syncPetDataToFirebase(); // 升級後也要同步更新到 Firebase
     },
     updatePetCollection(petCollection) {
       this.petCollection = petCollection;
+    },
+    syncPetDataToFirebase() {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const userId = JSON.parse(storedUser).uid;
+        const userRef = ref(database, `users/${userId}/pets`);
+
+        // 同步整個寵物集合到 Firebase
+        update(userRef, {
+          petCollection: this.petCollection,
+        });
+      }
     },
     loadSelectedPetIndex() {
       const storedUser = localStorage.getItem("user");

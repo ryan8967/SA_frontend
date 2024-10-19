@@ -102,6 +102,24 @@ export default {
                     petCollection: this.petStore.petCollection, // 同步整個寵物集合到 Firebase
                 });
             }
+        },
+        initializeDefaultPets() {
+            // 預設的寵物數據初始化
+            const defaultPetCollection = [
+                { src: 'pet/pet3.png', owned: true, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet5.png', owned: true, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet1.png', owned: false, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet2.png', owned: false, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet4.png', owned: false, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet6.png', owned: false, level: 1, currentExperience: 0, experienceNeeded: 100 },
+            ];
+
+            // 更新 petStore 的寵物數據
+            this.petStore.updatePetCollection(defaultPetCollection);
+            this.petStore.selectPet(0); // 預設選擇第一隻寵物
+
+            // 同步初始化數據到 Firebase
+            this.updatePetData();
         }
     },
     mounted() {
@@ -119,6 +137,7 @@ export default {
     },
 };
 </script>
+
 
 <style scoped>
 /* 經驗值條樣式 */
