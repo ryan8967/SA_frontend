@@ -23,6 +23,9 @@
         </div>
         <div class="task-description">{{ task.description }}</div>
         <button @click="updateTaskStatus(task.id, 'in progress')" class="btn btn-primary">Start the Event</button>
+        <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
+          {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
+        </button>
       </div>
 
       <h2>In Progress</h2>
@@ -34,6 +37,9 @@
         </div>
         <div class="task-description">{{ task.description }}</div>
         <button @click="updateTaskStatus(task.id, 'completed')" class="btn btn-primary">End the Event</button>
+        <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
+          {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
+        </button>
       </div>
 
       <h2>Completed</h2>
@@ -44,6 +50,9 @@
           <span class="task-time">{{ task.time }}</span>
         </div>
         <div class="task-description">{{ task.description }}</div>
+        <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
+          {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
+        </button>
       </div>
     </div>
 
@@ -55,7 +64,7 @@
 </template>
 
 <script>
-import { ref, push, onValue, update } from "firebase/database";
+import { ref, push, onValue, update, remove } from "firebase/database";
 import { database } from "../firebase";
 import { useUserStore } from "@/stores/userStore";
 
@@ -85,14 +94,15 @@ export default {
       this.showPopup = !this.showPopup;
     },
     addTask() {
-      //const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const tasksRef = ref(database, `tasks`);//users/${userId}/
+      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const tasksRef = ref(database, `tasks`); //users/${userId}/
       const newTask = {
         title: this.newTaskTitle,
         description: this.newTaskDescription,
         username: this.user ? this.user.displayName : "Anonymous", // Fallback for displayName
         time: new Date().toISOString().split('T')[0], // yyyy-mm-dd format
         status: "not started",
+        attendees: {},
       };
 
       // Push new task to Firebase
@@ -107,8 +117,8 @@ export default {
         });
     },
     loadTasks() {
-      //const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const tasksRef = ref(database, `tasks`);//users/${userId}/
+      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const tasksRef = ref(database, `tasks`); //users/${userId}/
 
       onValue(tasksRef, (snapshot) => {
         const data = snapshot.val();
@@ -125,12 +135,31 @@ export default {
       });
     },
     updateTaskStatus(taskId, newStatus) {
-      //const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const taskRef = ref(database, `tasks/${taskId}`);//users/${userId}/
-      
+      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const taskRef = ref(database, `tasks/${taskId}`); //users/${userId}/
+
       update(taskRef, { status: newStatus }).catch((error) => {
         console.error("Error updating task status:", error);
       });
+    },
+    toggleJoinTask(taskId) {
+      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const userName = this.user ? this.user.displayName : "Anonymous";
+      const taskRef = ref(database, `tasks/${taskId}/attendees/${userId}`);
+
+      if (this.isUserJoined(this.tasks.find(task => task.id === taskId))) {
+        remove(taskRef).catch((error) => {
+          console.error("Error disjoining task:", error);
+        });
+      } else {
+        update(taskRef, { username: userName }).catch((error) => {
+          console.error("Error joining task:", error);
+        });
+      }
+    },
+    isUserJoined(task) {
+      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      return task.attendees && task.attendees[userId];
     },
     cancelTask() {
       this.newTaskTitle = "";
@@ -141,142 +170,140 @@ export default {
 };
 </script>
 
-
-
 <style scoped>
 /* General Layout */
 .task-page {
-margin-top: 80px; /* Space for NavBar */
-margin-bottom: 60px; /* Space for BottomBar */
-padding: 20px;
-background-color: #f4f7fa;
-min-height: 100vh;
-box-sizing: border-box;
-width: 100vw;
+  margin-top: 80px; /* Space for NavBar */
+  margin-bottom: 60px; /* Space for BottomBar */
+  padding: 20px;
+  background-color: #f4f7fa;
+  min-height: 100vh;
+  box-sizing: border-box;
+  width: 100vw;
 }
 
 /* Add Task Button */
 .add-task-btn {
-position: fixed;
-bottom: 80px;
-right: 20px;
-background-color: #28a745;
-color: white;
-border: none;
-padding: 20px;
-border-radius: 50%;
-cursor: pointer;
-font-size: 24px;
-box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .add-task-btn:hover {
-background-color: #218838;
-box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.25);
+  background-color: #218838;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* Task List */
 .task-list {
-margin-top: 20px;
+  margin-top: 20px;
 }
 
 .task-item {
-background-color: white;
-border-radius: 8px;
-padding: 15px 20px;
-margin-bottom: 15px;
-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-transition: transform 0.2s ease;
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
 }
 
 .task-item:hover {
-transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 /* Task Header */
 .task-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .task-username {
-font-weight: 600;
-font-size: 14px;
-color: #3498db;
+  font-weight: 600;
+  font-size: 14px;
+  color: #3498db;
 }
 
 .task-time {
-font-size: 12px;
-color: #7f8c8d;
+  font-size: 12px;
+  color: #7f8c8d;
 }
 
 .task-description {
-font-size: 16px;
-line-height: 1.5;
-color: #2c3e50;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #2c3e50;
 }
 
 /* Popup Styles */
 .popup {
-position: fixed;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-background-color: white;
-padding: 30px;
-width: 350px;
-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-border-radius: 10px;
-z-index: 1000;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 30px;
+  width: 350px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  z-index: 1000;
 }
 
 .popup-content {
-display: flex;
-flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .input-textarea {
-width: 100%;
-height: 100px;
-padding: 10px;
-border: 1px solid #ddd;
-border-radius: 6px;
-margin-bottom: 15px;
-font-size: 14px;
-resize: none;
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  resize: none;
 }
 
 .popup-actions {
-display: flex;
-justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .btn {
-padding: 10px 15px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-font-size: 14px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .btn-primary {
-background-color: #3498db;
-color: white;
+  background-color: #3498db;
+  color: white;
 }
 
 .btn-primary:hover {
-background-color: #2980b9;
+  background-color: #2980b9;
 }
 
 .btn-secondary {
-background-color: #95a5a6;
-color: white;
+  background-color: #95a5a6;
+  color: white;
 }
 
 .btn-secondary:hover {
-background-color: #7f8c8d;
+  background-color: #7f8c8d;
 }
 </style>

@@ -344,6 +344,7 @@ button:hover {
     transform: translateY(-50px);
     opacity: 0;
     max-width: 80%;
+    z-index: 1000;
     /* Limit the maximum width to keep it readable */
 
 }
