@@ -11,13 +11,33 @@ import {
   faHome,
   faStore,
   faUser,
-  faCoins, // 新增金錢圖標
-  faGem, // 新增鑽石圖標
+  faCoins,
+  faGem,
+  faUsers, // 這裡選擇 faUsers 作為社群互動的圖標
+  faComments, // 這裡選擇 faComments 代表評論或交流
+  faHandshake, // 這裡選擇 faHandshake 代表合作或社交活動
+  faCalendarCheck, // 這裡選擇 faCalendarCheck 代表確認好的活動
+  faBullhorn, // 這裡選擇 faBullhorn 代表公告活動
+  faEnvelope, // 這裡選擇 faEnvelope 作為邀請或活動通知的圖標
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 // 將圖標添加到庫中
-library.add(faPaw, faTasks, faHome, faStore, faUser, faCoins, faGem);
+library.add(
+  faPaw,
+  faTasks,
+  faHome,
+  faStore,
+  faUser,
+  faCoins,
+  faGem,
+  faUsers, // 如果偏向社群
+  faComments, // 如果偏向互動
+  faHandshake, // 如果偏向合作活動
+  faCalendarCheck, // 如果代表已計劃的活動
+  faBullhorn, // 如果偏向公告活動
+  faEnvelope // 用於邀請或通知
+);
 
 const app = createApp(App);
 const pinia = createPinia();

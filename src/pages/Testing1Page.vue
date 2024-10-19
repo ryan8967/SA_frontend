@@ -22,6 +22,7 @@
           <span class="task-time">{{ task.time }}</span>
         </div>
         <div class="task-description">{{ task.description }}</div>
+        <button @click="updateTaskStatus(task.id, 'in progress')" class="btn btn-primary">Start the Event</button>
       </div>
 
       <h2>In Progress</h2>
@@ -32,6 +33,7 @@
           <span class="task-time">{{ task.time }}</span>
         </div>
         <div class="task-description">{{ task.description }}</div>
+        <button @click="updateTaskStatus(task.id, 'completed')" class="btn btn-primary">End the Event</button>
       </div>
 
       <h2>Completed</h2>
@@ -53,7 +55,7 @@
 </template>
 
 <script>
-import { ref, push, onValue } from "firebase/database";
+import { ref, push, onValue, update } from "firebase/database";
 import { database } from "../firebase";
 import { useUserStore } from "@/stores/userStore";
 
@@ -71,8 +73,6 @@ export default {
     return {
       newTaskTitle: "",
       newTaskDescription: "",
-      // time:"",
-      // status:"not started",
       tasks: [],
       showPopup: false, // Controls the visibility of the popup modal
     };
@@ -86,7 +86,7 @@ export default {
     },
     addTask() {
       const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const tasksRef = ref(database, `tasks`);//users/${userId}/tasks
+      const tasksRef = ref(database, `tasks`);//users/${userId}/
       const newTask = {
         title: this.newTaskTitle,
         description: this.newTaskDescription,
@@ -108,7 +108,7 @@ export default {
     },
     loadTasks() {
       const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const tasksRef = ref(database, `tasks`);//users/${userId}/tasks
+      const tasksRef = ref(database, `tasks`);//users/${userId}/
 
       onValue(tasksRef, (snapshot) => {
         const data = snapshot.val();
@@ -122,6 +122,14 @@ export default {
         }
 
         this.tasks = tasksArray;
+      });
+    },
+    updateTaskStatus(taskId, newStatus) {
+      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const taskRef = ref(database, `tasks/${taskId}`);//users/${userId}/
+      
+      update(taskRef, { status: newStatus }).catch((error) => {
+        console.error("Error updating task status:", error);
       });
     },
     cancelTask() {
