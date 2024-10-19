@@ -15,7 +15,7 @@
       </div>
     </div>
     <div v-else class="external-stuff">
-      <div class="diamonds">
+      <div class="diamond-exchange">
         <h2>Buy Diamonds</h2>
         <button @click="purchaseDiamonds" class="buy-btn">Buy</button>
       </div>
@@ -128,8 +128,8 @@ export default {
       } else {
         const newDiamonds = this.diamonds + 10;
         const newVirtualCoins = this.coins - 100;
-        
-        update(this.userRef, {virtualCoins: newVirtualCoins, diamonds: newDiamonds, 
+        const userRef = ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}`);
+        update(userRef, {virtualCoins: newVirtualCoins, diamonds: newDiamonds, 
           lastExchangeDate: today})
           .then(() => {
             console.log("Diamonds updated successfully!");
@@ -249,5 +249,20 @@ export default {
 }
 .buy-btn:hover {
     background-color: #2980b9;
+}
+.external-stuff {
+    display: flex;
+    align-items: center;
+}
+.diamond-exchange {
+    width: 100%;
+    border-radius: 10px;
+    background-color: #2c3e50;
+    color: white;
+    box-sizing: border-box;
+    padding: 5px;
+    text-align: center;  
+    object-fit: cover;
+    height: 100%;
 }
 </style>
