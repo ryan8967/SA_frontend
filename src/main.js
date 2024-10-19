@@ -11,11 +11,13 @@ import {
   faHome,
   faStore,
   faUser,
+  faCoins, // 新增金錢圖標
+  faGem, // 新增鑽石圖標
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 // 將圖標添加到庫中
-library.add(faPaw, faTasks, faHome, faStore, faUser);
+library.add(faPaw, faTasks, faHome, faStore, faUser, faCoins, faGem);
 
 const app = createApp(App);
 const pinia = createPinia();

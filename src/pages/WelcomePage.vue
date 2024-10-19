@@ -13,7 +13,6 @@
         <div class="user-info" v-if="user">
             <h2>Welcome, {{ user.displayName }}!</h2>
             <p>Your ID: {{ user.uid }}</p>
-
             <div class="form-group">
                 <input v-model="name" placeholder="Enter your pet's name" class="input-field" />
             </div>
