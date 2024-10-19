@@ -6,7 +6,7 @@
         </div>
         <div class="nav-item diamonds">
             <font-awesome-icon :icon="['fas', 'gem']" class="icon" /> {{ diamonds }}
-            <div ref="addDimondAmount" class="add-Dimond-anime">+ {{ addDimondAmount }}</div>
+            <div ref="addDimondAnime" class="add-dimond-anime">+ {{ addDimondAmount }}</div>
         </div> <!-- 顯示鑽石 -->
         <div class="nav-item username">
             Hi, {{ user ? user.displayName : 'Guest' }}
@@ -17,7 +17,7 @@
 
 <script>
 import { useUserStore } from "@/stores/userStore";
-import { computed, ref, watch, onMounted } from 'vue'; // 引入 computed
+import { computed, ref, watch, onMounted, nextTick  } from 'vue'; // 引入 computed
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // 引入 FontAwesomeIcon
 import gsap from 'gsap'; // 引入 gsap
 export default {
@@ -110,9 +110,14 @@ export default {
         });
 
         // 初始時隱藏動畫元素
-        onMounted(() => {
-            addCoinAnime.value.style.display = 'none';
-            addDimondAnime.value.style.display = 'none';
+        onMounted(async () => {
+            await nextTick();
+            if (addCoinAnime.value) {
+                addCoinAnime.value.style.display = 'none';
+            }
+            if (addDimondAnime.value) {
+                addDimondAnime.value.style.display = 'none';
+            }
         });
 
         return {
@@ -121,7 +126,9 @@ export default {
             diamonds, // 返回鑽石數據
             handleLogout,
             addCoinAnime,
-            addCoinAmount
+            addCoinAmount,
+            addDimondAnime,
+            addDimondAmount
         };
     },
 
@@ -176,12 +183,12 @@ export default {
 
 .add-dimond-anime {
 
-color: rgb(25, 251, 255);
-font-weight: bold;
-font-size: 14px;
-padding-left: 5%;
-pointer-events: none;
-opacity: 0; /* 初始狀態隱藏 */
+    color: rgb(45, 148, 228);
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 5%;
+    pointer-events: none;
+    opacity: 0; /* 初始狀態隱藏 */
 }
 
 
