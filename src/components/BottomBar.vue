@@ -87,4 +87,9 @@ export default {
     transform: scale(1.5);
     transition: transform 0.02s ease;
 }
+
+.nav-item:active .icon {
+    transform: scale(0.8);
+    transition: transform 0.1s ease;
+}
 </style>
