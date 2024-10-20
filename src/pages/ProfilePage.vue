@@ -250,7 +250,7 @@ export default {
             ];
 
             achievements.value = defaultAchievements;
-            alert("成就資料初始化完成！");
+            // alert("成就資料初始化完成！");
         };
 
         const showAchievementDetails = (achievement) => {
@@ -354,7 +354,7 @@ export default {
 
 /* button 樣式 */
 .pos-save-btn {
-    background-color: #3498db;
+    background-color: #ff5349;
     color: #fff;
     border: none;
     padding: 3px 15px;
@@ -366,11 +366,11 @@ export default {
 }
 
 .pos-save-btn:hover {
-    background-color: #2980b9;
+    background-color: #ff958f;
 }
 
 .pos-save-btn:active {
-    background-color: #217dbb;
+    background-color: #fa9a95;
     transform: scale(0.98);
 }
 
@@ -450,7 +450,7 @@ export default {
 
 .initialize-btn {
     padding: 10px 20px;
-    background-color: #3498db;
+    background-color: #ff5349;
     color: white;
     border: none;
     border-radius: 5px;
@@ -460,7 +460,7 @@ export default {
 }
 
 .initialize-btn:hover {
-    background-color: #2980b9;
+    background-color: #ec9591;
 }
 
 /* 員工資料樣式 */
@@ -490,7 +490,7 @@ export default {
 }
 
 .leave-btn:hover {
-    background-color: #c0392b;
+    background-color: #ef8a84;
 }
 
 .calendar-overlay {
