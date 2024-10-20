@@ -14,6 +14,7 @@
 
     <!-- Task List -->
     <div class="task-list">
+      <button @click="navigateToSocial" class="btn btn-social">Go to Social</button>
       <h2>Not Started</h2>
       <div v-for="task in tasks.filter(task => task.status === 'not started')" :key="task.id" class="task-item">
         <div class="task-header">
@@ -79,7 +80,7 @@ export default {
     const user = userStore.user;
     const petStore = usePetStore();
 
-    
+
 
     return {
       petStore,
@@ -98,6 +99,9 @@ export default {
     this.loadTasks();
   },
   methods: {
+    navigateToSocial() {
+      this.$router.push({ name: 'Social' });
+    },
     togglePopup() {
       this.showPopup = !this.showPopup;
     },
@@ -321,5 +325,44 @@ export default {
 
 .btn-secondary:hover {
   background-color: #7f8c8d;
+}
+
+.btn-social {
+  background-color: #ff5349;
+  /* 按鈕的背景色 */
+  color: white;
+  /* 按鈕上的文字顏色 */
+  border: none;
+  /* 去掉邊框 */
+  padding: 10px 15px;
+  /* 調整內邊距，讓按鈕更大 */
+  border-radius: 5px;
+  /* 圓角邊框 */
+  cursor: pointer;
+  /* 當滑鼠移到按鈕上顯示手型 */
+  font-size: 16px;
+  /* 調整字體大小 */
+  font-weight: bold;
+  /* 調整文字粗細 */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  /* 添加過渡效果 */
+  margin: 15px 0;
+  /* 調整按鈕與周圍的間距 */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  /* 添加陰影效果 */
+}
+
+.btn-social:hover {
+  background-color: #cf807c;
+  /* 當滑鼠懸停時改變背景顏色 */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.25);
+  /* 滑鼠懸停時加深陰影效果 */
+}
+
+.btn-social:active {
+  background-color: #cf807c;
+  /* 當按下按鈕時的背景顏色 */
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+  /* 按下時陰影縮小 */
 }
 </style>
