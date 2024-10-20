@@ -160,14 +160,14 @@
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    background-color: #3498db;
+    background-color: #ff5349;
     color: white;
     cursor: pointer;
     transition: background-color 0.3s;
   }
   
   .close-button:hover {
-    background-color: #0056b3;
+    background-color: #f29c97;
   }
   
   #particles-js {
