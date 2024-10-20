@@ -64,6 +64,8 @@
   import { database } from "../firebase";
   import { useUserStore } from "@/stores/userStore";
   import AchievementPopup from '../components/AchievementPopup.vue';
+  import { usePetStore } from '../stores/petStore'; // 引入狀態管理
+
 
   export default {
     components: {
@@ -73,8 +75,11 @@
       const userStore = useUserStore();
       // Making user reactive via computed
       const user = userStore.user;
+      const petStore = usePetStore();
+      
   
       return {
+        petStore,
         user,
       };
     },
@@ -172,12 +177,17 @@
       },
       receiveReward(taskId) {
 
+
         // to pop up
         //alert(`Reward received for task ${taskId}!`);
         this.isPopupVisible = true;
         this.popupTitle = taskId + " 成就解鎖：超級冒險者！";
         this.popupDescription = "你已經完成了所有挑戰，獲得了獨特的獎勵！";
         this.popupImage = "./pet/pet1.png";
+
+        this.petStore.addExperience(50); // 增加當前選中寵物的經驗值
+        alert(`Reward received for task ${taskId}!`);
+
         // Additional logic for rewarding can be added here
       },
     },
@@ -219,7 +229,8 @@
   
   /* Task List */
   .task-list {
-    margin-top: 20px;
+    /* margin-top: 20px; */
+    padding: 20% 0%;
   }
   
   .task-item {
