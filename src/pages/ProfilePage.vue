@@ -133,7 +133,7 @@ export default {
         // 員工資料，寫死在前端
         const employeeId = ref("123456"); // 6 位數的員工ID
         const hiringDate = ref("2020-05-01"); // 聘用日期
-        const name = ref("John Doe"); // 員工姓名
+        const name = ref("catfish"); // 員工姓名
         const birthdate = ref("1990-01-15"); // 員工生日
 
         const allPositions = [
