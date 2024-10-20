@@ -8,9 +8,10 @@
             <font-awesome-icon :icon="['fas', 'tasks']" class="icon" />
         </button>
 
+        <!-- 中間圖標換成 tsmc.png -->
         <button class="nav-item home-btn" @click="navigateTo('Main')">
             <div class="home-icon">
-                <font-awesome-icon :icon="['fas', 'home']" class="icon" />
+                <img src="tsmc.png" alt="Home" class="tsmc-icon" />
             </div>
         </button>
 
@@ -59,7 +60,7 @@ export default {
 }
 
 .nav-item:hover {
-    color: #3498db;
+    color: #ff5349;
 }
 
 .icon {
@@ -73,14 +74,22 @@ export default {
 }
 
 .home-icon {
-    background-color: #3498db;
+
     border-radius: 50%;
-    padding: 20px;
+
     color: white;
-    font-size: 36px;
+    font-size: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* 新增 tsmc 圖片樣式 */
+.tsmc-icon {
+    width: 80px;
+    height: 63px;
+    object-fit: cover;
+    scale: 1.3;
 }
 
 .nav-item:hover .icon {

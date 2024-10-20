@@ -158,7 +158,7 @@ export default {
 
 .exp-fill {
     height: 100%;
-    background-color: #3498db;
+    background-color: #2c3e50;
     border-radius: 10px;
     transition: width 0.3s ease;
 }
@@ -266,7 +266,7 @@ export default {
 .initialize-button {
     margin-top: 20px;
     padding: 10px 20px;
-    background-color: #3498db;
+    background-color: #2c3e50;
     color: white;
     border: none;
     border-radius: 10px;
@@ -276,6 +276,6 @@ export default {
 }
 
 .initialize-button:hover {
-    background-color: #2980b9;
+    background-color: #2c3e50;
 }
 </style>
