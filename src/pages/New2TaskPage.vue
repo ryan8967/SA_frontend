@@ -48,9 +48,9 @@
     <AchievementPopup v-if="isPopupVisible" :title="popupTitle" :description="popupDescription" :image="popupImage"
       @close="isPopupVisible = false" />
     <!-- Add Task Button -->
-    <button class="add-task-btn" @click="togglePopup">
+    <!-- <button class="add-task-btn" @click="togglePopup">
       <font-awesome-icon :icon="['fas', 'plus']" />
-    </button>
+    </button> -->
   </div>
 </template>
 
@@ -254,7 +254,7 @@ export default {
 .task-username {
   font-weight: 600;
   font-size: 14px;
-  color: #3498db;
+  color: #ff5349;
 }
 
 .task-time {
@@ -281,7 +281,7 @@ progress {
 .reward-btn {
   margin-top: 10px;
   padding: 10px;
-  background-color: #ffc107;
+  background-color: #ff5349;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -290,6 +290,6 @@ progress {
 }
 
 .reward-btn:hover {
-  background-color: #e0a800;
+  background-color: #db7671;
 }
 </style>
