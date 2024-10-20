@@ -7,7 +7,7 @@
     <div v-if="internalPage">
       <div class="diamond-exchange">
         <p class="diamond-desc" style="margin: 0 0; margin-top: 5%;">10 Diamonds for 100 coins</p>
-        <button @click="purchaseDiamonds" class="buy-btn">100 coins</button>
+        <button class="buy-btn" @click="purchaseDiamonds">100 coins</button>
       </div>
       <div class="stuff">
         <div class="product" v-for="product in stuff" :key="product.id">
@@ -170,6 +170,13 @@ export default {
         return false;
       }
     },
+    canBuyDiamonds() {
+      const today = new Date().toISOString().split('T')[0];
+      if (this.lastExchangeDate === today  || this.coins < 100) {
+        return false;
+      }
+      return true;
+    },
     purchaseDiamonds() {
       // check last time user bought diamonds
       const today = new Date().toISOString().split('T')[0];
@@ -219,9 +226,11 @@ export default {
             console.error("Error updating diamonds:", error);
             alert("Error updating diamonds. Please try again later.");
           });
-
-        alert("You bought 10 diamonds");
       }
+      this.isPopupVisible = true; // 顯示成就解鎖彈窗
+      this.stuffTitle = '鑽石';
+      this.stuffDescription = '你成功兌換了 10 鑽石！';
+      this.stuffImage = './diamond.png';
     }
   }
 };
@@ -348,7 +357,6 @@ export default {
   margin-top: 5%;
   margin-bottom: 5%;
 }
-
 .buy-btn:hover {
   background-color: #2980b9;
 }
