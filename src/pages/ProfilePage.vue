@@ -97,6 +97,7 @@ import { ref, computed, onMounted } from 'vue'; // 確保引入 onMounted
 import { ref as firebaseRef, update, onValue, set } from 'firebase/database'; // 引入 Firebase 相關 API
 import { database } from '@/firebase'; // 引入初始化的 Firebase 服務
 import AchievementPopup from '../components/AchievementPopup.vue';
+import { useUserStore } from '@/stores/userStore'; // 引入用戶狀態管理
 export default {
     components: {
         AchievementPopup,
@@ -133,8 +134,11 @@ export default {
         // 員工資料，寫死在前端
         const employeeId = ref("123456"); // 6 位數的員工ID
         const hiringDate = ref("2020-05-01"); // 聘用日期
-        const name = ref("catfish"); // 員工姓名
+        // const name = ref("catfish"); // 員工姓名
         const birthdate = ref("1990-01-15"); // 員工生日
+
+        const userStore = useUserStore();
+        const name = ref(userStore.user.displayName); // 員工姓名
 
         const allPositions = [
             'Software Engineer',
