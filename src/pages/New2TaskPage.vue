@@ -57,14 +57,19 @@
   import { ref, push, onValue, update, remove } from "firebase/database";
   import { database } from "../firebase";
   import { useUserStore } from "@/stores/userStore";
+  import { usePetStore } from '../stores/petStore'; // 引入狀態管理
   
+
   export default {
     setup() {
       const userStore = useUserStore();
       // Making user reactive via computed
       const user = userStore.user;
+      const petStore = usePetStore();
+      
   
       return {
+        petStore,
         user,
       };
     },
@@ -157,6 +162,7 @@
         this.showPopup = false;
       },
       receiveReward(taskId) {
+        this.petStore.addExperience(50); // 增加當前選中寵物的經驗值
         alert(`Reward received for task ${taskId}!`);
         // Additional logic for rewarding can be added here
       },
@@ -199,7 +205,8 @@
   
   /* Task List */
   .task-list {
-    margin-top: 20px;
+    /* margin-top: 20px; */
+    padding: 20% 0%;
   }
   
   .task-item {

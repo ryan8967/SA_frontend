@@ -70,14 +70,19 @@
 import { ref, push, onValue, update, remove } from "firebase/database";
 import { database } from "../firebase";
 import { useUserStore } from "@/stores/userStore";
+import { usePetStore } from '../stores/petStore'; // 引入狀態管理
 
 export default {
   setup() {
     const userStore = useUserStore();
     // Making user reactive via computed
     const user = userStore.user;
+    const petStore = usePetStore();
+
+    
 
     return {
+      petStore,
       user,
     };
   },
