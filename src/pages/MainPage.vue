@@ -7,7 +7,7 @@
 
         <!-- 寵物顯示區域 -->
         <div class="card pet-display" v-if="user" @click="showClickGif">
-            <h2>Your Pet</h2>
+            <h2 class="hh">Your Pet</h2>
 
             <div v-if="showBubble" :key="floatingTextIndex" class="floating-text">
                 {{ floatingTexts[floatingTextIndex] }}
@@ -229,6 +229,10 @@ export default {
 </script>
 
 <style scoped>
+.hh {
+    padding-bottom: 150px;
+}
+
 #main-page {
     padding-top: 80px;
     display: flex;
@@ -375,7 +379,7 @@ button:hover {
 @keyframes fadeOut {
     0% {
         opacity: 1;
-        transform: translateY(-20px);
+        transform: translateY(-100px);
     }
 
     90% {
@@ -384,7 +388,7 @@ button:hover {
 
     100% {
         opacity: 0;
-        transform: translateY(-60px);
+        transform: translateY(-240px);
     }
 }
 </style>
