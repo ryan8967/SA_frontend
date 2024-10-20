@@ -320,7 +320,7 @@ export default {
 
 button {
     padding: 8px 12px;
-    background-color: #3498db;
+    background-color: #ff5349;
     color: white;
     border: none;
     border-radius: 8px;
@@ -328,7 +328,7 @@ button {
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #ff5349;
 }
 
 .task-intro {

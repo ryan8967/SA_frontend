@@ -176,8 +176,10 @@ export default {
 <style scoped>
 /* General Layout */
 .task-page {
-  /*margin-top: 200px;*/ /* Space for NavBar */
-  /*margin-bottom: 200px;*/ /* Space for BottomBar */
+  /*margin-top: 200px;*/
+  /* Space for NavBar */
+  /*margin-bottom: 200px;*/
+  /* Space for BottomBar */
   display: flex;
   flex-direction: column;
   justify-items: center;
@@ -195,7 +197,7 @@ export default {
   position: fixed;
   bottom: 80px;
   right: 20px;
-  background-color: #28a745;
+  background-color: #ff4500;
   color: white;
   border: none;
   padding: 20px;
@@ -207,7 +209,7 @@ export default {
 }
 
 .add-task-btn:hover {
-  background-color: #218838;
+  background-color: #e87b54;
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.25);
 }
 
@@ -240,7 +242,7 @@ export default {
 .task-username {
   font-weight: 600;
   font-size: 14px;
-  color: #3498db;
+  color: #ff5349;
 }
 
 .task-time {
@@ -298,12 +300,13 @@ export default {
 }
 
 .btn-primary {
-  background-color: #3498db;
+
+  background-color: #ff5349;
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #2980b9;
+  background-color: #d38e6c;
 }
 
 .btn-secondary {
