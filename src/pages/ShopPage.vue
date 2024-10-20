@@ -21,7 +21,7 @@
           <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
           <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
           <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
-          <button @click="purchase(product)" class="buy-btn">Buy</button>
+          <button @click="purchaseByDiamond(product)" class="buy-btn">Buy</button>
         </div>
       </div>
     </div>
@@ -57,8 +57,8 @@ export default {
         { id: 4, img: 'upgrade.png', name: '寵物突破', price: 1 },
       ],
       outStuff: [
-        { id: 10, img: 'coupon1.png', name: '餐卷', price: 300 },
-        { id: 11, img: 'coupon2.png', name: '餐卷', price: 500 },
+        { id: 10, img: 'coupon1.png', name: '餐卷', price: 300, qrCode: 'qrcode.png' },
+        { id: 11, img: 'coupon2.png', name: '餐卷', price: 500, qrCode: 'qrcode.png' },
       ],
       coins: 0,
       diamonds: 0,
@@ -94,8 +94,39 @@ export default {
       this.internalPage = !this.internalPage;
       this.pageName = this.internalPage ? '內部商城' : '外部商城';
     },
+    purchaseByDiamond(product) {
+      if (this.diamonds >= product.price) {
+        // update user's diamonds
+        const newDiamonds = this.diamonds - product.price;
+        const userRef = ref(database, `users/${JSON.parse(localStorage.getItem("user")).uid}`);
+        update(userRef, { diamonds: newDiamonds })
+          .then(() => {
+            console.log("Diamonds updated successfully!");
+          })
+          .catch((error) => {
+            console.error("Error updating diamonds:", error);
+            alert("Error updating diamonds. Please try again later.");
+          });
+        if (product.id === 10) {
+          this.isPopupVisible = true; // 顯示成就解鎖彈窗
+          this.stuffTitle = product.name;
+          this.stuffDescription = '你成功購買了' + product.name + '！';
+          this.stuffImage = './'+product.qrCode;
+        }
+        else if (product.id === 11) {
+          this.isPopupVisible = true; // 顯示成就解鎖彈窗
+          this.stuffTitle = product.name;
+          this.stuffDescription = '你成功購買了' + product.name + '！';
+          this.stuffImage = './'+product.qrCode;
+        } else {
+          this.isPopupVisible = true; // 顯示成就解鎖彈窗
+          this.stuffTitle = product.name;
+          this.stuffDescription = '你成功購買了' + product.name + '！';
+          this.stuffImage = './product_img/'+product.img;
+        }
+      }
+    },
     purchase(product) {
-      console.log(product);
       if (this.checkCoins(product.price)) {
         
 
@@ -116,13 +147,13 @@ export default {
           this.petStore.syncBreakthroughStatus(); // 同步突破狀態到 Firebase
           this.isPopupVisible = true; // 顯示成就解鎖彈窗
           this.stuffTitle = product.name;
-          this.stuffDescription = '你的寵物已經突破了！';
+          this.stuffDescription = '你的寵物突破了！';
           this.stuffImage = './product_img/'+product.img;
         }
         else{
           this.isPopupVisible = true; // 顯示成就解鎖彈窗
           this.stuffTitle = product.name;
-          this.stuffDescription = '你已經購買了' + product.name + '！';
+          this.stuffDescription = '你成功購買了' + product.name + '！';
           this.stuffImage = './product_img/'+product.img;
         }
 
