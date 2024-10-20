@@ -266,7 +266,7 @@ export default {
 .initialize-button {
     margin-top: 20px;
     padding: 10px 20px;
-    background-color: #2c3e50;
+    background-color: white;
     color: white;
     border: none;
     border-radius: 10px;
@@ -276,6 +276,6 @@ export default {
 }
 
 .initialize-button:hover {
-    background-color: #2c3e50;
+    background-color: white;
 }
 </style>
