@@ -1,6 +1,9 @@
 <template>
   <div id="shop-page">
-    <button class="switch-btn" @click="switchPage">{{ pageName }}</button>
+    <button class="switch-btn" @click="switchPage">
+      <font-awesome-icon :icon="['fas', 'exchange-alt']" class="icon" />
+      {{ pageName }}
+    </button>
     <div v-if="internalPage">
       <div class="diamond-exchange">
         <p class="diamond-desc" style="margin: 0 0; margin-top: 5%;">10 Diamonds for 100 coins</p>
@@ -247,7 +250,7 @@ export default {
   justify-content: center;
   height: 55px;
   width: 80%;
-  background-color: ecf0f1;
+  background-color: #ecf0f1;
   border-radius: 10px;
   margin-bottom: 1%;
 }
@@ -257,7 +260,7 @@ export default {
   position: relative;
   min-width: 200px;
   height: 50px;
-  background-color: #2c3e50;
+  background-color: #e28b6c;
   border-radius: 4em;
   color: white;
   font-size: 1rem;
@@ -270,7 +273,7 @@ export default {
 }
 
 .switch-btn:hover {
-  background-color: #2c3e50;
+  background-color: #e28b6c;
   color: white;
   transition-duration: 0.1s;
 }
@@ -285,7 +288,7 @@ export default {
   height: 100%;
   opacity: 0;
   transition: all 0.5s;
-  box-shadow: 0 0 10px 40px white;
+  box-shadow: 0 0 10px 40px #df4e19;
   border-radius: 4em;
 }
 
@@ -305,8 +308,10 @@ export default {
   grid-template-columns: repeat(2, 1fr);
   width: 100%;
   gap: 10px;
-  align-items: stretch;;
+  align-items: stretch;
+  ;
 }
+
 .product {
   display: flex;
   flex-direction: column;
@@ -321,6 +326,7 @@ export default {
   height: 100%;
   align-items: center;
 }
+
 .product-img {
   width: 40%;
   height: auto;
@@ -386,5 +392,9 @@ export default {
 .diamond-exchange:hover {
   box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3);
 
+}
+
+.icon {
+  margin-right: 15px;
 }
 </style>

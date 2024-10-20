@@ -15,6 +15,7 @@ import {
   faGem, // 新增鑽石圖標
   faPlus,
   faUsers,
+  faExchangeAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -45,7 +46,8 @@ library.add(
   faGem,
   faUsers,
   faPlus,
-  faUsers
+  faUsers,
+  faExchangeAlt
 );
 
 const app = createApp(App);

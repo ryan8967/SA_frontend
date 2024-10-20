@@ -1,5 +1,5 @@
 <template>
-  <div id="app"  @click="createParticles">
+  <div id="app" @click="createParticles">
     <NavBar v-if="!isWelcomePage" />
     <router-view></router-view> <!-- 渲染當前路由的頁面 -->
     <BottomBar v-if="!isWelcomePage" />
@@ -73,7 +73,7 @@ export default {
           }
         });
 
-      }, 10000); // 每10秒抓取一次資料
+      }, 3000); // 每10秒抓取一次資料
     },
     setupPassiveIncome() {
       const userStore = useUserStore();
@@ -85,16 +85,15 @@ export default {
         // 每隔 10 秒自動增加虛擬幣和鑽石
         setInterval(() => {
           const newCoins = userStore.virtualCoins + 1;
-          const newDiamonds = userStore.diamonds + 1; // 增加鑽石
+          // const newDiamonds = userStore.diamonds + 1; // 增加鑽石
           userStore.setVirtualCoins(newCoins);
-          userStore.setDiamonds(newDiamonds); // 更新鑽石
+          // userStore.setDiamonds(newDiamonds); // 更新鑽石
 
           // 同步到 Firebase
           update(userRef, {
             virtualCoins: newCoins,
-            diamonds: newDiamonds, // 同步鑽石
           });
-        }, 10000); // 每10秒增加1個虛擬幣和1個鑽石
+        }, 3000); // 每10秒增加1個虛擬幣和1個鑽石
       }
     },
     // 創建粒子效果
@@ -130,7 +129,7 @@ export default {
         });
       }
     }
-    
+
 
   }
 };
@@ -146,7 +145,7 @@ body {
 
 #app {
   height: 100vh;
-  width:100vw;
+  width: 100vw;
   display: flex;
   flex-direction: column;
 }
@@ -165,7 +164,8 @@ body {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background-color: #ff8cdb; /* 粒子顏色 */
+  background-color: #ff4500;
+  /* 粒子顏色 */
   pointer-events: none;
 }
 </style>
