@@ -45,7 +45,13 @@
           </div>
         </div>
       </div>
-  
+      <AchievementPopup
+        v-if="isPopupVisible"
+        :title="popupTitle"
+        :description="popupDescription"
+        :image="popupImage"
+        @close="isPopupVisible = false"
+      />
       <!-- Add Task Button -->
       <button class="add-task-btn" @click="togglePopup">
         <font-awesome-icon :icon="['fas', 'plus']" />
@@ -57,10 +63,14 @@
   import { ref, push, onValue, update, remove } from "firebase/database";
   import { database } from "../firebase";
   import { useUserStore } from "@/stores/userStore";
+  import AchievementPopup from '../components/AchievementPopup.vue';
   import { usePetStore } from '../stores/petStore'; // 引入狀態管理
-  
+
 
   export default {
+    components: {
+      AchievementPopup,
+    },
     setup() {
       const userStore = useUserStore();
       // Making user reactive via computed
@@ -79,6 +89,10 @@
         newTaskDescription: "",
         tasks: [],
         showPopup: false, // Controls the visibility of the popup modal
+        isPopupVisible: false,
+        popupTitle: "",
+        popupDescription: "",
+        popupImage: "",
       };
     },
     mounted() {
@@ -162,8 +176,18 @@
         this.showPopup = false;
       },
       receiveReward(taskId) {
+
+
+        // to pop up
+        //alert(`Reward received for task ${taskId}!`);
+        this.isPopupVisible = true;
+        this.popupTitle = taskId + " 成就解鎖：超級冒險者！";
+        this.popupDescription = "你已經完成了所有挑戰，獲得了獨特的獎勵！";
+        this.popupImage = "./pet/pet1.png";
+
         this.petStore.addExperience(50); // 增加當前選中寵物的經驗值
         alert(`Reward received for task ${taskId}!`);
+
         // Additional logic for rewarding can be added here
       },
     },
