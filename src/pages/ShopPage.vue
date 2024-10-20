@@ -28,6 +28,13 @@
         </div>
       </div>
     </div>
+    <AchievementPopup
+      v-if="isPopupVisible"
+      :title="stuffTitle"
+      :description="stuffDescription"
+      :image="stuffImage"
+      @close="isPopupVisible = false"
+      />
   </div>
 </template>
 
@@ -36,7 +43,11 @@ import { onValue, ref, update, set } from "firebase/database";
 import { database } from "../firebase"; // 引入 Firebase Realtime Database
 import { usePetStore } from "@/stores/petStore";
 // import { useUserStore } from "@/stores/userStore";
+import AchievementPopup from '../components/AchievementPopup.vue';
 export default {
+  components: {
+      AchievementPopup,
+  },
   data() {
     return {
       internalPage: true, // default page
@@ -55,6 +66,10 @@ export default {
       coins: 0,
       diamonds: 0,
       lastExchangeDate: '',
+      isPopupVisible: false,
+      stuffTitle: '成就解鎖：超級冒險者！',
+      stuffDescription: '你已經完成了所有挑戰，獲得了獨特的獎勵！',
+      stuffImage: './pet/pet1.png',
     };
   },
   setup() {
@@ -85,11 +100,7 @@ export default {
     purchase(product) {
       console.log(product);
       if (this.checkCoins(product.price)) {
-        if (product.id === 4) {
-          this.petStore.hasBrokenThrough = true; // 設置突破狀態
-          this.petStore.syncBreakthroughStatus(); // 同步突破狀態到 Firebase
-          alert("突破成功！你已經達到了突破狀態！");
-        }
+        
 
         // update user's virtualCoins
         const newCoins = this.coins - product.price;
@@ -102,8 +113,21 @@ export default {
             console.error("Error updating coins:", error);
             alert("Error updating coins. Please try again later.");
           });
-        console.log("You bought " + product.name + " for $" + product.price);
-        alert(`You bought ${product.name} for $${product.price}`);
+
+        if (product.id === 4) {
+          this.petStore.hasBrokenThrough = true; // 設置突破狀態
+          this.petStore.syncBreakthroughStatus(); // 同步突破狀態到 Firebase
+          this.isPopupVisible = true; // 顯示成就解鎖彈窗
+          this.stuffTitle = product.name;
+          this.stuffDescription = '你的寵物已經突破了！';
+          this.stuffImage = './product_img/'+product.img;
+        }
+        else{
+          this.isPopupVisible = true; // 顯示成就解鎖彈窗
+          this.stuffTitle = product.name;
+          this.stuffDescription = '你已經購買了' + product.name + '！';
+          this.stuffImage = './product_img/'+product.img;
+        }
 
       }
     },
