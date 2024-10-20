@@ -13,7 +13,7 @@
         <div class="product" v-for="product in stuff" :key="product.id">
           <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
           <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
-          <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
+          <p style="font-size: small; margin: 1px; padding: 0%;"><font-awesome-icon :icon="['fas', 'coins']" class="icon" />{{ product.price }}</p>
           <button @click="purchase(product)" class="buy-btn">Buy</button>
         </div>
       </div>
@@ -23,7 +23,7 @@
         <div class="product external-stuff" v-for="product in outStuff" :key="product.id">
           <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
           <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
-          <p style="font-size: small; margin: 1px; padding: 0%;">Price: ${{ product.price }}</p>
+          <p style="font-size: small; margin: 1px; padding: 0%;"><font-awesome-icon :icon="['fas', 'gem']" class="icon" />{{ product.price }}</p>
           <button @click="purchaseByDiamond(product)" class="buy-btn">Buy</button>
         </div>
       </div>
