@@ -405,7 +405,7 @@ export default {
 
 .achievements-completed,
 .achievements-incomplete {
-    margin-bottom: 20px;
+    padding-bottom: 40px;
 }
 
 .achievements-list {
