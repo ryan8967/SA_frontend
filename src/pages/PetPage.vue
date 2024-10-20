@@ -73,10 +73,16 @@ export default {
         },
         mainPetImage() {
             const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+            if (this.petStore.hasBrokenThrough && petFileName == 'pet3') {
+                return 'pet/upgrade.gif'; // 突破後的主圖片
+            }
             return `pet/${petFileName}.gif`;
         },
         clickGifImage() {
             const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
+            if (this.petStore.hasBrokenThrough && petFileName == 'pet3') {
+                return 'pet/upgrade-click.gif'; // 突破後的主圖片
+            }
             return `pet/${petFileName}-click.gif`;
         },
         experiencePercentage() {

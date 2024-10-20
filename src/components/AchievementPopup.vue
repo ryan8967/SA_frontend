@@ -151,16 +151,16 @@
   }
   
   .achievement-image {
-    max-width: 100%;
+    max-width: 50%;
     height: auto;
-    margin: 20px 0;
+    margin: 10px 10px;
   }
   
   .close-button {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    background-color: #007bff;
+    background-color: #3498db;
     color: white;
     cursor: pointer;
     transition: background-color 0.3s;

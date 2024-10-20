@@ -1,5 +1,8 @@
 <template>
     <div class="profile-page">
+      <div style="margin-top: 100px;" ></div>
+      <div v-show="achievements.length > 0" style="margin-top: 850px;"></div>
+      
       <h1 class="title">個人資料頁面</h1>
   
       <!-- 初始化成就按鈕 -->
@@ -38,7 +41,7 @@
          <p><strong>直屬：</strong> {{ mentor }}</p>
 
         <!-- 新增請心理假的按鈕 -->
-        <button @click="openLeaveCalendar" class="leave-btn">申請心理假</button>
+        <button @click="openLeaveCalendar" class="leave-btn">💔 申請心理假 💔</button>
       </div>
   
       <div class="achievements">
@@ -54,9 +57,10 @@
             @click="showAchievementDetails(achievement)"
           >
             <img :src="achievement.icon" :alt="achievement.description" class="achievement-icon" />
-            <span>{{ achievement.name }}</span>
+            <p>{{ achievement.name }}</p>
             <p>{{ achievement.description }}</p>
           </div>
+          <hr />
         </div>
   
         <!-- 未完成成就區塊 -->
@@ -69,12 +73,19 @@
             @click="completeAchievement(achievement)" 
           >
             <img :src="achievement.icon" :alt="achievement.description" :class="{'incomplete-icon': !achievement.completed}" class="achievement-icon" />
-            <span>{{ achievement.name }}</span>
+            <p>{{ achievement.name }}</p>
             <p>{{ achievement.description }}</p>
           </div>
+          <hr />
         </div>
       </div>
-  
+      <AchievementPopup
+        v-if="isPopupVisible"
+        :title="popupTitle"
+        :description="popupDescription"
+        :image="popupImage"
+        @close="isPopupVisible = false"
+      />
       <div v-if="showDialog" class="dialog-overlay">
         <div class="dialog">
           <p>{{ dialogContent }}</p>
@@ -97,8 +108,11 @@
   import { ref, computed, onMounted } from 'vue'; // 確保引入 onMounted
   import { ref as firebaseRef, update, onValue, set } from 'firebase/database'; // 引入 Firebase 相關 API
   import { database } from '@/firebase'; // 引入初始化的 Firebase 服務
-
+  import AchievementPopup from '../components/AchievementPopup.vue';
   export default {
+    components: {
+      AchievementPopup,
+    },
     data() {
       return {
         selectedPosition: '', // 用來暫存選擇的職位
@@ -124,7 +138,10 @@
       const achievements = ref([]); // 用來存儲成就資料
       const diamonds = ref(0); // 紀錄用戶的鑽石數量
       const position = ref(null); // 用戶的職位
-  
+      const popupTitle = ref('');
+      const popupDescription = ref('');
+      const popupImage = ref('');
+      const isPopupVisible = ref(false);
       // 員工資料，寫死在前端
       const employeeId = ref("123456"); // 6 位數的員工ID
       const hiringDate = ref("2020-05-01"); // 聘用日期
@@ -193,7 +210,12 @@
         // 在現有鑽石基礎上增加 300 鑽石
         diamonds.value += 300;
         await updateFirebaseDiamonds(); // 將變更同步至 Firebase
-        alert(`成就完成！你獲得了 300 鑽石，當前鑽石總數為：${diamonds.value}`);
+        // alert(`成就完成！你獲得了 300 鑽石，當前鑽石總數為：${diamonds.value}`);
+        popupTitle.value = "成就完成：" + achievement.name;
+        popupDescription.value = "你獲得了 300 鑽石，當前鑽石總數為：" + diamonds.value;
+        popupImage.value = achievement.icon;
+        isPopupVisible.value = true;
+
       };
   
       // 更新 Firebase 上的鑽石數量
@@ -303,6 +325,11 @@
         submitLeaveRequest, // 提交心理假申請
         showCalendar,
         leaveDate,
+        isPopupVisible,
+        popupTitle,
+        popupDescription,
+        popupImage,
+
       };
     },
     methods: {
@@ -397,8 +424,8 @@
   }
   
   .achievement-icon {
-    width: 50px;
-    height: 50px;
+    width: 150px;
+    height: 150px;
   }
   
   .completed {
@@ -459,7 +486,7 @@
 
   .leave-btn {
     padding: 10px 20px;
-    background-color: #e74c3c;
+    background-color: #3f1510;
     color: white;
     border: none;
     border-radius: 5px;

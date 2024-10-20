@@ -181,14 +181,18 @@ export default {
 <style scoped>
 /* General Layout */
 .task-page {
-  margin-top: 200px; /* Space for NavBar */
-  margin-bottom: 200px; /* Space for BottomBar */
-  padding: 20px;
+  /*margin-top: 200px;*/ /* Space for NavBar */
+  /*margin-bottom: 200px;*/ /* Space for BottomBar */
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  flex-wrap: wrap;
+  padding: 0;
   background-color: #f4f7fa;
   min-height: 100vh;
   box-sizing: border-box;
   width: 100vw;
-  height: 80%;
+  height: 100%;
 }
 
 /* Add Task Button */
@@ -214,7 +218,7 @@ export default {
 
 /* Task List */
 .task-list {
-  margin-top: 20px;
+  padding: 20% 0%;
 }
 
 .task-item {
