@@ -94,13 +94,13 @@ const router = createRouter({
 });
 
 // 路由守衛：未登入時重定向到歡迎頁面
-router.beforeEach((to, from, next) => {
-  const user = JSON.parse(localStorage.getItem("user")); // 簡單模擬驗證
-  if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
-    next("/");
-  } else {
-    next();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   const user = JSON.parse(localStorage.getItem("user")); // 簡單模擬驗證
+//   if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
+//     next("/");
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;
