@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3 # Updated to v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3 # Updated to v3
         with:
           node-version: "16" # Change this to your desired Node.js version
 
@@ -30,8 +30,11 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Print message
+        run: echo 'yunnnchieh 是我大腿' # This line will print in the logs
+
       - name: Upload production-ready files
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3 # Updated to v3
         with:
           name: production-ready-files
           path: dist/
