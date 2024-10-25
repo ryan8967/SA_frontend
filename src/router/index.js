@@ -11,6 +11,7 @@ import TestPopup from "@/pages/TestPopup.vue";
 import SocialPage from "@/pages/SocialPage.vue";
 
 import New2TaskPage from "@/pages/New2TaskPage.vue";
+import RenderTest from "@/pages/RenderTest.vue";
 
 
 const routes = [
@@ -78,6 +79,12 @@ const routes = [
     name: "Social",
     component: SocialPage,
     meta: { requiresAuth: true }, // 需要登入的頁面
+  },
+  {
+    path: "/render",
+    name: "Render",
+    component: RenderTest,
+    //meta: { requiresAuth: true }, // 需要登入的頁面
   },
 ];
 
