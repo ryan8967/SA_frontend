@@ -13,6 +13,7 @@ import SocialPage from "@/pages/SocialPage.vue";
 import New2TaskPage from "@/pages/New2TaskPage.vue";
 import RenderTest from "@/pages/RenderTest.vue";
 
+import CardAddPage from "@/pages/CardAddPage.vue";
 
 const routes = [
   {
@@ -85,6 +86,12 @@ const routes = [
     name: "Render",
     component: RenderTest,
     //meta: { requiresAuth: true }, // 需要登入的頁面
+  },
+  {
+    path: "/card",
+    name: "Card",
+    component: CardAddPage,
+    meta: { requiresAuth: true },
   },
 ];
 
