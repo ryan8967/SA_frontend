@@ -1,0 +1,41 @@
+name: Vue.js CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3 # Updated to v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3 # Updated to v3
+        with:
+          node-version: "16" # Change this to your desired Node.js version
+
+      - name: Install dependencies
+        run: npm install
+
+      # - name: Run tests
+      #   run: npm test
+
+      # - name: Build project
+      #   run: npm run build
+
+      - name: Print message
+        run: echo 'catfish 是我大腿' # This line will print in the logs
+
+
+      # - name: Upload production-ready files
+      #   uses: actions/upload-artifact@v3 # Updated to v3
+      #   with:
+      #     name: production-ready-files
+      #     path: dist/
