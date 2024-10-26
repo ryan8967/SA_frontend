@@ -2,9 +2,7 @@
     <div class="word-card" v-if="show">
       <div class="word-card__header">
         <h2 class="word-card__title">建立字卡</h2>
-        <button class="word-card__close" @click="closeCard">
-            <strong>X</strong>
-        </button>
+        <button class="word-card__close" @click="closeAddCard"><strong>X</strong></button>
       </div>
       <div class="word-card__content" style="justify-content: left;">
         <input style="display: flex;"
@@ -18,24 +16,35 @@
             <span v-if="empty" style="display: flex; color: gray; margin-top: 10px;margin-left: 5vh;">* type in the word first</span>
         </div>
         <div v-if="wordData" class="word-card__result">
-          <h3>{{ wordData.word }}</h3>
-          <p><strong>詞性：</strong>{{ wordData.partOfSpeech }}</p>
-          <p><strong>中文翻譯：</strong>{{ wordData.translation }}</p>
-          <p><strong>例句：</strong>{{ wordData.exampleSentence }}</p>
+            <button class="word-card__close" @click="closeCard"><strong>X</strong></button>
+            <h3>{{ wordData.word }}</h3>
+            <p><strong>詞性：</strong>{{ wordData.partOfSpeech }}</p>
+            <p><strong>中文翻譯：</strong>{{ wordData.translation }}</p>
+            <p><strong>例句：</strong>{{ wordData.exampleSentence }}</p>
         </div>
+      </div>
+    </div>
+    <!-- show loading icon -->
+    <div v-if="showLoading" class="loading-modal">
+      <div class="loading-content">
+        <p>Loading...</p>
       </div>
     </div>
 </template>
   
 <script>
 import OpenAI from "openai";
+import { ref, set } from "firebase/database";
+import { database } from "../firebase"; // 引入 Firebase Realtime Database
 
 export default {
     data() {
       return {
         inputWord: "", // 用戶輸入的英文單字
         wordData: null, // 單字資料
-        show: true,
+        show: true, // whether to show the add-card component
+        showLoading: false, // show loading icon when fetching word data
+        userId: null,
       };
     },
     computed: {
@@ -43,24 +52,27 @@ export default {
             return !this.inputWord;
         },
     },
+    mounted() {
+        this.userId = JSON.parse(localStorage.getItem("user")).uid;
+    },
     methods: {
+        closeAddCard() {
+            this.show = false;
+        },
         closeCard() {
             this.wordData = null; // 清除單字資料
-            this.show = false;
         },
         async getCardFromGPT() {
             console.log("getCardFromGPT");
-            // console.log("this.inputWord", this.inputWord);
+            this.showLoading = true;
+            // loading test
+            
+            // await sleep(2000);
+            // this.showLoading = false;
             // let a = 2;
-            // if(2==a){
+            // if (a === 2) {
             //     return;
             // }
-            // const storedUser = localStorage.getItem('user');
-            // if (storedUser) {
-            //     this.user = JSON.parse(storedUser);
-
-            // }
-
             let kkk =
                 "c2stM1VhNDUwUHhhdjNnVVNNLUNmSHVTQ25ySUI3YUZGZjU1d0RRaE92SEZSVDNCbGJrRkowUkVpazRGWmN3QnIwZXIyX2xUU1BsbWV5dFZzQWpnYmpNS1puLVRfNEE=";
             const decodedStr = atob(kkk);
@@ -80,7 +92,8 @@ export default {
                 translation: Traditional Chinese of the word.
                 exampleSentence: a sample sentence including the word to show user how use the word.
                 partOfSpeecch: as the meaning of the attribute name
-                You can ignore the imgUrl, just fill with empty string.`
+                You can ignore the imgUrl, just fill with empty string.
+                Don't use markdown simbol in your answer.`
             let run = await openai.beta.threads.runs.createAndPoll(thread.id, {
                 assistant_id: "asst_8GkyxwRkgLuvSkUcvhkFIFKT",
                 instructions: prompt
@@ -95,10 +108,30 @@ export default {
                     console.log("mes", mes);
 
                     // do store the word data
+                    this.storeWordData(mes);
                 }
             } else {
                 console.log(run.status);
             }
+
+            this.showLoading = false;
+        },
+        storeWordData(mes) {
+            let wordData = JSON.parse(mes);
+            // store to user's word card collection
+              // Generate your own unique ID (if needed)
+
+            // Store to user's word card collection with your ID
+            const cardRef = ref(database, `users/${this.userId}/wordCards/${wordData.word}`);
+            set(cardRef, wordData)
+                .then(() => {
+                    console.log("Card stored successfully!");
+                    this.wordData = wordData;
+                })
+                .catch((error) => {
+                    console.error("Error storing data: ", error);
+                });
+            
         },
     },
 };
@@ -111,8 +144,6 @@ export default {
     width: 300px;
     background-color: #f9f9f9;
     border-radius: 5px;
-
-
   }
   .word-card__header {
     display: flex;
@@ -136,6 +167,25 @@ export default {
     border-top: 1px solid #ddd;
     padding-top: 10px;
   }
-  </style>
+  .loading-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+</style>
   
  
