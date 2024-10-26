@@ -13,6 +13,8 @@ import SocialPage from "@/pages/SocialPage.vue";
 import New2TaskPage from "@/pages/New2TaskPage.vue";
 import RenderTest from "@/pages/RenderTest.vue";
 
+import FlashcardPage from "@/pages/FlashcardPage.vue";
+
 
 const routes = [
   {
@@ -86,6 +88,12 @@ const routes = [
     component: RenderTest,
     //meta: { requiresAuth: true }, // 需要登入的頁面
   },
+  {
+    path: "/learn",
+    name: "learn",
+    component: FlashcardPage,
+    //meta: { requiresAuth: true }, // 需要登入的頁面
+  }
 ];
 
 const router = createRouter({
