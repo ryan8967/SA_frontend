@@ -15,6 +15,7 @@ import RenderTest from "@/pages/RenderTest.vue";
 
 import FlashcardPage from "@/pages/FlashcardPage.vue";
 
+import CardAddPage from "@/pages/CardAddPage.vue";
 
 const routes = [
   {
@@ -93,7 +94,13 @@ const routes = [
     name: "learn",
     component: FlashcardPage,
     //meta: { requiresAuth: true }, // 需要登入的頁面
-  }
+  },
+  {
+    path: "/card",
+    name: "Card",
+    component: CardAddPage,
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({
