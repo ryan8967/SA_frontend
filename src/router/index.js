@@ -16,6 +16,8 @@ import RenderTest from "@/pages/RenderTest.vue";
 import FlashcardPage from "@/pages/FlashcardPage.vue";
 
 import CardAddPage from "@/pages/CardAddPage.vue";
+import GetAllCards from "@/pages/GetAllCards.vue";
+
 
 const routes = [
   {
@@ -100,6 +102,12 @@ const routes = [
     name: "Card",
     component: CardAddPage,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/all",
+    name: "All",
+    component: GetAllCards,
+    //meta: { requiresAuth: true },
   },
 ];
 
