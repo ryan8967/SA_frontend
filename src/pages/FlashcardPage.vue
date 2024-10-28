@@ -1,16 +1,21 @@
 <template>
-  <div class="title">Learn!</div>
   <div class="flashcard-wrapper">
     <div class="allcards">
       <router-link to="/all">
         <button @click="viewAllCards">View all my cards!</button>
       </router-link>
     </div>
+    <div class="title">Learn!</div>
     <div v-if="flashcards.length > 0">
       <div class="flashcard">
         <div class="content" @click="flipCard(currentCard)">
           <p v-if="!currentCard.flipped" class="question">{{ currentCard.word }}</p>
-          <p v-else class="answer">{{ currentCard.translation }}</p>
+          <div v-else class="answer">
+            <p>{{ currentCard.translation }}</p>
+            <hr/>
+            <p class="part-of-speech"><strong>詞性：</strong>{{ currentCard.partOfSpeech }}</p>
+            <p class="example"><strong>例句：</strong>{{ currentCard.exampleSentence }}</p>
+          </div>
         </div>
       </div>
       <div class="controls">
@@ -95,12 +100,13 @@ export default {
 
 <style scoped>
 .title {
-  padding-top: 500px;
+  padding-top: 200px;
   font-size: 45px;
   text-align: center;
 }
 
 .flashcard-wrapper {
+  position: relative;
   padding-top: 30px;
   display: flex;
   flex-direction: column;
@@ -127,16 +133,6 @@ export default {
   cursor: pointer;
 }
 
-.input-box {
-  margin-bottom: 15px;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  width: 200px;
-  box-sizing: border-box;
-}
-
 button:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
@@ -157,17 +153,17 @@ button {
   display: flex;
   gap: 10px;
   justify-content: center;
-  gap: 10px;
+  gap: 15px;
 }
 
-
 .allcards {
-  padding-top: 20px;
-  display: flex;
-  justify-content: flex-end;
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 
 .allcards button {
+  margin-top: 100px;
   background-color: #ff6f61;
   padding: 15px 25px;
   border-radius: 10px;
@@ -175,5 +171,11 @@ button {
   border: none;
   color: white;
   cursor: pointer;
+}
+
+.part-of-speech,
+.example{
+  font-size: 20px;
+  text-align: left;
 }
 </style>

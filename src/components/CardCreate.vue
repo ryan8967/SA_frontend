@@ -55,7 +55,6 @@ export default {
     mounted() {
         // Skip UID retrieval for debugging
         this.userId = JSON.parse(localStorage.getItem("user")).uid;
-
         // You can set a temporary userId for testing
         //this.userId = 'testUserId'; // Use a test ID or hard-code a value for debugging
     },

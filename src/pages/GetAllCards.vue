@@ -1,13 +1,19 @@
 <template>
-    <div class="title">All the cards!</div>
     <div class="flashcard-wrapper">
+        <div class="title">All the cards!</div>
         <div v-if="flashcards.length > 0">
             <div class="flashcard" v-for="(card, index) in flashcards" :key="index">
                 <div class="content" @click="flipCard(card)">
                     <p v-if="!card.flipped" class="question">{{ card.word }}</p>
-                    <p v-else class="answer">{{ card.translation }}</p>
+                    <div v-else class="answer">
+                        <p>{{ card.translation }}</p>
+                        <hr/>
+                        <p class="part-of-speech"><strong>詞性：</strong>{{ card.partOfSpeech }}</p>
+                        <p class="example"><strong>例句：</strong>{{ card.exampleSentence }}</p>
+                    </div>
                 </div>
             </div>
+            <div class="end"></div>
         </div>
         <div v-else>
             <p>No flashcards available.</p>
@@ -21,7 +27,7 @@ import { ref, getDatabase, get } from "firebase/database";
 export default {
     data() {
         return {
-            flashcards: [], 
+            flashcards: [],
         };
     },
     mounted() {
@@ -31,8 +37,8 @@ export default {
     methods: {
         async fetchFlashcards() {
             const db = getDatabase();
-            //const userId = JSON.parse(localStorage.getItem("user")).uid;
-            const userId = 'testUserId';
+            const userId = JSON.parse(localStorage.getItem("user")).uid;
+            //const userId = 'testUserId';
             const flashcardsRef = ref(db, `users/${userId}/wordCards`);
 
             try {
@@ -62,17 +68,18 @@ export default {
 
 <style scoped>
 .title {
-    padding-top: 500px;
+    margin-top: 100px;
     font-size: 45px;
     text-align: center;
 }
 
 .flashcard-wrapper {
-    padding-top: 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
+    margin-top: 100px;
+    margin-bottom: 100px;
 }
 
 .flashcard {
@@ -92,6 +99,16 @@ export default {
     justify-content: center;
     text-align: center;
     cursor: pointer;
+}
+
+.part-of-speech,
+.example {
+    text-align: left;
+    font-size: 20px;
+}
+
+.end {
+    margin-top: 100px;
 }
 
 </style>
