@@ -1,20 +1,28 @@
 <template>
   <div class="flashcard-wrapper">
-    <div class="allcards">
+    <div class="header">
+      <div class="title">Learn!</div>
       <router-link to="/all">
-        <button @click="viewAllCards">View all my cards!</button>
+        <button class="all-cards-button" @click="viewAllCards">
+          View all my cards!
+        </button>
       </router-link>
     </div>
-    <div class="title">Learn!</div>
     <div v-if="flashcards.length > 0">
       <div class="flashcard">
         <div class="content" @click="flipCard(currentCard)">
-          <p v-if="!currentCard.flipped" class="question">{{ currentCard.word }}</p>
+          <p v-if="!currentCard.flipped" class="question">
+            {{ currentCard.word }}
+          </p>
           <div v-else class="answer">
             <p>{{ currentCard.translation }}</p>
-            <hr/>
-            <p class="part-of-speech"><strong>詞性：</strong>{{ currentCard.partOfSpeech }}</p>
-            <p class="example"><strong>例句：</strong>{{ currentCard.exampleSentence }}</p>
+            <hr />
+            <p class="part-of-speech">
+              <strong>詞性：</strong>{{ currentCard.partOfSpeech }}
+            </p>
+            <p class="example">
+              <strong>例句：</strong>{{ currentCard.exampleSentence }}
+            </p>
           </div>
         </div>
       </div>
@@ -53,7 +61,7 @@ export default {
     async fetchFlashcards() {
       const db = getDatabase();
       const userId = JSON.parse(localStorage.getItem("user")).uid;
-      //const userId = 'testUserId';
+      //const userId = "testUserId";
       const flashcardsRef = ref(db, `users/${userId}/wordCards`);
 
       try {
@@ -76,7 +84,7 @@ export default {
     rateCard(rating) {
       const currentCard = this.flashcards[this.currentCardIndex];
 
-      if (rating === 'again') {
+      if (rating === "again") {
         this.cardsToRepeat.push({ ...currentCard, flipped: false });
       }
 
@@ -99,12 +107,20 @@ export default {
 
 
 <style scoped>
-.title {
-  padding-top: 200px;
-  font-size: 45px;
-  text-align: center;
+.header {
+    display: flex;                
+    justify-content: space-between; 
+    align-items: center;        
+    padding: 10px;             
+    margin-top: 150px;
+    gap: 350px;
 }
-
+  
+  .title {
+    font-size: 45px;
+    text-align: center;
+  }
+  
 .flashcard-wrapper {
   position: relative;
   padding-top: 30px;
@@ -140,13 +156,12 @@ button:hover {
 
 button {
   background-color: #ff6f61;
-  padding: 15px 25px;
+  padding: 10px 25px;
   border-radius: 10px;
   font-size: 15px;
   border: none;
   color: white;
   cursor: pointer;
-
 }
 
 .controls {
@@ -165,7 +180,7 @@ button {
 .allcards button {
   margin-top: 100px;
   background-color: #ff6f61;
-  padding: 15px 25px;
+  padding: 10px 25px;
   border-radius: 10px;
   font-size: 15px;
   border: none;
@@ -174,8 +189,31 @@ button {
 }
 
 .part-of-speech,
-.example{
+.example {
   font-size: 20px;
   text-align: left;
 }
+
+.answer {
+  width: 100%;
+}
+
+.example {
+  margin-top: 1rem;
+}
+
+
+.all-cards-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  background-color: #ff6f61;
+  color: white;
+  margin-top: 12px;
+}
+
+
+
 </style>

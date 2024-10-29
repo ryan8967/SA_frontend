@@ -1,17 +1,31 @@
 <template>
     <div class="flashcard-wrapper">
-        <div class="title">All the cards!</div>
+        <div class="header">
+            <div class="title">All the cards!</div>
+            <router-link to="/learn">
+                <button class="back-button">Back to learning</button>
+            </router-link>
+        </div>
         <div v-if="flashcards.length > 0">
-            <div class="flashcard" v-for="(card, index) in flashcards" :key="index">
+            <div class="flashcard" v-for="(card, index) in paginatedFlashcards" :key="index">
                 <div class="content" @click="flipCard(card)">
                     <p v-if="!card.flipped" class="question">{{ card.word }}</p>
                     <div v-else class="answer">
                         <p>{{ card.translation }}</p>
-                        <hr/>
+                        <hr />
                         <p class="part-of-speech"><strong>詞性：</strong>{{ card.partOfSpeech }}</p>
                         <p class="example"><strong>例句：</strong>{{ card.exampleSentence }}</p>
                     </div>
                 </div>
+            </div>
+            <div class="pagination">
+                <button class="previous-page-button" @click="prevPage" :disabled="currentPage === 1">
+                    Previous
+                </button>
+                <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                <button class="next-page-button" @click="nextPage" :disabled="currentPage === totalPages">
+                    Next
+                </button>
             </div>
             <div class="end"></div>
         </div>
@@ -28,17 +42,26 @@ export default {
     data() {
         return {
             flashcards: [],
+            currentPage: 1,
+            cardsPerPage: 10,
         };
     },
     mounted() {
         this.fetchFlashcards();
-
+    },
+    computed: {
+        totalPages() {
+            return Math.ceil(this.flashcards.length / this.cardsPerPage);
+        },
+        paginatedFlashcards() {
+            const start = (this.currentPage - 1) * this.cardsPerPage;
+            return this.flashcards.slice(start, start + this.cardsPerPage);
+        },
     },
     methods: {
         async fetchFlashcards() {
             const db = getDatabase();
-            const userId = JSON.parse(localStorage.getItem("user")).uid;
-            //const userId = 'testUserId';
+            const userId = 'testUserId';
             const flashcardsRef = ref(db, `users/${userId}/wordCards`);
 
             try {
@@ -58,19 +81,47 @@ export default {
         flipCard(card) {
             card.flipped = !card.flipped;
         },
-        rateCard(rating) {
-            this.$emit("rate", rating);
-            this.flashcards.forEach((card) => (card.flipped = false));
+        nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+            }
+        },
+        prevPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+            }
+        },
+        addCard() {
+            console.log("Add card button clicked!");
         },
     },
 };
 </script>
 
 <style scoped>
+.header {
+    display: flex;                
+    justify-content: space-between; 
+    align-items: center;        
+    padding: 10px;             
+    margin-top: 150px;
+    gap: 200px;
+}
+
 .title {
-    margin-top: 100px;
     font-size: 45px;
     text-align: center;
+    margin: 0;
+}
+
+.back-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background-color: #ff6f61;
+    color: white;
 }
 
 .flashcard-wrapper {
@@ -78,7 +129,7 @@ export default {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    margin-top: 100px;
+    margin-top: 50px;
     margin-bottom: 100px;
 }
 
@@ -109,6 +160,55 @@ export default {
 
 .end {
     margin-top: 100px;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    justify-content: center;
+
+}
+
+.previous-page-button {
+    padding: 10px 15px;
+    margin: 0 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background-color: #ff6f61;
+    color: white;
+}
+
+.next-page-button {
+    padding: 10px 30px;
+    margin: 0 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background-color: #ff6f61;
+    color: white;
+}
+
+.previous-page-button:disabled,
+.next-page-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.answer {
+  width: 100%;
+}
+
+.example {
+  margin-top: 1rem;
+}
+
+button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 </style>
