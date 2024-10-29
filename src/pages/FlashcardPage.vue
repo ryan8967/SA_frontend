@@ -60,8 +60,8 @@ export default {
   methods: {
     async fetchFlashcards() {
       const db = getDatabase();
-      const userId = JSON.parse(localStorage.getItem("user")).uid;
-      //const userId = "testUserId";
+      //const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const userId = "testUserId";
       const flashcardsRef = ref(db, `users/${userId}/wordCards`);
 
       try {
