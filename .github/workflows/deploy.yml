@@ -37,6 +37,7 @@ jobs:
           K3S_IP: ${{ secrets.K3S_IP }} # K3s 虛擬機的 IP 地址
           K3S_USER: ${{ secrets.K3S_USER }} # 用於 SSH 的用戶名
           K3S_PASSWORD: ${{ secrets.K3S_PASSWORD }} # 用於 SSH 的密碼
+          SSH_PORT: ${{ secrets.SSH_PORT }} # SSH 連接的端口號
         run: |
           # SSH 連接到 K3s 虛擬機器
           sshpass -p "$K3S_PASSWORD" ssh -o StrictHostKeyChecking=no $K3S_USER@$K3S_IP << EOF
