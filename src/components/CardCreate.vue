@@ -1,4 +1,6 @@
 <template>
+  <div class="card-block">
+    <button @click="showScreen" v-if="!show">Add Card</button>
     <div class="word-card" v-if="show">
       <div class="word-card__header">
         <h2 class="word-card__title">建立字卡</h2>
@@ -30,6 +32,7 @@
         <p>Loading...</p>
       </div>
     </div>
+  </div>
 </template>
   
 <script>
@@ -59,6 +62,9 @@ export default {
         //this.userId = 'testUserId'; // Use a test ID or hard-code a value for debugging
     },
     methods: {
+        showScreen() {
+            this.show = !this.show;
+        },
         closeAddCard() {
             this.show = false;
         },
