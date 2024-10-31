@@ -30,7 +30,7 @@ jobs:
     needs: build-and-push
     steps:
       - name: Install SSH client
-        run: sudo apt-get install -y openssh-client
+        run: sudo apt-get install -y openssh-client sshpass
 
       - name: Deploy to K3s
         env:
@@ -40,6 +40,9 @@ jobs:
           SSH_PORT: ${{ secrets.SSH_PORT }} # 自定義 SSH 端口號
         run: |
           sshpass -p "$K3S_PASSWORD" ssh -o StrictHostKeyChecking=no -p $SSH_PORT $K3S_USER@$K3S_IP << EOF
-            # 更新 K3s 中的 Kubernetes 部署，使用新的 Docker 映像
-            kubectl set image deployment/my-deployment my-container=ghcr.io/${{ github.repository }}:latest
+            # 更新 K3s 中的 Kubernetes 部署，使用新的 Docker 映像並強制重新拉取
+            kubectl set image deployment/my-deployment my-container=ghcr.io/${{ github.repository }}:latest --record -n default
+
+            # 等待滾動更新完成
+            kubectl rollout status deployment/my-deployment -n default
           EOF
