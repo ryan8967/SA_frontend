@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Checkmarx One CLI Action
-        uses: checkmarx/ast-github-action@main #Github Action version1
+        uses: checkmarx/ast-github-action@main #Github Action version2
         with:
           project_name: 'ACW_2024_Team02'
           cx_tenant: 'galaxysoftware'
