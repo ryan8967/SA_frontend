@@ -2,7 +2,7 @@
     <div id="app">
         <div class="login-container" v-if="!user">
             <div class="login-box">
-                <h1>Welcome to TSMC-pettt</h1>
+                <h1>Welcome to hackthon-pettt</h1>
                 <p>Your journey to success and rewards starts here</p>
                 <button class="login-btn" @click="login">
                     Login with Google
