@@ -18,6 +18,8 @@ import FlashcardPage from "@/pages/FlashcardPage.vue";
 import CardAddPage from "@/pages/CardAddPage.vue";
 import GetAllCards from "@/pages/GetAllCards.vue";
 
+import ChatBot from "@/pages/ChatBot.vue";
+
 
 const routes = [
   {
@@ -107,6 +109,12 @@ const routes = [
     path: "/all",
     name: "All",
     component: GetAllCards,
+    //meta: { requiresAuth: true },
+  },
+  {
+    path: "/chatbot",
+    name: "All",
+    component: ChatBot,
     //meta: { requiresAuth: true },
   },
 ];
