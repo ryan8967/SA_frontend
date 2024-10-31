@@ -19,12 +19,7 @@
         />
         <button @click="sendMessage" class="send-button">Send</button>
       </div>
-      <br>
-      <div v-if="canDownload" class="button-container">
-        <router-link :to="{ path: '/download', query: { formname: 'travelform', userid: 3, extra1: extra1 } }" class="button">
-          <button class="send-button">Download PDF</button>
-        </router-link>
-      </div>
+
     </div>
     <button @click="canDownload = !canDownload">Toggle Download Button</button>
   </template>
@@ -222,5 +217,21 @@
 }
 
 /* 保留之前的樣式並增加檔案上傳按鈕的樣式 */
+.chat-window {
+  width: 90%;
+  height: 400px;
+  border: 1px solid #c1c1c1;
+  border-radius: 8px;
+  background-color: #e9e4e4;
+  padding: 15px;
+  overflow-y: scroll;
+  margin-bottom: 20px;
+
+  /* Add the background image */
+  background-image: url('src\assets\pet2.png'); /* Replace with your image path */
+  background-size: cover; /* Scales the image to cover the entire chat window */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+}
 
 </style>
