@@ -181,7 +181,7 @@ export default {
       this.popupImage = "./pet/pet1.png";
 
       this.petStore.addExperience(50); // 增加當前選中寵物的經驗值
-      alert(`Reward received for task ${taskId}!`);
+      //alert(`Reward received for task ${taskId}!`);
 
       // Additional logic for rewarding can be added here
     },
@@ -191,6 +191,13 @@ export default {
 
 <style scoped>
 /* General Layout */
+
+#text {
+  font-size: 20px;
+  color: #333;
+
+}
+
 .task-page {
   margin-top: 80px;
   /* Space for NavBar */
@@ -230,6 +237,8 @@ export default {
   padding: 20% 0%;
 }
 
+
+
 .task-item {
   background-color: white;
   border-radius: 8px;
@@ -263,7 +272,8 @@ export default {
 }
 
 .task-description {
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: bold;
   line-height: 1.5;
   color: #2c3e50;
 }

@@ -260,9 +260,11 @@ export default {
 }
 
 .task-description {
-  font-size: 16px;
+  font-size: 22px;
+  font-weight: bold;
   line-height: 1.5;
   color: #2c3e50;
+
 }
 
 /* Popup Styles */
