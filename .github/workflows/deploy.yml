@@ -1,0 +1,45 @@
+name: CI/CD Pipeline for K3s
+
+on:
+  push:
+    branches:
+      - main # 當推送到主分支時觸發
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:latest .
+          docker push ghcr.io/${{ github.repository }}:latest
+
+  deploy-to-k3s:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Install SSH client
+        run: sudo apt-get install -y openssh-client
+
+      - name: Deploy to K3s
+        env:
+          K3S_IP: ${{ secrets.K3S_IP }} # K3s 虛擬機的 IP 地址
+          K3S_USER: ${{ secrets.K3S_USER }} # 用於 SSH 的用戶名
+          K3S_PASSWORD: ${{ secrets.K3S_PASSWORD }} # 用於 SSH 的密碼
+        run: |
+          # SSH 連接到 K3s 虛擬機器
+          sshpass -p "$K3S_PASSWORD" ssh -o StrictHostKeyChecking=no $K3S_USER@$K3S_IP << EOF
+            # 更新 K3s 中的 Kubernetes 部署，使用新的 Docker 映像
+            kubectl set image deployment/my-deployment my-container=ghcr.io/${{ github.repository }}:latest
+          EOF
