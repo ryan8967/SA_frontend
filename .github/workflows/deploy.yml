@@ -37,10 +37,9 @@ jobs:
           K3S_IP: ${{ secrets.K3S_IP }} # K3s 虛擬機的 IP 地址
           K3S_USER: ${{ secrets.K3S_USER }} # 用於 SSH 的用戶名
           K3S_PASSWORD: ${{ secrets.K3S_PASSWORD }} # 用於 SSH 的密碼
-          SSH_PORT: ${{ secrets.SSH_PORT }} # SSH 連接的端口號
+          SSH_PORT: ${{ secrets.SSH_PORT }} # 自定義 SSH 端口號
         run: |
-          # SSH 連接到 K3s 虛擬機器
-          sshpass -p "$K3S_PASSWORD" ssh -o StrictHostKeyChecking=no $K3S_USER@$K3S_IP << EOF
+          sshpass -p "$K3S_PASSWORD" ssh -o StrictHostKeyChecking=no -p $SSH_PORT $K3S_USER@$K3S_IP << EOF
             # 更新 K3s 中的 Kubernetes 部署，使用新的 Docker 映像
             kubectl set image deployment/my-deployment my-container=ghcr.io/${{ github.repository }}:latest
           EOF
