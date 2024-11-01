@@ -84,6 +84,7 @@ export default {
     gap: 20px;
     padding: 10px;
     background-color: #f9f9f9;
+    padding-bottom: 20%;
     /* 背景保持淡雅 */
 }
 

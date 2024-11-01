@@ -11,6 +11,14 @@ import TestPopup from "@/pages/TestPopup.vue";
 import SocialPage from "@/pages/SocialPage.vue";
 
 import New2TaskPage from "@/pages/New2TaskPage.vue";
+import RenderTest from "@/pages/RenderTest.vue";
+
+import FlashcardPage from "@/pages/FlashcardPage.vue";
+
+import CardAddPage from "@/pages/CardAddPage.vue";
+import GetAllCards from "@/pages/GetAllCards.vue";
+
+import ChatBot from "@/pages/ChatBot.vue";
 
 
 const routes = [
@@ -79,6 +87,36 @@ const routes = [
     component: SocialPage,
     meta: { requiresAuth: true }, // 需要登入的頁面
   },
+  {
+    path: "/render",
+    name: "Render",
+    component: RenderTest,
+    //meta: { requiresAuth: true }, // 需要登入的頁面
+  },
+  {
+    path: "/learn",
+    name: "learn",
+    component: FlashcardPage,
+    //meta: { requiresAuth: true }, // 需要登入的頁面
+  },
+  {
+    path: "/card",
+    name: "Card",
+    component: CardAddPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/all",
+    name: "All",
+    component: GetAllCards,
+    //meta: { requiresAuth: true },
+  },
+  {
+    path: "/chatbot",
+    name: "All",
+    component: ChatBot,
+    //meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({
@@ -87,13 +125,13 @@ const router = createRouter({
 });
 
 // 路由守衛：未登入時重定向到歡迎頁面
-router.beforeEach((to, from, next) => {
-  const user = JSON.parse(localStorage.getItem("user")); // 簡單模擬驗證
-  if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
-    next("/");
-  } else {
-    next();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   const user = JSON.parse(localStorage.getItem("user")); // 簡單模擬驗證
+//   if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
+//     next("/");
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;

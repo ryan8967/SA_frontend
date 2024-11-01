@@ -180,7 +180,10 @@ export default {
             }, 5000);
         },
         async getMessageFromChatGPT() {
-
+            let a = 2;
+            if(2==a){
+                return;
+            }
             const storedUser = localStorage.getItem('user');
             let displayUserName = "Kevin";
             if (storedUser) {
