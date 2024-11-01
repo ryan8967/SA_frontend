@@ -43,7 +43,7 @@ export default {
         return {
             flashcards: [],
             currentPage: 1,
-            cardsPerPage: 10,
+            cardsPerPage: 4,
         };
     },
     mounted() {
@@ -104,12 +104,12 @@ export default {
     justify-content: space-between; 
     align-items: center;        
     padding: 10px;             
-    margin-top: 150px;
-    gap: 200px;
+    margin-top: 100px;
+    gap: 50px;
 }
 
 .title {
-    font-size: 45px;
+    font-size: 35px;
     text-align: center;
     margin: 0;
 }
@@ -134,14 +134,14 @@ export default {
 }
 
 .flashcard {
-    padding: 20px;
-    border-radius: 12px;
-    width: 600px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 20px;
-    font-size: 30px;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 20px;
+  font-size: 30px;
 }
 
 .content {
