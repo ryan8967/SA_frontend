@@ -10,9 +10,10 @@
 
         <!-- 中間圖標換成 tsmc.png -->
         <button class="nav-item home-btn" @click="navigateTo('Main')">
-            <div class="home-icon">
+            <!-- <div class="home-icon">
                 <img src="tsmc.png" alt="Home" class="tsmc-icon" />
-            </div>
+            </div> -->
+            <font-awesome-icon :icon="['fas', 'home']" class="icon" />
         </button>
 
         <button class="nav-item" @click="navigateTo('Shop')">
