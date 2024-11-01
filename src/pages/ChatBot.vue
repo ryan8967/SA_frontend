@@ -228,7 +228,7 @@
   margin-bottom: 20px;
 
   /* Add the background image */
-  background-image: url('src\assets\pet2.png'); /* Replace with your image path */
+  background-image: url('@/assets/pet2.png');  /* Replace with your image path */
   background-size: cover; /* Scales the image to cover the entire chat window */
   background-position: center; /* Centers the image */
   background-repeat: no-repeat; /* Prevents the image from repeating */
