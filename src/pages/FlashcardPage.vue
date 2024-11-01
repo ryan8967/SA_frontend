@@ -60,8 +60,8 @@ export default {
   methods: {
     async fetchFlashcards() {
       const db = getDatabase();
-      const userId = JSON.parse(localStorage.getItem("user")).uid;
-      //const userId = "testUserId";
+      //const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const userId = "testUserId";
       const flashcardsRef = ref(db, `users/${userId}/wordCards`);
 
       try {
@@ -108,19 +108,20 @@ export default {
 
 <style scoped>
 .header {
-    display: flex;                
-    justify-content: space-between; 
-    align-items: center;        
-    padding: 10px;             
-    margin-top: 150px;
-    gap: 350px;
+  display: flex;                
+  justify-content: space-between; 
+  align-items: center;        
+  padding: 10px;             
+  margin-top: 150px;
+  gap: 50px;
 }
-  
-  .title {
-    font-size: 45px;
-    text-align: center;
-  }
-  
+
+.title {
+  font-size: 35px;
+  text-align: center;
+  margin-top: 4px;
+}
+
 .flashcard-wrapper {
   position: relative;
   padding-top: 30px;
@@ -133,7 +134,7 @@ export default {
 .flashcard {
   padding: 20px;
   border-radius: 12px;
-  width: 600px;
+  width: 300px;
   background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -178,7 +179,7 @@ button {
 }
 
 .allcards button {
-  margin-top: 100px;
+  margin-top: 10px;
   background-color: #ff6f61;
   padding: 10px 25px;
   border-radius: 10px;
@@ -202,7 +203,6 @@ button {
   margin-top: 1rem;
 }
 
-
 .all-cards-button {
   padding: 10px 20px;
   font-size: 16px;
@@ -211,9 +211,7 @@ button {
   border-radius: 10px;
   background-color: #ff6f61;
   color: white;
-  margin-top: 12px;
+  margin-top: 4px;
 }
-
-
 
 </style>

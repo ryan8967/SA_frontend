@@ -1,6 +1,5 @@
 <template>
     <div class="test-page">
-        <button @click="showScreen">Add Card</button>
         <CardCreate></CardCreate>
     </div>
 </template>

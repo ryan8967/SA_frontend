@@ -1,4 +1,6 @@
 <template>
+  <div class="card-block">
+    <button @click="showScreen" v-if="!show">Add Card</button>
     <div class="word-card" v-if="show">
       <div class="word-card__header">
         <h2 class="word-card__title">建立字卡</h2>
@@ -30,6 +32,7 @@
         <p>Loading...</p>
       </div>
     </div>
+  </div>
 </template>
   
 <script>
@@ -54,11 +57,14 @@ export default {
     },
     mounted() {
         // Skip UID retrieval for debugging
-        this.userId = JSON.parse(localStorage.getItem("user")).uid;
+        //this.userId = JSON.parse(localStorage.getItem("user")).uid;
         // You can set a temporary userId for testing
-        //this.userId = 'testUserId'; // Use a test ID or hard-code a value for debugging
+        this.userId = 'testUserId'; // Use a test ID or hard-code a value for debugging
     },
     methods: {
+        showScreen() {
+            this.show = !this.show;
+        },
         closeAddCard() {
             this.show = false;
         },
