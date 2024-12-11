@@ -36,8 +36,6 @@
 </template>
 
 <script>
-import { ref, getDatabase, get } from "firebase/database";
-
 export default {
     data() {
         return {
@@ -59,24 +57,25 @@ export default {
         },
     },
     methods: {
-        async fetchFlashcards() {
-            const db = getDatabase();
-            const userId = 'testUserId';
-            const flashcardsRef = ref(db, `users/${userId}/wordCards`);
-
-            try {
-                const snapshot = await get(flashcardsRef);
-                if (snapshot.exists()) {
-                    this.flashcards = Object.values(snapshot.val()).map((card) => ({
-                        ...card,
-                        flipped: false,
-                    }));
-                } else {
-                    console.log("No flashcards found.");
-                }
-            } catch (error) {
-                console.error("Error fetching flashcards: ", error);
-            }
+        fetchFlashcards() {
+            // 模擬從後端或其他來源獲取數據
+            const mockFlashcards = [
+                {
+                    word: "Example",
+                    translation: "範例",
+                    partOfSpeech: "noun",
+                    exampleSentence: "This is an example sentence.",
+                    flipped: false,
+                },
+                {
+                    word: "Learn",
+                    translation: "學習",
+                    partOfSpeech: "verb",
+                    exampleSentence: "I want to learn something new.",
+                    flipped: false,
+                },
+            ];
+            this.flashcards = mockFlashcards;
         },
         flipCard(card) {
             card.flipped = !card.flipped;
@@ -91,19 +90,16 @@ export default {
                 this.currentPage--;
             }
         },
-        addCard() {
-            console.log("Add card button clicked!");
-        },
     },
 };
 </script>
 
 <style scoped>
 .header {
-    display: flex;                
-    justify-content: space-between; 
-    align-items: center;        
-    padding: 10px;             
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
     margin-top: 100px;
     gap: 50px;
 }
@@ -134,14 +130,14 @@ export default {
 }
 
 .flashcard {
-  padding: 20px;
-  border-radius: 12px;
-  width: 300px;
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin-bottom: 20px;
-  font-size: 30px;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+    font-size: 30px;
 }
 
 .content {
@@ -167,7 +163,6 @@ export default {
     align-items: center;
     margin-top: 20px;
     justify-content: center;
-
 }
 
 .previous-page-button {
@@ -199,16 +194,15 @@ export default {
 }
 
 .answer {
-  width: 100%;
+    width: 100%;
 }
 
 .example {
-  margin-top: 1rem;
+    margin-top: 1rem;
 }
 
 button:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
-
 </style>

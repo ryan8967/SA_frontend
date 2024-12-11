@@ -28,13 +28,10 @@
 
                 <div class="pet-details">
                     <p class="pet-level">Level: {{ petLevel }}</p>
-
-
                     <p class="pet-name">Name: {{ petName }}</p>
                 </div>
             </div>
         </div>
-
 
         <!-- 任務狀態顯示 -->
         <div class="card task-status" v-if="user">
@@ -57,9 +54,7 @@
 </template>
 
 <script>
-import { ref, update, onValue } from 'firebase/database';
-import { database } from '../firebase'; // 引入 Firebase Realtime Database
-import OpenAI from "openai";
+// import OpenAI from "openai";
 import { usePetStore } from '../stores/petStore'; // 引入狀態管理
 
 export default {
@@ -74,15 +69,12 @@ export default {
             user: null, // 用戶資訊
             isClickGif: false, // 控制是否顯示 -click.gif
             tasks: [], // 任務列表
-            passiveIncomeInterval: null, // 用於被動收入的定時器
             showBubble: false,
             floatingTexts: ["你超棒", "明日新星就是你", "又完成一個任務了", "加油加油", "你是最棒的"],
             floatingTextIndex: 0
-
         };
     },
     computed: {
-        // 從 petStore 取出主寵物的圖片和其他屬性
         selectedPet() {
             return this.petStore.selectedPet;
         },
@@ -92,23 +84,6 @@ export default {
         petLevel() {
             return this.selectedPet.level || 1;
         },
-        // mainPetImage() {
-        //     if (this.petStore.hasBrokenThrough) {
-        //         return 'pet/upgrade.gif'; // 突破後的主圖片
-        //     } else {
-        //         const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
-        //         return `pet/${petFileName}.gif`;
-        //     }
-        // },
-        // clickGifImage() {
-        //     if (this.petStore.hasBrokenThrough) {
-        //         return 'pet/upgrade-click.gif'; // 突破後的點擊圖片
-        //     } else {
-        //         const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
-        //         return `pet/${petFileName}-click.gif`;
-        //     }
-        // }
-
         mainPetImage() {
             const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
             if (this.petStore.hasBrokenThrough && petFileName == 'pet3') {
@@ -119,7 +94,7 @@ export default {
         clickGifImage() {
             const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
             if (this.petStore.hasBrokenThrough && petFileName == 'pet3') {
-                return 'pet/upgrade-click.gif'; // 突破後的主圖片
+                return 'pet/upgrade-click.gif'; // 突破後的點擊圖片
             }
             return `pet/${petFileName}-click.gif`;
         },
@@ -133,35 +108,16 @@ export default {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
                 this.user = JSON.parse(storedUser);
-                const userId = this.user.uid;
-                const userRef = ref(database, `users/${userId}`);
-
-                // 監聽 Firebase Realtime Database 的變化
-                onValue(userRef, (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        this.tasks = data.tasks || [];
-                    }
-                });
             } else {
                 this.$router.push('/'); // 如果沒有用戶資料，重定向回登入頁面
             }
         },
         acceptTask(task) {
             task.status = 'in progress';
-            this.updateTasks();
         },
         completeTask(task) {
             task.status = 'completed';
             this.petStore.addExperience(10); // 完成任務提升經驗值
-            this.updateTasks();
-        },
-        updateTasks() {
-            const userId = this.user.uid;
-            const userRef = ref(database, `users/${userId}`);
-            update(userRef, {
-                tasks: this.tasks,
-            });
         },
         showClickGif() {
             this.isClickGif = true;
@@ -170,66 +126,23 @@ export default {
             }, 1500);
         },
         showTextBubble() {
-            console.log("show text tttt")
             this.showBubble = true;
-            // this.floatingTextIndex = Math.floor(Math.random() * this.floatingTexts.length);
             this.floatingTextIndex = (this.floatingTextIndex + 1) % this.floatingTexts.length;
-            // Hide the bubble after 5 seconds
             setTimeout(() => {
                 this.showBubble = false;
             }, 5000);
         },
         async getMessageFromChatGPT() {
-            let a = 2;
-            if(2==a){
-                return;
-            }
-            const storedUser = localStorage.getItem('user');
-            let displayUserName = "Kevin";
-            if (storedUser) {
-                this.user = JSON.parse(storedUser);
-                displayUserName = this.user.displayName
-
-            }
-
-            console.log(displayUserName)
-
-            let kkk =
-                "c2stM1VhNDUwUHhhdjNnVVNNLUNmSHVTQ25ySUI3YUZGZjU1d0RRaE92SEZSVDNCbGJrRkowUkVpazRGWmN3QnIwZXIyX2xUU1BsbWV5dFZzQWpnYmpNS1puLVRfNEE=";
-            const decodedStr = atob(kkk);
-            // console.log(decodedStr);
-
-            const openai = new OpenAI({
-                apiKey: decodedStr,
-                dangerouslyAllowBrowser: true,
-            });
-
-            const thread = await openai.beta.threads.create();
-
-            console.log("loading GPT");
-            let prompt = `Please address the user as ${displayUserName}. The user has a premium account.First greeting to user with his name. Then say something to encourage him to work, give me five sentences. Separate each sentence with commas. Each sentence should cotent user name and not exceed 10 words. there shoudn't be comma after name. Answer in Traditional Chinese.`
-            let run = await openai.beta.threads.runs.createAndPoll(thread.id, {
-                assistant_id: "asst_8GkyxwRkgLuvSkUcvhkFIFKT",
-                instructions: prompt
-
-            });
-
-            if (run.status === "completed") {
-
-                const messages = await openai.beta.threads.messages.list(run.thread_id);
-                for (const message of messages.data.reverse()) {
-                    console.log(`${message.role} > ${message.content[0].text.value}`);
-                    this.mes = message.content[0].text.value;
-                    this.floatingTexts = this.mes.split("，");
-                    console.log(this.floatingTexts);
-                }
-            } else {
-                console.log(run.status);
-            }
+            // 假回傳替代 OpenAI 調用
+            this.floatingTexts = ["模擬訊息1", "模擬訊息2", "模擬訊息3", "模擬訊息4", "模擬訊息5"];
         },
     },
+
+
 };
 </script>
+
+
 
 <style scoped>
 .hh {

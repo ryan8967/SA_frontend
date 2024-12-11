@@ -12,9 +12,9 @@ import BottomBar from '@/components/BottomBar.vue';
 import NavBar from '@/components/NavBar.vue';
 import { useUserStore } from '@/stores/userStore';
 import { usePetStore } from './stores/petStore';
-import { ref, onValue, update } from 'firebase/database'; // 引入 Firebase 相關 API
-import { database } from '@/firebase'; // 引入初始化的 Firebase 服務
 import gsap from 'gsap'; // 引入 gsap
+import axios from 'axios';
+
 export default {
   name: 'App',
   components: {
@@ -38,62 +38,50 @@ export default {
       if (storedUser) {
         const user = JSON.parse(storedUser);
         userStore.setUser(user);
-        this.setupFirebaseSync(user.uid);
-
+        this.setupApiSync(user.uid);
       }
     },
-    setupFirebaseSync(userId) {
+    setupApiSync(userId) {
       const userStore = useUserStore();
-
-      const userRef = ref(database, `users/${userId}`);
       const petStore = usePetStore();
-      // 監聽 Firebase 的數據變化
-      onValue(userRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          userStore.setVirtualCoins(data.virtualCoins);
-          userStore.setDiamonds(data.diamonds || 0); // 同步鑽石
-          userStore.setPetLevel(data.petLevel || 1);
 
-          petStore.selectPet(data.selectedPetIndex.selectedPetIndex);
-          console.log('selectedPetIndex:', data.selectedPetIndex.selectedPetIndex);
-          console.log('Data updated from Firebase:', data.virtualCoins, data.diamonds);
-        }
-      });
+      // 假設你有 API 提供用戶數據
+      setInterval(async () => {
+        try {
+          const response = await axios.get(`/api/users/${userId}`);
+          const data = response.data;
 
-      // 定時從 Firebase 抓取數據
-      setInterval(() => {
-        onValue(userRef, (snapshot) => {
-          const data = snapshot.val();
           if (data) {
             userStore.setVirtualCoins(data.virtualCoins);
-            userStore.setDiamonds(data.diamonds || 0); // 定時同步鑽石
+            userStore.setDiamonds(data.diamonds || 0); // 同步鑽石
             userStore.setPetLevel(data.petLevel || 1);
-            console.log('Data updated from Firebase:', data.virtualCoins, data.diamonds);
+            petStore.selectPet(data.selectedPetIndex);
+            console.log('Data updated from API:', data.virtualCoins, data.diamonds);
           }
-        });
-
-      }, 3000); // 每10秒抓取一次資料
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }, 3000); // 每 3 秒抓取一次資料
     },
     setupPassiveIncome() {
       const userStore = useUserStore();
       const userId = userStore.user ? userStore.user.uid : null;
 
       if (userId) {
-        const userRef = ref(database, `users/${userId}`);
-
-        // 每隔 10 秒自動增加虛擬幣和鑽石
-        setInterval(() => {
+        // 每隔 3 秒自動增加虛擬幣
+        setInterval(async () => {
           const newCoins = userStore.virtualCoins + 1;
-          // const newDiamonds = userStore.diamonds + 1; // 增加鑽石
           userStore.setVirtualCoins(newCoins);
-          // userStore.setDiamonds(newDiamonds); // 更新鑽石
 
-          // 同步到 Firebase
-          update(userRef, {
-            virtualCoins: newCoins,
-          });
-        }, 3000); // 每10秒增加1個虛擬幣和1個鑽石
+          try {
+            // 同步到後端 API
+            await axios.put(`/api/users/${userId}`, {
+              virtualCoins: newCoins,
+            });
+          } catch (error) {
+            console.error('Error updating virtual coins:', error);
+          }
+        }, 3000);
       }
     },
     // 創建粒子效果
@@ -129,12 +117,8 @@ export default {
         });
       }
     }
-
-
   }
 };
-
-
 </script>
 
 <style>

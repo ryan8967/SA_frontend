@@ -2,7 +2,7 @@
     <div class="task-page">
         <!-- Button to trigger popup -->
         <button @click="showPopup = true" class="add-task-btn">+</button>
-        
+
         <!-- Task list display -->
         <ul>
             <li v-for="task in tasks" :key="task.id" class="card task-item">
@@ -34,27 +34,13 @@
 </template>
 
 <script>
-import { ref, push, onValue } from "firebase/database";
-import { database } from "../firebase";
-import { useUserStore } from "@/stores/userStore";
-
 export default {
-    setup() {
-        const userStore = useUserStore();
-
-        // Using computed to make the data reactive
-        const user = userStore.user;
-
-        return {
-            user,
-        };
-    },
     data() {
         return {
             newTaskDescription: "",
             newTaskUsername: "",
             tasks: [],
-            showPopup: false // Controls the visibility of the popup modal
+            showPopup: false, // Controls the visibility of the popup modal
         };
     },
     mounted() {
@@ -62,49 +48,54 @@ export default {
     },
     methods: {
         addTask() {
-            const userId = JSON.parse(localStorage.getItem("user")).uid;
-            const tasksRef = ref(database, `users/${userId}/tasks`);
             const newTask = {
+                id: this.generateId(),
                 description: this.newTaskDescription,
-                username: this.user.displayName,
+                username: this.newTaskUsername || "Anonymous",
                 published_time: new Date().toISOString().split('T')[0], // Gets the current date in yyyy-mm-dd format
-                status: "not started"
+                status: "not started",
             };
 
-            // Push new task to Firebase
-            push(tasksRef, newTask)
-                .then(() => {
-                    this.newTaskDescription = "";
-                    this.newTaskUsername = "";
-                    this.showPopup = false; // Hide the popup after adding task
-                })
-                .catch((error) => {
-                    console.error("Error adding task:", error);
-                });
+            this.tasks.push(newTask); // Add new task to local tasks array
+            this.newTaskDescription = "";
+            this.newTaskUsername = "";
+            this.showPopup = false; // Hide the popup after adding task
         },
         loadTasks() {
-            const userId = JSON.parse(localStorage.getItem("user")).uid;
-            const tasksRef = ref(database, `users/${userId}/tasks`);
-
-            onValue(tasksRef, (snapshot) => {
-                const data = snapshot.val();
-                const tasksArray = [];
-
-                for (const key in data) {
-                    tasksArray.push({
-                        id: key,
-                        ...data[key]
-                    });
-                }
-
-                this.tasks = tasksArray;
-            });
-        }
-    }
+            // Mock loading tasks from a local array
+            this.tasks = [
+                {
+                    id: "1",
+                    description: "Complete project documentation",
+                    username: "John Doe",
+                    published_time: "2024-12-10",
+                    status: "not started",
+                },
+                {
+                    id: "2",
+                    description: "Code review with the team",
+                    username: "Jane Smith",
+                    published_time: "2024-12-09",
+                    status: "in progress",
+                },
+                {
+                    id: "3",
+                    description: "Prepare project presentation",
+                    username: "Alice Brown",
+                    published_time: "2024-12-08",
+                    status: "completed",
+                },
+            ];
+        },
+        generateId() {
+            // Generate a simple unique ID for new tasks
+            return Date.now().toString();
+        },
+    },
 };
 </script>
 
-<!-- <style scoped>
+<style scoped>
 .task-page {
     max-width: 450px;
     margin: 0 auto;
@@ -247,100 +238,4 @@ export default {
         font-size: 18px;
     }
 }
-</style> -->
-
-<!-- <style scoped>
-.task-page {
-    max-width: 400px;
-    margin: 0 auto;
-    position: relative;
-    padding-top: 20px;
-    box-sizing: border-box;
-}
-
-.add-task-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 5px 10px;
-    font-size: 24px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.add-task-btn:hover {
-    background-color: #0056b3;
-}
-
-.task-item {
-    background-color: white;
-    border: 1px solid #ccc;
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.task-header {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.task-username {
-    font-size: 16px;
-}
-
-.task-time {
-    font-size: 12px;
-    color: #999;
-}
-
-.task-body {
-    margin-top: 5px;
-}
-
-.popup-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.popup-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-}
-
-.popup-buttons {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-}
-
-@media only screen and (max-width: 600px) {
-    .task-page {
-        padding: 10px;
-    }
-
-    .task-item {
-        padding: 10px;
-    }
-
-    .add-task-btn {
-        font-size: 20px;
-    }
-}
-</style> -->
-
+</style>

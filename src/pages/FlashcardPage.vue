@@ -39,8 +39,6 @@
 </template>
 
 <script>
-import { ref, getDatabase, get } from "firebase/database";
-
 export default {
   data() {
     return {
@@ -58,25 +56,25 @@ export default {
     this.fetchFlashcards();
   },
   methods: {
-    async fetchFlashcards() {
-      const db = getDatabase();
-      //const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const userId = "testUserId";
-      const flashcardsRef = ref(db, `users/${userId}/wordCards`);
-
-      try {
-        const snapshot = await get(flashcardsRef);
-        if (snapshot.exists()) {
-          this.flashcards = Object.values(snapshot.val()).map((card) => ({
-            ...card,
-            flipped: false,
-          }));
-        } else {
-          console.log("No flashcards found.");
-        }
-      } catch (error) {
-        console.error("Error fetching flashcards: ", error);
-      }
+    fetchFlashcards() {
+      // 模擬從後端 API 或其他資料來源獲取資料
+      const mockFlashcards = [
+        {
+          word: "Example",
+          translation: "範例",
+          partOfSpeech: "noun",
+          exampleSentence: "This is an example sentence.",
+          flipped: false,
+        },
+        {
+          word: "Learn",
+          translation: "學習",
+          partOfSpeech: "verb",
+          exampleSentence: "I want to learn something new.",
+          flipped: false,
+        },
+      ];
+      this.flashcards = mockFlashcards;
     },
     flipCard(card) {
       card.flipped = !card.flipped;
@@ -98,20 +96,20 @@ export default {
         this.flashcards = [];
       }
     },
-    async tryAgain() {
+    tryAgain() {
       window.location.reload();
     },
   },
 };
 </script>
 
-
 <style scoped>
+/* 保留原有的樣式 */
 .header {
-  display: flex;                
-  justify-content: space-between; 
-  align-items: center;        
-  padding: 10px;             
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
   margin-top: 150px;
   gap: 50px;
 }
@@ -172,23 +170,6 @@ button {
   gap: 15px;
 }
 
-.allcards {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-}
-
-.allcards button {
-  margin-top: 10px;
-  background-color: #ff6f61;
-  padding: 10px 25px;
-  border-radius: 10px;
-  font-size: 15px;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
 .part-of-speech,
 .example {
   font-size: 20px;
@@ -213,5 +194,4 @@ button {
   color: white;
   margin-top: 4px;
 }
-
 </style>

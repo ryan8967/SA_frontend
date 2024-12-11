@@ -5,14 +5,14 @@
                 <h1>Welcome to deploytest!!!!</h1>
                 <p>Your journey to success and rewards starts here</p>
                 <button class="login-btn" @click="login">
-                    Login with Google
+                    Login
                 </button>
             </div>
         </div>
 
         <div class="user-info" v-if="user">
-            <h2>Welcome, {{ user.displayName }}!</h2>
-            <p>Your ID: {{ user.uid }}</p>
+            <h2>Welcome, {{ user.name }}!</h2>
+            <p>Your ID: {{ user.id }}</p>
             <div class="form-group">
                 <input v-model="name" placeholder="Enter your pet's name" class="input-field" />
             </div>
@@ -28,9 +28,6 @@
 </template>
 
 <script>
-import { signInWithGoogle, database } from '../firebase'; // 引入 Firebase 認證和數據庫
-import { ref, set } from 'firebase/database'; // 使用 Realtime Database 的 ref 和 set 方法
-
 export default {
     name: 'WelcomePage',
     data() {
@@ -41,37 +38,36 @@ export default {
         };
     },
     methods: {
-        // Google 登入功能
-        async login() {
-            try {
-                const result = await signInWithGoogle();
-                this.user = result.user; // 登入成功後，儲存用戶資訊
+        // 模擬登入功能
+        login() {
+            // 模擬用戶資料
+            const mockUser = {
+                id: "12345",
+                name: "John Doe"
+            };
+            this.user = mockUser;
 
-                // 將用戶資訊存入 localStorage 並跳轉到主頁面
-                localStorage.setItem('user', JSON.stringify(this.user));
-                this.$router.push('/main');
-            } catch (error) {
-                console.error('Error during Google login:', error);
-            }
+            // 將用戶資訊存入 localStorage
+            localStorage.setItem('user', JSON.stringify(this.user));
         },
-        // 儲存用戶資料到 Firebase Realtime Database
+        // 模擬儲存資料
         saveData() {
             if (this.user) {
-                const userId = this.user.uid; // 使用 Google 的 UID 作為用戶 ID
-                const userRef = ref(database, 'users/' + userId); // 建立到資料庫的參考路徑
-
-                // 儲存用戶的名字和金額（寵物的名字和能量）
-                set(userRef, {
+                console.log("Saving pet info:", {
                     petName: this.name,
                     petEnergy: this.balance
-                })
-                    .then(() => {
-                        console.log('Pet data saved successfully');
-                    })
-                    .catch((error) => {
-                        console.error('Error saving pet data:', error);
-                    });
+                });
+                alert("Pet data saved successfully!");
+            } else {
+                alert("Please login first!");
             }
+        }
+    },
+    mounted() {
+        // 嘗試從 localStorage 載入用戶資料
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+            this.user = JSON.parse(savedUser);
         }
     }
 };

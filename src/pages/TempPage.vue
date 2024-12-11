@@ -1,71 +1,49 @@
 <script>
-import { ref, push, onValue } from "firebase/database";
-import { database } from "../firebase";
-import { useUserStore } from "@/stores/userStore";
-
 export default {
-    setup() {
-        const userStore = useUserStore();
-
-        // Using computed to make the data reactive
-        const user = userStore.user;
-
-        return {
-            user,
-        };
-    },
     data() {
         return {
-            newTaskDescription: "",
-            newTaskUsername: "",
-            newTaskTitle,
-            tasks: [],
-            showPopup: false // Controls the visibility of the popup modal
+            newTaskDescription: "", // 新任務描述
+            newTaskUsername: "", // 用戶名稱
+            newTaskTitle: "", // 任務標題
+            tasks: [], // 任務列表
+            showPopup: false // 控制是否顯示新增彈窗
         };
-    },
-    mounted() {
-        this.loadTasks();
     },
     methods: {
         addTask() {
-            //const userId = JSON.parse(localStorage.getItem("user")).uid;
-            //const tasksRef = ref(database, `users/${userId}/tasks`);
+            // 建立新任務物件
             const newTask = {
-                
+                id: Date.now(), // 使用當前時間戳作為唯一 ID
                 description: this.newTaskDescription,
-                username: this.user.displayName,
-                published_time: new Date().toISOString().split('T')[0], // Gets the current date in yyyy-mm-dd format
+                username: this.newTaskUsername || "Anonymous", // 如果未提供用戶名稱，使用 "Anonymous"
+                published_time: new Date().toISOString().split('T')[0], // yyyy-mm-dd 格式的日期
                 status: "not started"
             };
 
-            // Push new task to Firebase
-            push(tasksRef, newTask)
-                .then(() => {
-                    this.newTaskDescription = "";
-                    this.newTaskUsername = "";
-                    this.showPopup = false; // Hide the popup after adding task
-                })
-                .catch((error) => {
-                    console.error("Error adding task:", error);
-                });
+            // 將新任務加入本地任務列表
+            this.tasks.push(newTask);
+
+            // 清空輸入欄位並隱藏彈窗
+            this.newTaskDescription = "";
+            this.newTaskUsername = "";
+            this.showPopup = false;
         },
         loadTasks() {
-            const userId = JSON.parse(localStorage.getItem("user")).uid;
-            const tasksRef = ref(database, `users/${userId}/tasks`);
-
-            onValue(tasksRef, (snapshot) => {
-                const data = snapshot.val();
-                const tasksArray = [];
-
-                for (const key in data) {
-                    tasksArray.push({
-                        id: key,
-                        ...data[key]
-                    });
-                }
-
-                this.tasks = tasksArray;
-            });
+            // 假設從本地存儲中載入任務
+            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            this.tasks = storedTasks;
+        }
+    },
+    mounted() {
+        this.loadTasks(); // 頁面載入時載入任務
+    },
+    watch: {
+        // 監控 tasks 變化並同步到本地存儲
+        tasks: {
+            deep: true,
+            handler(newTasks) {
+                localStorage.setItem("tasks", JSON.stringify(newTasks));
+            }
         }
     }
 };

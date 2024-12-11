@@ -25,7 +25,6 @@
         <div class="task-description">{{ task.description }}</div>
         <button @click="updateTaskStatus(task.id, 'in progress')" class="btn btn-primary">Start the Event</button>
         <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
-          <font-awesome-icon :icon="['fas', 'user']" class="icon" />
           {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
         </button>
       </div>
@@ -40,7 +39,6 @@
         <div class="task-description">{{ task.description }}</div>
         <button @click="updateTaskStatus(task.id, 'completed')" class="btn btn-primary">End the Event</button>
         <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
-          <font-awesome-icon :icon="['fas', 'user']" class="icon" />
           {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
         </button>
       </div>
@@ -54,7 +52,6 @@
         </div>
         <div class="task-description">{{ task.description }}</div>
         <button @click="toggleJoinTask(task.id)" class="btn btn-secondary">
-          <font-awesome-icon :icon="['fas', 'user']" class="icon" />
           {{ isUserJoined(task) ? 'Disjoin' : 'Join' }} ({{ task.attendees ? Object.keys(task.attendees).length : 0 }})
         </button>
       </div>
@@ -62,41 +59,20 @@
 
     <!-- Add Task Button -->
     <button class="add-task-btn" @click="togglePopup">
-      <font-awesome-icon :icon="['fas', 'plus']" />
+      Add Task
     </button>
   </div>
 </template>
 
 <script>
-import { ref, push, onValue, update, remove } from "firebase/database";
-import { database } from "../firebase";
-import { useUserStore } from "@/stores/userStore";
-import { usePetStore } from '../stores/petStore'; // 引入狀態管理
-
 export default {
-  setup() {
-    const userStore = useUserStore();
-    // Making user reactive via computed
-    const user = userStore.user;
-    const petStore = usePetStore();
-
-
-
-    return {
-      petStore,
-      user,
-    };
-  },
   data() {
     return {
       newTaskTitle: "",
       newTaskDescription: "",
-      tasks: [],
-      showPopup: false, // Controls the visibility of the popup modal
+      tasks: [], // 使用本地資料來儲存任務
+      showPopup: false,
     };
-  },
-  mounted() {
-    this.loadTasks();
   },
   methods: {
     navigateToSocial() {
@@ -106,71 +82,36 @@ export default {
       this.showPopup = !this.showPopup;
     },
     addTask() {
-      // const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const tasksRef = ref(database, `tasks`); //users/${userId}/
       const newTask = {
+        id: Date.now(), // 唯一 ID
         title: this.newTaskTitle,
         description: this.newTaskDescription,
-        username: this.user ? this.user.displayName : "Anonymous", // Fallback for displayName
-        time: new Date().toISOString().split('T')[0], // yyyy-mm-dd format
+        username: "Anonymous", // 預設用戶名稱
+        time: new Date().toISOString().split('T')[0], // yyyy-mm-dd 格式
         status: "not started",
         attendees: {},
       };
-
-      // Push new task to Firebase
-      push(tasksRef, newTask)
-        .then(() => {
-          this.newTaskTitle = "";
-          this.newTaskDescription = "";
-          this.showPopup = false; // Hide the popup after adding task
-        })
-        .catch((error) => {
-          console.error("Error adding task:", error);
-        });
-    },
-    loadTasks() {
-      // const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const tasksRef = ref(database, `tasks`); //users/${userId}/
-
-      onValue(tasksRef, (snapshot) => {
-        const data = snapshot.val();
-        const tasksArray = [];
-
-        for (const key in data) {
-          tasksArray.push({
-            id: key,
-            ...data[key],
-          });
-        }
-
-        this.tasks = tasksArray;
-      });
+      this.tasks.push(newTask);
+      this.newTaskTitle = "";
+      this.newTaskDescription = "";
+      this.showPopup = false;
     },
     updateTaskStatus(taskId, newStatus) {
-      // const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const taskRef = ref(database, `tasks/${taskId}`); //users/${userId}/
-
-      update(taskRef, { status: newStatus }).catch((error) => {
-        console.error("Error updating task status:", error);
-      });
+      const task = this.tasks.find(t => t.id === taskId);
+      if (task) task.status = newStatus;
     },
     toggleJoinTask(taskId) {
-      const userId = JSON.parse(localStorage.getItem("user")).uid;
-      const userName = this.user ? this.user.displayName : "Anonymous";
-      const taskRef = ref(database, `tasks/${taskId}/attendees/${userId}`);
-
-      if (this.isUserJoined(this.tasks.find(task => task.id === taskId))) {
-        remove(taskRef).catch((error) => {
-          console.error("Error disjoining task:", error);
-        });
+      const task = this.tasks.find(t => t.id === taskId);
+      const userId = "User123"; // 模擬用戶 ID
+      if (!task.attendees) task.attendees = {};
+      if (task.attendees[userId]) {
+        delete task.attendees[userId];
       } else {
-        update(taskRef, { username: userName }).catch((error) => {
-          console.error("Error joining task:", error);
-        });
+        task.attendees[userId] = "Anonymous"; // 模擬用戶名稱
       }
     },
     isUserJoined(task) {
-      const userId = JSON.parse(localStorage.getItem("user")).uid;
+      const userId = "User123"; // 模擬用戶 ID
       return task.attendees && task.attendees[userId];
     },
     cancelTask() {

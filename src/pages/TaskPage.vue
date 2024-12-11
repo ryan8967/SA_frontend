@@ -18,9 +18,6 @@
 </template>
 
 <script>
-import { ref, push, onValue } from "firebase/database";
-import { database } from "../firebase"; // 引入 Firebase Realtime Database
-
 export default {
     data() {
         return {
@@ -28,45 +25,20 @@ export default {
             tasks: [] // 現有任務列表
         };
     },
-    mounted() {
-        this.loadTasks();
-    },
     methods: {
         addTask() {
-            const userId = JSON.parse(localStorage.getItem("user")).uid;
-            const tasksRef = ref(database, `users/${userId}/tasks`);
+            // 生成新的任務物件
             const newTask = {
+                id: Date.now(), // 使用當前時間戳作為唯一 ID
                 description: this.newTaskDescription,
                 status: "not started"
             };
 
-            // 將新任務推送到 Firebase
-            push(tasksRef, newTask)
-                .then(() => {
-                    this.newTaskDescription = ""; // 清空輸入框
-                })
-                .catch((error) => {
-                    console.error("Error adding task:", error);
-                });
-        },
-        loadTasks() {
-            const userId = JSON.parse(localStorage.getItem("user")).uid;
-            const tasksRef = ref(database, `users/${userId}/tasks`);
+            // 將新任務加入到本地任務列表
+            this.tasks.push(newTask);
 
-            // 監聽任務列表的變化
-            onValue(tasksRef, (snapshot) => {
-                const data = snapshot.val();
-                const tasksArray = [];
-
-                for (const key in data) {
-                    tasksArray.push({
-                        id: key,
-                        ...data[key]
-                    });
-                }
-
-                this.tasks = tasksArray;
-            });
+            // 清空輸入框
+            this.newTaskDescription = "";
         }
     }
 };

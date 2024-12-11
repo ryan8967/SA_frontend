@@ -8,7 +8,7 @@
         <!-- 初始化成就按鈕 -->
         <button @click="initializeAchievements" class="initialize-btn">Reset</button>
 
-        <!-- 員工資訊區域，包含頭像和更改頭像功能 -->
+        <!-- 員工資訊區域 -->
         <div class="employee-info">
             <h2>員工資訊</h2>
 
@@ -32,12 +32,10 @@
                         <option value="">請選擇職位</option>
                         <option v-for="pos in allPositions" :key="pos" :value="pos">{{ pos }}</option>
                     </select>
-                    <button class="pos-save-btn" @click="pushPosition">儲存</button>
+                    <button class="pos-save-btn" @click="savePosition">儲存</button>
                 </span>
             </p>
             <p><strong>生日：</strong> {{ birthdate }}</p>
-
-            <!-- 直屬-->
             <p><strong>直屬：</strong> {{ mentor }}</p>
 
             <!-- 新增請心理假的按鈕 -->
@@ -72,164 +70,79 @@
                 <hr />
             </div>
         </div>
+
         <AchievementPopup v-if="isPopupVisible" :title="popupTitle" :description="popupDescription" :image="popupImage"
             @close="isPopupVisible = false" />
-        <div v-if="showDialog" class="dialog-overlay">
-            <div class="dialog">
-                <p>{{ dialogContent }}</p>
-                <button @click="closeDialog">關閉</button>
-            </div>
-        </div>
-
-        <!-- 心理假日期選擇彈窗 -->
-        <div v-if="showCalendar" class="calendar-overlay">
-            <div class="calendar-dialog">
-                <input type="date" v-model="leaveDate" class="calendar-input" />
-                <button @click="submitLeaveRequest" class="calendar-submit-btn">送出申請</button>
-                <button @click="closeCalendar" class="calendar-close-btn">取消</button>
-            </div>
-        </div>
     </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'; // 確保引入 onMounted
-import { ref as firebaseRef, update, onValue, set } from 'firebase/database'; // 引入 Firebase 相關 API
-import { database } from '@/firebase'; // 引入初始化的 Firebase 服務
+// import { ref, computed } from 'vue';
 import AchievementPopup from '../components/AchievementPopup.vue';
-import { useUserStore } from '@/stores/userStore'; // 引入用戶狀態管理
+
 export default {
     components: {
         AchievementPopup,
     },
     data() {
         return {
-            selectedPosition: '', // 用來暫存選擇的職位
-            position: null, // 用來顯示職位
+            userAvatar: "/default-avatar.png", // 預設頭像
+            achievements: [], // 用來存儲成就資料
+            diamonds: 0, // 紀錄用戶的鑽石數量
+            employeeId: "123456",
+            hiringDate: "2020-05-01",
+            name: "catfish",
+            birthdate: "1990-01-15",
+            mentor: "Mentor Name",
+            selectedPosition: '',
+            position: null,
+            allPositions: [
+                'Software Engineer',
+                'Frontend Engineer',
+                'Backend Engineer',
+                'Full Stack Engineer',
+                'DevOps Engineer',
+                'Data Engineer',
+                'Machine Learning Engineer',
+                'AI Engineer',
+                'Cloud Engineer',
+                'Security Engineer'
+            ],
+            isPopupVisible: false,
+            popupTitle: '',
+            popupDescription: '',
+            popupImage: '',
         };
     },
-    mounted() {
-        const userId = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).uid : null;
-        if (userId) {
-            const userPosRef = firebaseRef(database, `users/${userId}/position`);
-            onValue(userPosRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    this.position = data;
-                    this.selectedPosition = data;
-                }
-                // console.log('職位資料已載入：', data);
-            });
-        }
+    computed: {
+        completedAchievements() {
+            return this.achievements.filter(achievement => achievement.completed);
+        },
+        incompleteAchievements() {
+            return this.achievements.filter(achievement => !achievement.completed);
+        },
     },
-    setup() {
-        const userAvatar = ref("/default-avatar.png"); // 預設頭像
-        const achievements = ref([]); // 用來存儲成就資料
-        const diamonds = ref(0); // 紀錄用戶的鑽石數量
-        const position = ref(null); // 用戶的職位
-        const popupTitle = ref('');
-        const popupDescription = ref('');
-        const popupImage = ref('');
-        const isPopupVisible = ref(false);
-        // 員工資料，寫死在前端
-        const employeeId = ref("123456"); // 6 位數的員工ID
-        const hiringDate = ref("2020-05-01"); // 聘用日期
-        // const name = ref("catfish"); // 員工姓名
-        const birthdate = ref("1990-01-15"); // 員工生日
-
-        const userStore = useUserStore();
-        const name = ref(userStore.user.displayName); // 員工姓名
-
-        const allPositions = [
-            'Software Engineer',
-            'Frontend Engineer',
-            'Backend Engineer',
-            'Full Stack Engineer',
-            'DevOps Engineer',
-            'Data Engineer',
-            'Machine Learning Engineer',
-            'AI Engineer',
-            'Cloud Engineer',
-            'Security Engineer'
-        ];
-        // 新增直屬
-        const mentor = ref("Mentor Name"); // 直屬姓名
-
-        const completedAchievements = computed(() =>
-            achievements.value.filter(achievement => achievement.completed)
-        );
-        const incompleteAchievements = computed(() =>
-            achievements.value.filter(achievement => !achievement.completed)
-        );
-
-        const showDialog = ref(false);
-        const dialogContent = ref("");
-
-        // 心理假相關狀態
-        const showCalendar = ref(false);
-        const leaveDate = ref(null);
-
-        // 初始化 Firebase 上的用戶數據，包含鑽石數量
-        const initializeUserData = (userId) => {
-            const userRef = firebaseRef(database, `users/${userId}`);
-            onValue(userRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    diamonds.value = data.diamonds || 0; // 獲取當前鑽石數量
-                    position.value = data.position || null; // 獲取職位資料
-                }
-            });
-        };
-
-        // 更換頭像及完成成就
-        const uploadAvatar = async (event) => {
+    methods: {
+        uploadAvatar(event) {
             const file = event.target.files[0];
             if (file) {
-                userAvatar.value = URL.createObjectURL(file);
-                const firstAvatarChange = achievements.value.find((achievement) => achievement.id === 'first-avatar-change');
+                this.userAvatar = URL.createObjectURL(file);
+                const firstAvatarChange = this.achievements.find(ach => ach.id === 'first-avatar-change');
                 if (firstAvatarChange && !firstAvatarChange.completed) {
-                    firstAvatarChange.completed = true;
-                    completeAchievement(firstAvatarChange); // 完成成就
+                    this.completeAchievement(firstAvatarChange);
                 }
             }
-        };
-
-        // 完成成就後，增加 300 鑽石
-        const completeAchievement = async (achievement) => {
+        },
+        completeAchievement(achievement) {
             achievement.completed = true;
-            updateAchievements(); // 更新成就狀態
-
-            // 在現有鑽石基礎上增加 300 鑽石
-            diamonds.value += 300;
-            await updateFirebaseDiamonds(); // 將變更同步至 Firebase
-            // alert(`成就完成！你獲得了 300 鑽石，當前鑽石總數為：${diamonds.value}`);
-            popupTitle.value = "成就完成：" + achievement.name;
-            popupDescription.value = "你獲得了 300 鑽石，當前鑽石總數為：" + diamonds.value;
-            popupImage.value = achievement.icon;
-            isPopupVisible.value = true;
-
-        };
-
-        // 更新 Firebase 上的鑽石數量
-        const updateFirebaseDiamonds = async () => {
-            const userId = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).uid : null;
-            if (userId) {
-                const userRef = firebaseRef(database, `users/${userId}`);
-                await update(userRef, {
-                    diamonds: diamonds.value, // 更新鑽石數量
-                });
-                console.log('鑽石數量已更新至 Firebase:', diamonds.value);
-            }
-        };
-
-        // 更新成就資料
-        const updateAchievements = () => {
-            achievements.value = [...achievements.value];
-        };
-
-        // 初始化按鈕：初始化成就
-        const initializeAchievements = () => {
-            const defaultAchievements = [
+            this.diamonds += 300;
+            this.isPopupVisible = true;
+            this.popupTitle = `成就完成：${achievement.name}`;
+            this.popupDescription = `你獲得了 300 鑽石，當前鑽石總數為：${this.diamonds}`;
+            this.popupImage = achievement.icon;
+        },
+        initializeAchievements() {
+            this.achievements = [
                 {
                     id: 'login-three-times',
                     name: '登入三次',
@@ -252,95 +165,16 @@ export default {
                     icon: 'badge/employOfTheYear.png',
                 }
             ];
-
-            achievements.value = defaultAchievements;
-            // alert("成就資料初始化完成！");
-        };
-
-        const showAchievementDetails = (achievement) => {
-            dialogContent.value = (achievement.description || achievement.name) + '\n可兌換300鑽石';
-            showDialog.value = true;
-        };
-
-        const closeDialog = () => {
-            showDialog.value = false;
-        };
-
-        // 申請心理假功能
-        const openLeaveCalendar = () => {
-            showCalendar.value = true;
-        };
-
-        const closeCalendar = () => {
-            showCalendar.value = false;
-        };
-
-        const submitLeaveRequest = () => {
-            if (leaveDate.value) {
-                alert(`心理假申請已送出，選擇的日期為：${leaveDate.value}，請等待管理員批准。`);
-                showCalendar.value = false;
-            } else {
-                alert("請選擇一個日期。");
-            }
-        };
-
-        // 初始化用戶數據，獲取當前的鑽石數量
-        onMounted(() => {
-            const userId = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).uid : null;
-            if (userId) {
-                initializeUserData(userId);
-            }
-        });
-
-        return {
-
-            userAvatar,
-            employeeId,
-            hiringDate,
-            name,
-            birthdate,
-            mentor, // 新增直屬
-            allPositions, // 新增職位選項
-            achievements,
-            completedAchievements,
-            incompleteAchievements,
-            diamonds,
-            uploadAvatar,
-            showDialog,
-            dialogContent,
-            showAchievementDetails,
-            closeDialog,
-            initializeAchievements,
-            completeAchievement,
-            openLeaveCalendar, // 開啟心理假日曆選擇
-            closeCalendar, // 關閉心理假日曆選擇
-            submitLeaveRequest, // 提交心理假申請
-            showCalendar,
-            leaveDate,
-            isPopupVisible,
-            popupTitle,
-            popupDescription,
-            popupImage,
-
-        };
-    },
-    methods: {
-        pushPosition() {
-            const userId = JSON.parse(localStorage.getItem("user")).uid;
-            if (userId) {
-                const userPosRef = firebaseRef(database, `users/${userId}/position`);
-                this.selectedPosition;
-                set(userPosRef, this.selectedPosition)
-                    .then(() => {
-                        console.log("Position updated successfully!");
-                        this.position = this.selectedPosition;
-                    })
-                    .catch((error) => {
-                        console.error("Error updating position:", error);
-                        alert("Error updating position. Please try again later.");
-                    });
-            }
         },
+        savePosition() {
+            this.position = this.selectedPosition;
+        },
+        openLeaveCalendar() {
+            alert("心理假申請的模擬窗口");
+        },
+    },
+    mounted() {
+        this.initializeAchievements();
     },
 };
 </script>
