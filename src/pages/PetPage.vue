@@ -39,22 +39,38 @@ export default {
             petName: 'Fluffy',
             isClickGif: false,
             selectedPetIndex: 0,
-            petCollection: [],
+            petCollection: [
+                { src: 'pet/pet3.png', owned: true, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet5.png', owned: true, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet1.png', owned: false, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet2.png', owned: false, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet4.png', owned: false, level: 1, currentExperience: 0, experienceNeeded: 100 },
+                { src: 'pet/pet6.png', owned: false, level: 1, currentExperience: 0, experienceNeeded: 100 },
+            ], // 預設的寵物集合
         };
     },
     computed: {
         selectedPet() {
-            return this.petCollection[this.selectedPetIndex];
+            return this.petCollection[this.selectedPetIndex] || {
+                src: '',
+                owned: false,
+                level: 1,
+                currentExperience: 0,
+                experienceNeeded: 100,
+            };
         },
         mainPetImage() {
+            if (!this.selectedPet || !this.selectedPet.src) return '';
             const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
             return `pet/${petFileName}.gif`;
         },
         clickGifImage() {
+            if (!this.selectedPet || !this.selectedPet.src) return '';
             const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
             return `pet/${petFileName}-click.gif`;
         },
         experiencePercentage() {
+            if (!this.selectedPet || this.selectedPet.experienceNeeded === 0) return 0;
             return (this.selectedPet.currentExperience / this.selectedPet.experienceNeeded) * 100;
         },
     },
@@ -73,6 +89,7 @@ export default {
         },
         addExperience(amount) {
             const selectedPet = this.petCollection[this.selectedPetIndex];
+            if (!selectedPet) return;
             selectedPet.currentExperience += amount;
             if (selectedPet.currentExperience >= selectedPet.experienceNeeded) {
                 selectedPet.level += 1;
@@ -96,6 +113,7 @@ export default {
         this.initializeDefaultPets(); // 初始化時載入預設寵物集合
     },
 };
+
 </script>
 
 <style scoped>

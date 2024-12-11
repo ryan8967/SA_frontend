@@ -52,7 +52,6 @@
 
 <script>
 import AchievementPopup from '../components/AchievementPopup.vue';
-import { useUserStore } from "@/stores/userStore";
 import { usePetStore } from '../stores/petStore';
 
 export default {
@@ -60,17 +59,14 @@ export default {
     AchievementPopup,
   },
   setup() {
-    const userStore = useUserStore();
     const petStore = usePetStore();
-
     return {
-      userStore,
       petStore,
     };
   },
   data() {
     return {
-      tasks: [], // 本地模擬的任務數據
+      tasks: [], // 模擬的任務數據
       isPopupVisible: false,
       popupTitle: "",
       popupDescription: "",
@@ -82,46 +78,47 @@ export default {
   },
   methods: {
     loadTasks() {
-      // 模擬從後端獲取任務數據
+      // 提供本地模擬數據
       this.tasks = [
         {
           id: "1",
-          title: "Finish Vue.js project",
-          description: "Complete the Vue.js front-end for the project",
-          username: "John Doe",
+          title: "Complete Vue.js Component",
+          description: "Build a reusable Vue.js component",
+          username: "Alice",
           time: "2024-12-10",
           status: "not started",
         },
         {
           id: "2",
-          title: "Write Documentation",
-          description: "Prepare documentation for the project",
-          username: "Jane Smith",
+          title: "Write Unit Tests",
+          description: "Add unit tests for all components",
+          username: "Bob",
           time: "2024-12-09",
           status: "in progress",
         },
         {
           id: "3",
-          title: "Project Review",
-          description: "Review the project with the team",
-          username: "Sam Wilson",
+          title: "Refactor Codebase",
+          description: "Improve code readability and remove unused files",
+          username: "Charlie",
           time: "2024-12-08",
           status: "completed",
         },
       ];
     },
     receiveReward(taskId) {
-      const task = this.tasks.find(task => task.id === taskId);
+      const task = this.tasks.find((t) => t.id === taskId);
       if (task) {
         this.isPopupVisible = true;
-        this.popupTitle = `${task.title} 成就解鎖：超級冒險者！`;
-        this.popupDescription = "你已經完成了所有挑戰，獲得了獨特的獎勵！";
-        this.popupImage = "./pet/pet1.png";
+        this.popupTitle = `${task.title} Achieved!`;
+        this.popupDescription = `Congratulations! You have completed the task: ${task.title}.`;
+        this.popupImage = "./images/reward.png";
         this.petStore.addExperience(50); // 增加寵物經驗值
       }
     },
   },
 };
+
 </script>
 
 <style scoped>

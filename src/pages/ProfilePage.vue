@@ -1,7 +1,7 @@
 <template>
     <div class="profile-page">
         <div style="margin-top: 100px;"></div>
-        <div v-show="achievements.length > 0" style="margin-top: 850px;"></div>
+        <div v-show="achievements.length > 0" style="margin-top: 150px;"></div>
 
         <h1 class="title">個人資料頁面</h1>
 
@@ -77,7 +77,6 @@
 </template>
 
 <script>
-// import { ref, computed } from 'vue';
 import AchievementPopup from '../components/AchievementPopup.vue';
 
 export default {
@@ -88,14 +87,14 @@ export default {
         return {
             userAvatar: "/default-avatar.png", // 預設頭像
             achievements: [], // 用來存儲成就資料
-            diamonds: 0, // 紀錄用戶的鑽石數量
-            employeeId: "123456",
-            hiringDate: "2020-05-01",
-            name: "catfish",
-            birthdate: "1990-01-15",
-            mentor: "Mentor Name",
-            selectedPosition: '',
-            position: null,
+            diamonds: 100, // 初始鑽石數量
+            employeeId: "123456", // 員工 ID
+            hiringDate: "2020-05-01", // 聘用日期
+            name: "catfish", // 用戶名
+            birthdate: "1990-01-15", // 生日
+            mentor: "Mentor Name", // 直屬主管
+            selectedPosition: '', // 選中的職位
+            position: null, // 當前職位
             allPositions: [
                 'Software Engineer',
                 'Frontend Engineer',
@@ -107,11 +106,11 @@ export default {
                 'AI Engineer',
                 'Cloud Engineer',
                 'Security Engineer'
-            ],
-            isPopupVisible: false,
-            popupTitle: '',
-            popupDescription: '',
-            popupImage: '',
+            ], // 可選職位列表
+            isPopupVisible: false, // 彈窗是否可見
+            popupTitle: '', // 彈窗標題
+            popupDescription: '', // 彈窗描述
+            popupImage: '', // 彈窗圖片
         };
     },
     computed: {
@@ -174,55 +173,54 @@ export default {
         },
     },
     mounted() {
-        this.initializeAchievements();
+        this.initializeAchievements(); // 初始化模擬成就
     },
 };
+
 </script>
 
 <style scoped>
 .profile-page {
     padding: 20px;
-    margin-top: 40px;
-    /* 加入 margin-top，確保整個頁面向下平移 */
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #f4f7fa;
+}
+
+.title {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.employee-info {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #ffffff;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .employee-info p {
+    margin: 8px 0;
+    font-size: 14px;
     text-align: left;
 }
 
-/* button 樣式 */
-.pos-save-btn {
-    background-color: #ff5349;
-    color: #fff;
-    border: none;
-    padding: 3px 15px;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.pos-save-btn:hover {
-    background-color: #ff958f;
-}
-
-.pos-save-btn:active {
-    background-color: #fa9a95;
-    transform: scale(0.98);
-}
-
-.pos-save-btn:focus {
-    outline: none;
-    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-}
-
 .avatar-section {
-    margin-bottom: 20px;
-}
-
-.avatar-label {
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
 .avatar-image {
@@ -231,89 +229,45 @@ export default {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #ccc;
+    margin-bottom: 5px;
 }
 
-.achievements {
-    margin-top: 20px;
-}
-
-.achievements-completed,
-.achievements-incomplete {
-    padding-bottom: 40px;
-}
-
-.achievements-list {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.achievement-item {
-    margin: 10px;
-    text-align: center;
+.avatar-label span {
+    font-size: 14px;
+    color: #3498db;
     cursor: pointer;
 }
 
-.achievement-icon {
-    width: 150px;
-    height: 150px;
-}
-
-.completed {
-    opacity: 1;
-}
-
-.incomplete-icon {
-    opacity: 0.4;
-    /* 未完成成就的圖標顏色較淺 */
-}
-
-.dialog-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dialog {
-    background: white;
-    padding: 20px;
+.pos-save-btn {
+    background-color: #ff5349;
+    color: white;
+    border: none;
+    padding: 8px 16px;
     border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.pos-save-btn:hover {
+    background-color: #ff958f;
 }
 
 .initialize-btn {
+    margin-top: 20px;
     padding: 10px 20px;
     background-color: #ff5349;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 20px;
+    font-size: 14px;
 }
 
 .initialize-btn:hover {
     background-color: #ec9591;
-}
-
-/* 員工資料樣式 */
-.employee-info {
-    margin-top: 20px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-    text-align: center;
-    /* 中心對齊員工資訊 */
-}
-
-.employee-info .avatar-section {
-    margin-bottom: 10px;
 }
 
 .leave-btn {
@@ -323,12 +277,50 @@ export default {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     margin-top: 15px;
 }
 
 .leave-btn:hover {
     background-color: #ef8a84;
+}
+
+.achievements {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+.achievements-completed,
+.achievements-incomplete {
+    margin-bottom: 20px;
+}
+
+.achievement-item {
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.achievement-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.completed {
+    opacity: 1;
+}
+
+.incomplete-icon {
+    opacity: 0.5;
 }
 
 .calendar-overlay {
@@ -354,7 +346,7 @@ export default {
 .calendar-input {
     margin-bottom: 15px;
     padding: 10px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .calendar-submit-btn {
@@ -364,7 +356,7 @@ export default {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     margin-right: 10px;
 }
 
@@ -379,7 +371,7 @@ export default {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .calendar-close-btn:hover {

@@ -15,6 +15,7 @@ import {
   faPlus,
   faUsers,
   faExchangeAlt,
+  faBook,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -30,7 +31,8 @@ library.add(
   faUsers,
   faPlus,
   faUsers,
-  faExchangeAlt
+  faExchangeAlt,
+  faBook
 );
 
 const app = createApp(App);

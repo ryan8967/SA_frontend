@@ -4,7 +4,7 @@
             <font-awesome-icon :icon="['fas', 'paw']" class="icon" />
         </button>
 
-        <button class="nav-item" @click="navigateTo('test2')">
+        <button class="nav-item" @click="navigateTo('Test2')">
             <font-awesome-icon :icon="['fas', 'tasks']" class="icon" />
         </button>
 
@@ -21,7 +21,7 @@
         </button>
 
         <button class="nav-item" @click="navigateTo('test')">
-            <font-awesome-icon :icon="['fas', 'users']" class="icon" />
+            <font-awesome-icon :icon="['fas', 'book']" class="icon" />
         </button>
     </nav>
 </template>
