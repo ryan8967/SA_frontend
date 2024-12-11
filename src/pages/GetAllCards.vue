@@ -1,7 +1,7 @@
 <template>
     <div class="flashcard-wrapper">
         <div class="header">
-            <div class="title">All the cards!</div>
+            <div class="title">所有字卡</div>
             <router-link to="/learn">
                 <button class="back-button">Back to learning</button>
             </router-link>
@@ -15,6 +15,8 @@
                         <hr />
                         <p class="part-of-speech"><strong>詞性：</strong>{{ card.partOfSpeech }}</p>
                         <p class="example"><strong>例句：</strong>{{ card.exampleSentence }}</p>
+                        <button class="delete-button" @onclick="deleteFlashcard(card.index)">刪除</button>
+                        <button class="edit-button">編輯</button>
                     </div>
                 </div>
             </div>
@@ -57,25 +59,38 @@ export default {
         },
     },
     methods: {
-        fetchFlashcards() {
-            // 模擬從後端或其他來源獲取數據
-            const mockFlashcards = [
-                {
-                    word: "Example",
-                    translation: "範例",
-                    partOfSpeech: "noun",
-                    exampleSentence: "This is an example sentence.",
-                    flipped: false,
-                },
-                {
-                    word: "Learn",
-                    translation: "學習",
-                    partOfSpeech: "verb",
-                    exampleSentence: "I want to learn something new.",
-                    flipped: false,
-                },
-            ];
-            this.flashcards = mockFlashcards;
+        async fetchFlashcards() {
+            const db = getDatabase();
+            const userId = JSON.parse(localStorage.getItem("user")).uid;
+            const flashcardsRef = ref(db, `users/${userId}/wordCards`);
+
+            try {
+                const snapshot = await get(flashcardsRef);
+                if (snapshot.exists()) {
+                    this.flashcards = Object.values(snapshot.val()).map((card) => ({
+                        ...card,
+                        flipped: false,
+                    }));
+                } else {
+                    console.log("No flashcards found.");
+                }
+            } catch (error) {
+                console.error("Error fetching flashcards: ", error);
+            }
+        },
+        async deleteFlashcard(cardId) {
+            const db = getDatabase();
+            const userId = JSON.parse(localStorage.getItem("user")).uid;
+            const cardRef = ref(db, `users/${userId}/wordCards/${cardId}`);
+            
+            try {
+                await remove(cardRef);
+                // Remove the card from the local flashcards array
+                this.flashcards = this.flashcards.filter(card => card.id !== cardId);
+                console.log(`Flashcard with ID ${cardId} deleted successfully.`);
+            } catch (error) {
+                console.error("Error deleting flashcard: ", error);
+            }
         },
         flipCard(card) {
             card.flipped = !card.flipped;
@@ -96,11 +111,11 @@ export default {
 
 <style scoped>
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    margin-top: 100px;
+    display: flex;                
+    justify-content: space-between; 
+    align-items: center;        
+    padding: 10px;             
+    margin-top: 125px;
     gap: 50px;
 }
 
@@ -199,6 +214,19 @@ export default {
 
 .example {
     margin-top: 1rem;
+}
+
+.delete-button,
+.edit-button {
+    margin-right: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    background-color: #ff6f61;
+    color: white;
 }
 
 button:hover {

@@ -20,8 +20,8 @@
             <font-awesome-icon :icon="['fas', 'store']" class="icon" />
         </button>
 
-        <button class="nav-item" @click="navigateTo('test')">
-            <font-awesome-icon :icon="['fas', 'book']" class="icon" />
+        <button class="nav-item" @click="navigateTo('menu')">
+            <font-awesome-icon :icon="['fas', 'users']" class="icon" />
         </button>
     </nav>
 </template>
