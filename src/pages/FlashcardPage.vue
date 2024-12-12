@@ -37,14 +37,19 @@
       <button @click="navigateTo('createMenu')">創建新字卡</button>
     </div>
 
-     <!-- Score Modal (Pop-up window) -->
-     <div v-if="showScore" class="score-modal-overlay">
+    <!-- Score Modal (Pop-up window) -->
+    <div v-if="showScore" class="score-modal-overlay">
       <div class="score-modal-content">
         <p>Your Score: {{ score }}%</p>
         <button @click="closeScoreModal">Close</button>
       </div>
     </div>
-
+  </div>
+  <div v-if="showExperienceModal" class="modal-overlay">
+    <div class="modal">
+      <button class="close-button" @click="closeExperienceModal">×</button>
+      <p>完成記住五個字卡！寵物已獲得20經驗值！</p>
+    </div>
   </div>
 </template>
 
@@ -57,7 +62,16 @@ export default {
       cardsToRepeat: [],
       goodRatings: 0,
       showScore: false,
+      goodCardsCount: 0,
       score: 0,
+      showExperienceModal: false,
+      petStore: {
+        experience: 0,
+        addExperience(points) {
+          this.experience += points;
+          console.log(`Experience added: ${points}. Total: ${this.experience}`);
+        },
+      },
     };
   },
   computed: {
@@ -99,6 +113,13 @@ export default {
 
       if (rating === "good") {
         this.goodRatings++;
+        this.goodCardsCount++;
+        if (this.goodCardsCount == 5) {
+          const task = { id: 1, status: "completed" };
+          console.log(`Task status: ${task.status}`);
+          this.petStore.addExperience(20);
+          this.showExperienceModal = true;
+        }
       } else if (rating === "again") {
         this.cardsToRepeat.push({ ...currentCard, flipped: false });
       }
@@ -129,6 +150,9 @@ export default {
     async tryAgain() {
       window.location.reload();
     },
+    closeExperienceModal(){
+      this.showExperienceModal = false;
+    }
   },
 };
 </script>
@@ -238,6 +262,4 @@ button:hover {
 .try-again-button {
   background-color: #e23b2c;
 }
-
-
 </style>

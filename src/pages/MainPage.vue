@@ -1,5 +1,6 @@
 <template>
     <div id="main-page">
+        <!-- Login Modal -->
         <div v-if="showLoginModal" class="modal-overlay">
             <div class="modal">
                 <h2>Login</h2>
@@ -16,12 +17,13 @@
                 </form>
             </div>
         </div>
-        <!-- 如果 user 尚未加載，顯示加載提示 -->
+
+        <!-- If user data is not loaded -->
         <div v-if="!user">
             <p>Loading user information...</p>
         </div>
 
-        <!-- 寵物顯示區域 -->
+        <!-- Pet Display -->
         <div class="card pet-display" v-if="user" @click="showClickGif">
             <h2 class="hh">Your Pet</h2>
 
@@ -31,7 +33,8 @@
             <div v-else style="height: 48px;">
                 &nbsp;
             </div>
-            <!-- 寵物圖片顯示與過渡效果 -->
+
+            <!-- Pet Images -->
             <div class="pet-info">
                 <transition name="fade" mode="out-in">
                     <img :src="mainPetImage" alt="Main Pet" class="pet-image" v-if="!isClickGif" />
@@ -49,7 +52,7 @@
             </div>
         </div>
 
-        <!-- 任務狀態顯示 -->
+        <!-- Task Status -->
         <div class="card task-status" v-if="user">
             <h2>Task Status</h2>
             <p class="task-intro">Complete tasks to level up your pet!</p>
@@ -61,17 +64,24 @@
                         Accept Task
                     </button>
                     <button v-if="task.status === 'in progress'" @click="completeTask(task)">
-                        Complete Task
+                        做任務
                     </button>
                 </li>
             </ul>
+        </div>
+
+        <!-- Pop-Out Modal -->
+        <div class="modal-overlay" v-if="showExperienceModal">
+            <div class="modal">
+                <button class="close-button" @click="closeExperienceModal">×</button>
+                <p>寵物已獲得20經驗值</p>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-// import OpenAI from "openai";
-import { usePetStore } from '../stores/petStore'; // 引入狀態管理
+import { usePetStore } from "../stores/petStore";
 
 export default {
     setup() {
@@ -82,15 +92,20 @@ export default {
     },
     data() {
         return {
-            user: null, // 用戶資訊
+            user: null,
             showLoginModal: true,
-            loginUsername: '',
-            loginPassword: '',
-            isClickGif: false, // 控制是否顯示 -click.gif
-            tasks: [], // 任務列表
+            loginUsername: "",
+            loginPassword: "",
+            isClickGif: false,
+            tasks: [
+                { id: 1, description: "記起來5個字卡", status: "in progress" },
+                { id: 2, description: "新增5個字卡", status: "in progress" },
+                { id: 3, description: "點擊簽到", status: "in progress" },
+            ],
             showBubble: false,
             floatingTexts: ["你超棒", "明日新星就是你", "又完成一個任務了", "加油加油", "你是最棒的"],
-            floatingTextIndex: 0
+            floatingTextIndex: 0,
+            showExperienceModal: false, // New state for experience modal
         };
     },
     computed: {
@@ -98,40 +113,34 @@ export default {
             return this.petStore.selectedPet;
         },
         petName() {
-            return this.selectedPet.name || 'Fluffy';
+            return this.selectedPet.name || "Fluffy";
         },
         petLevel() {
             return this.selectedPet.level || 1;
         },
         mainPetImage() {
-            const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
-            if (this.petStore.hasBrokenThrough && petFileName == 'pet3') {
-                return 'pet/upgrade.gif'; // 突破後的主圖片
+            const petFileName = this.selectedPet.src.split("/").pop().split(".")[0];
+            if (this.petStore.hasBrokenThrough && petFileName == "pet3") {
+                return "pet/upgrade.gif";
             }
             return `pet/${petFileName}.gif`;
         },
         clickGifImage() {
-            const petFileName = this.selectedPet.src.split('/').pop().split('.')[0];
-            if (this.petStore.hasBrokenThrough && petFileName == 'pet3') {
-                return 'pet/upgrade-click.gif'; // 突破後的點擊圖片
+            const petFileName = this.selectedPet.src.split("/").pop().split(".")[0];
+            if (this.petStore.hasBrokenThrough && petFileName == "pet3") {
+                return "pet/upgrade-click.gif";
             }
             return `pet/${petFileName}-click.gif`;
         },
     },
-    mounted() {
-        this.loadUserData();
-        this.getMessageFromChatGPT();
-    },
     methods: {
         handleLogin() {
             if (this.loginUsername && this.loginPassword) {
-
                 const mockUser = {
                     username: this.loginUsername,
                     password: this.loginPassword,
                 };
-
-                localStorage.setItem('user', JSON.stringify(mockUser));
+                localStorage.setItem("user", JSON.stringify(mockUser));
                 this.user = mockUser;
                 this.showLoginModal = false;
             } else {
@@ -142,38 +151,47 @@ export default {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
                 this.user = JSON.parse(storedUser);
+                this.showLoginModal = false;
             } else {
-                // Keep modal visible instead of redirecting immediately
+                this.user = null;
                 this.showLoginModal = true;
             }
         },
         acceptTask(task) {
-            task.status = 'in progress';
+            task.status = "in progress";
         },
         completeTask(task) {
-            task.status = 'completed';
-            this.petStore.addExperience(10); // 完成任務提升經驗值
+            if (task.id == 1) {
+                this.$router.push("/learn");
+            }
+            else if(task.id == 2) {
+                this.$router.push("/card");
+            }
+            else {task.status = "completed";
+            this.petStore.addExperience(20);
+            this.showExperienceModal = true;
+            }
         },
-        showClickGif() {
-            this.isClickGif = true;
-            setTimeout(() => {
-                this.isClickGif = false;
-            }, 1500);
+        async fetchTaskStatus() {
+            //取得status
+/*            try {
+                const db = getDatabase();
+                const userId = JSON.parse(localStorage.getItem('user')).username; // Assuming you have a username for user identification
+                for (let task of this.tasks) {
+                    const taskRef = ref(db, `users/${userId}/tasks/${task.id}`);
+                    const snapshot = await get(taskRef);
+                    if (snapshot.exists()) {
+                        task.status = snapshot.val().status;  // Update the task status from the DB
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching task status: ", error);
+            } */
         },
-        showTextBubble() {
-            this.showBubble = true;
-            this.floatingTextIndex = (this.floatingTextIndex + 1) % this.floatingTexts.length;
-            setTimeout(() => {
-                this.showBubble = false;
-            }, 5000);
-        },
-        async getMessageFromChatGPT() {
-            // 假回傳替代 OpenAI 調用
-            this.floatingTexts = ["模擬訊息1", "模擬訊息2", "模擬訊息3", "模擬訊息4", "模擬訊息5"];
+        closeExperienceModal() {
+            this.showExperienceModal = false;
         },
     },
-
-
 };
 </script>
 
@@ -368,7 +386,6 @@ button:hover {
 }
 
 .floating-text {
-
     background-color: rgba(255, 255, 255, 0.7);
     color: rgb(0, 0, 0);
     padding: 10px 15px;
@@ -381,7 +398,6 @@ button:hover {
     max-width: 80%;
     z-index: 1000;
     /* Limit the maximum width to keep it readable */
-
 }
 
 @keyframes fadeOut {
@@ -398,5 +414,9 @@ button:hover {
         opacity: 0;
         transform: translateY(-240px);
     }
+}
+
+.close-button {
+    margin-left: 0;
 }
 </style>

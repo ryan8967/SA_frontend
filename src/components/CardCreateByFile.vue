@@ -85,7 +85,7 @@
       };
     },
     mounted() {
-      this.userId = JSON.parse(localStorage.getItem("user")).uid;
+      //this.userId = JSON.parse(localStorage.getItem("user")).uid;
     },
     methods: {
       showScreen() {
@@ -172,7 +172,8 @@
         this.editCardIndex = null;
         this.editCard = {};
       },
-      saveEditedCard() { /*
+      saveEditedCard() { 
+      /*
         const cardRef = ref(
           database,
           `users/${this.userId}/wordCards/${this.editCard.word}`
@@ -185,9 +186,11 @@
           })
           .catch((error) => {
             console.error("Error updating card:", error);
-          }); */
+          }); 
+      */
       },
-      deleteCard() { /*  //index inside ()
+      deleteCard() { //index inside ()
+      /*
         console.log("clicked");
         const card = this.wordDataArray[index];
         const cardRef = ref(database, `users/${this.userId}/wordCards/${card.word}`);
@@ -198,13 +201,24 @@
           })
           .catch((error) => {
             console.error("Error deleting card:", error);
-          });*/
+          });
+      */
       },
     },
   };
   </script>
   
   <style scoped>
+
+  .card-block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-color: #f5f5f5;
+}
+
   .word-card {
     border: 1px solid #ddd;
     padding: 20px;

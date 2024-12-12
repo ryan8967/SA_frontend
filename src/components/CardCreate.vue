@@ -71,6 +71,13 @@
       </div>
     </div>
   </div>
+
+  <div v-if="showExperienceModal" class="modal-overlay">
+    <div class="modal">
+                <button class="close-button" @click="closeExperienceModal">×</button>
+                <p>完成新增五個字卡！寵物已獲得20經驗值！</p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -86,7 +93,16 @@ export default {
       show: true, // whether to show the add-card component
       showLoading: false, // show loading icon when fetching word data
       userId: null,
-      editCardIndex: null, // Index for editing a card (null means no card is being edited)
+      savedCardsCount: 0,
+      editCardIndex: null,
+      showExperienceModal: false,
+      petStore: {
+        experience: 0,
+        addExperience(points) {
+          this.experience += points;
+          console.log(`Experience added: ${points}. Total: ${this.experience}`);
+        },
+      },
       editCard: {
         word: "",
         translation: "",
@@ -114,11 +130,22 @@ export default {
       this.wordData = null; // 清除單字資料
     },
     editCardData() {
-      // Trigger the edit modal with current word data
-      this.editCard = { ...this.wordData }; // Copy word data to edit card
-      this.editCardIndex = this.userId; // Set index or identifier (for now it's just userId for simplicity)
+      
+      this.editCard = { ...this.wordData }; 
+      this.editCardIndex = this.userId; 
     },
-    saveCard() { /*
+    saveCard() {
+      if(this.savedCardsCount<5){
+          this.savedCardsCount++;
+        }
+        if (this.savedCardsCount == 5) {
+          const task = { id: 2, status: "completed" };
+          console.log(`Task status: ${task.status}`);
+          this.petStore.addExperience(20);
+          this.showExperienceModal = true;
+          this.savedCardsCount++;
+        }
+    /*
       // Save new card to Firebase
       const cardRef = ref(database, `users/${this.userId}/wordCards/${this.inputWord}`);
       const newWordData = {
@@ -136,9 +163,11 @@ export default {
         })
         .catch((error) => {
           console.error("Error saving data: ", error);
-        }); */
+        }); 
+    */
     },
-    saveEditedCard() { /*
+    saveEditedCard() { 
+    /*
       // Save edited card back to Firebase
       const cardRef = ref(database, `users/${this.userId}/wordCards/${this.editCard.word}`);
       set(cardRef, this.editCard)
@@ -149,12 +178,14 @@ export default {
         })
         .catch((error) => {
           console.error("Error saving edited data: ", error);
-        }); */
+        }); 
+    */
     },
     cancelEdit() {
       this.editCardIndex = null; // Close the modal without saving
     },
-    deleteCard() { /*
+    deleteCard() { 
+    /*
       // Delete the card from Firebase
       const cardRef = ref(database, `users/${this.userId}/wordCards/${this.wordData.word}`);
       remove(cardRef)
@@ -165,7 +196,8 @@ export default {
         })
         .catch((error) => {
           console.error("Error deleting card: ", error);
-        }); */
+        }); 
+    */
     },
     async getCardFromGPT() {
       console.log("getCardFromGPT");
@@ -205,10 +237,11 @@ export default {
       } catch (error) {
         console.error("Error interacting with OpenAI:", error);
       } finally {
-        this.showLoading = false; // Ensure the loading indicator is hidden
+        this.showLoading = false; 
       }
     },
-    storeWordData() { /* //mes inside ()
+    storeWordData() {  //mes inside ()
+    /*
       let wordData = JSON.parse(mes);
       const cardRef = ref(database, `users/${this.userId}/wordCards/${wordData.word}`);
       set(cardRef, wordData)
@@ -219,13 +252,29 @@ export default {
         .catch((error) => {
           console.error("Error storing data: ", error);
         });
-      this.showLoading = false; */
+      this.showLoading = false; 
+    */
     },
+    closeExperienceModal(){
+      this.showExperienceModal = false;
+    }
   },
 };
 </script>
 
 <style scoped>
+.modal {
+  display: block !important;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 1000;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+}
+
 .card-block {
   display: flex;
   justify-content: center;
