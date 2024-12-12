@@ -49,8 +49,8 @@
   
   <script>
   import OpenAI from "openai";
-  import { ref, set } from "firebase/database";
-  import { database } from "../firebase"; // 引入 Firebase Realtime Database
+  //import { ref, set } from "firebase/database";
+  //import { database } from "../firebase"; // 引入 Firebase Realtime Database
   
   export default {
     data() {
@@ -70,7 +70,7 @@
     },
     mounted() {
       // Skip UID retrieval for debugging
-      this.userId = JSON.parse(localStorage.getItem("user")).uid;
+      //this.userId = JSON.parse(localStorage.getItem("user")).uid;
       // You can set a temporary userId for testing
       //this.userId = 'testUserId'; // Use a test ID or hard-code a value for debugging
     },
@@ -132,7 +132,7 @@
           this.showLoading = false;
         }
       },
-      storeWordData(mes) {
+      storeWordData() { /* // mes inside()
         try {
           const wordDataArray = JSON.parse(mes);
   
@@ -149,8 +149,8 @@
           console.error("Error parsing or storing word data: ", error);
         } finally {
           this.showLoading = false;
-        }
-      },
+        } */
+      }, 
     },
   };
   </script>

@@ -1,5 +1,21 @@
 <template>
     <div id="main-page">
+        <div v-if="showLoginModal" class="modal-overlay">
+            <div class="modal">
+                <h2>Login</h2>
+                <form @submit.prevent="handleLogin">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" v-model="loginUsername" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" v-model="loginPassword" required />
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
         <!-- 如果 user 尚未加載，顯示加載提示 -->
         <div v-if="!user">
             <p>Loading user information...</p>
@@ -67,6 +83,9 @@ export default {
     data() {
         return {
             user: null, // 用戶資訊
+            showLoginModal: true,
+            loginUsername: '',
+            loginPassword: '',
             isClickGif: false, // 控制是否顯示 -click.gif
             tasks: [], // 任務列表
             showBubble: false,
@@ -104,12 +123,28 @@ export default {
         this.getMessageFromChatGPT();
     },
     methods: {
+        handleLogin() {
+            if (this.loginUsername && this.loginPassword) {
+
+                const mockUser = {
+                    username: this.loginUsername,
+                    password: this.loginPassword,
+                };
+
+                localStorage.setItem('user', JSON.stringify(mockUser));
+                this.user = mockUser;
+                this.showLoginModal = false;
+            } else {
+                alert("Please enter valid credentials.");
+            }
+        },
         loadUserData() {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
                 this.user = JSON.parse(storedUser);
             } else {
-                this.$router.push('/'); // 如果沒有用戶資料，重定向回登入頁面
+                // Keep modal visible instead of redirecting immediately
+                this.showLoginModal = true;
             }
         },
         acceptTask(task) {
@@ -157,6 +192,63 @@ export default {
     padding: 20px;
     box-sizing: border-box;
     width: 100%;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    text-align: center;
+}
+
+.modal h2 {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 .card {

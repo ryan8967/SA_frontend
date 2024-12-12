@@ -68,8 +68,8 @@
   
   <script>
   import OpenAI from "openai";
-  import { ref, set, remove } from "firebase/database";
-  import { database } from "../firebase";
+  //import { ref, set, remove } from "firebase/database";
+  //import { database } from "../firebase";
   import * as mammoth from "mammoth";
   
   export default {
@@ -150,7 +150,7 @@
   
         this.showLoading = false;
       },
-      storeWordData(wordData) {
+      storeWordData() {/* //wordData inside()
         const cardRef = ref(
           database,
           `users/${this.userId}/wordCards/${wordData.word}`
@@ -162,7 +162,7 @@
           })
           .catch((error) => {
             console.error("Error storing data: ", error);
-          });
+          }); */
       },
       selectCard(index) {
         this.editCardIndex = index;
@@ -172,7 +172,7 @@
         this.editCardIndex = null;
         this.editCard = {};
       },
-      saveEditedCard() {
+      saveEditedCard() { /*
         const cardRef = ref(
           database,
           `users/${this.userId}/wordCards/${this.editCard.word}`
@@ -185,9 +185,9 @@
           })
           .catch((error) => {
             console.error("Error updating card:", error);
-          });
+          }); */
       },
-      deleteCard(index) {
+      deleteCard() { /*  //index inside ()
         console.log("clicked");
         const card = this.wordDataArray[index];
         const cardRef = ref(database, `users/${this.userId}/wordCards/${card.word}`);
@@ -198,7 +198,7 @@
           })
           .catch((error) => {
             console.error("Error deleting card:", error);
-          });
+          });*/
       },
     },
   };

@@ -30,7 +30,7 @@ const routes = [
     component: WelcomePage,
   },*/
   {
-    path: "/main",
+    path: "/",
     name: "Main",
     component: MainPage,
     meta: { requiresAuth: true }, // 需要登入的頁面
@@ -105,13 +105,13 @@ const routes = [
     path: "/card",
     name: "Card",
     component: CardAddPage,
-    meta: { requiresAuth: true },
+    //meta: { requiresAuth: true },
   },
   {
     path: "/all",
     name: "AllCards",
     component: GetAllCards,
-    meta: { requiresAuth: true },
+    //meta: { requiresAuth: true },
   },
   {
     path: "/chatbot",

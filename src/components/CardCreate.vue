@@ -75,8 +75,8 @@
 
 <script>
 import OpenAI from "openai";
-import { ref, set, remove, update } from "firebase/database";
-import { database } from "../firebase"; // 引入 Firebase Realtime Database
+//import { ref, set, remove } from "firebase/database";
+//import { database } from "../firebase"; // 引入 Firebase Realtime Database
 
 export default {
   data() {
@@ -101,7 +101,7 @@ export default {
     },
   },
   mounted() {
-    this.userId = JSON.parse(localStorage.getItem("user")).uid;
+    //this.userId = JSON.parse(localStorage.getItem("user")).uid;
   },
   methods: {
     showScreen() {
@@ -118,7 +118,7 @@ export default {
       this.editCard = { ...this.wordData }; // Copy word data to edit card
       this.editCardIndex = this.userId; // Set index or identifier (for now it's just userId for simplicity)
     },
-    saveCard() {
+    saveCard() { /*
       // Save new card to Firebase
       const cardRef = ref(database, `users/${this.userId}/wordCards/${this.inputWord}`);
       const newWordData = {
@@ -136,9 +136,9 @@ export default {
         })
         .catch((error) => {
           console.error("Error saving data: ", error);
-        });
+        }); */
     },
-    saveEditedCard() {
+    saveEditedCard() { /*
       // Save edited card back to Firebase
       const cardRef = ref(database, `users/${this.userId}/wordCards/${this.editCard.word}`);
       set(cardRef, this.editCard)
@@ -149,12 +149,12 @@ export default {
         })
         .catch((error) => {
           console.error("Error saving edited data: ", error);
-        });
+        }); */
     },
     cancelEdit() {
       this.editCardIndex = null; // Close the modal without saving
     },
-    deleteCard() {
+    deleteCard() { /*
       // Delete the card from Firebase
       const cardRef = ref(database, `users/${this.userId}/wordCards/${this.wordData.word}`);
       remove(cardRef)
@@ -165,14 +165,13 @@ export default {
         })
         .catch((error) => {
           console.error("Error deleting card: ", error);
-        });
+        }); */
     },
     async getCardFromGPT() {
       console.log("getCardFromGPT");
       this.showLoading = true;
 
-      let kkk =
-        "c2stcHJvai15cUFsY3JwS1JEMWlkLWU4MHFBSzRHUmRVckYwYlZNemtXSEZNeVFBZ1JCeHBRNm9fZlowY29OeW5xVDNCbGJrRkpnMkFpVVoycjNPb0trYm5QSmlkSm5xTUloMFBmRXg2a2pCcHFkdGVmaGhlbVduNEhhSGZjWkowSGNB";
+      let kkk = "c2stcHJvai15cUFsY3JwS1JEMWlkLWU4MHFBSzRHUmRVckYwYlZNemtXSEZNeVFBZ1JCeHBRNm9fZlowY29OeW5xVDNCbGJrRkpnMkFpVVoycjNPb0trYm5QSmlkSm5xTUloMFBmRXg2a2pCcHFkdGVmaGhlbVduNEhhSGZjWkowSGNB";
       const decodedStr = atob(kkk);
 
       const openai = new OpenAI({
@@ -181,12 +180,12 @@ export default {
       });
 
       const prompt = `You are an English teacher to help the user understand an English word.
-        Here is the given word: "${this.inputWord}". Please answer with a JSON format string as follows:
-        {"word":"", "translation":"", "exampleSentence": "", "partOfSpeech": "", "imgUrl":""}. translation: Traditional Chinese of the word.
-          exampleSentence: a sample sentence including the word to show the user how to use the word based on the word's part of speech.
-          partOfSpeech: the meaning of the attribute name.
-          You can ignore the imgUrl, just fill with an empty string.
-          Don't use markdown symbols in your answer.`;
+    Here is the given word: "${this.inputWord}". Please answer with a JSON format string as follows:
+    {"word":"", "translation":"", "exampleSentence": "", "partOfSpeech": "", "imgUrl":""}. translation: Traditional Chinese of the word.
+      exampleSentence: a sample sentence including the word to show the user how to use the word based on the word's part of speech.
+      partOfSpeech: the meaning of the attribute name.
+      You can ignore the imgUrl, just fill with an empty string.
+      Don't use markdown symbols in your answer.`;
 
       try {
         const response = await openai.chat.completions.create({
@@ -198,12 +197,18 @@ export default {
         });
 
         const message = response.choices[0].message.content;
-        this.storeWordData(message);
+
+        // Parse the JSON response
+        this.wordData = JSON.parse(message);
+
+        console.log("Word data fetched:", this.wordData);
       } catch (error) {
         console.error("Error interacting with OpenAI:", error);
+      } finally {
+        this.showLoading = false; // Ensure the loading indicator is hidden
       }
     },
-    storeWordData(mes) {
+    storeWordData() { /* //mes inside ()
       let wordData = JSON.parse(mes);
       const cardRef = ref(database, `users/${this.userId}/wordCards/${wordData.word}`);
       set(cardRef, wordData)
@@ -214,13 +219,22 @@ export default {
         .catch((error) => {
           console.error("Error storing data: ", error);
         });
-      this.showLoading = false;
+      this.showLoading = false; */
     },
   },
 };
 </script>
 
 <style scoped>
+.card-block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-color: #f5f5f5;
+}
+
 .word-card {
   border: 1px solid #ddd;
   padding: 20px;
@@ -234,16 +248,12 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
-  /* Optional: Add padding for spacing */
   border-bottom: 1px solid #ddd;
-  /* Optional: Add a separator line */
 }
 
 .word-card__title {
   margin: 0;
-  /* Remove default margin */
   font-size: 1.5em;
-  /* Adjust font size as needed */
   font-weight: bold;
 }
 

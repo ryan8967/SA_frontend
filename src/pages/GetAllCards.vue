@@ -60,7 +60,7 @@ export default {
     },
     methods: {
         async fetchFlashcards() {
-            const db = getDatabase();
+            /*const db = getDatabase();
             const userId = JSON.parse(localStorage.getItem("user")).uid;
             const flashcardsRef = ref(db, `users/${userId}/wordCards`);
 
@@ -76,9 +76,9 @@ export default {
                 }
             } catch (error) {
                 console.error("Error fetching flashcards: ", error);
-            }
+            }*/
         },
-        async deleteFlashcard(cardId) {
+        async deleteFlashcard() {/*  //cardId inside()
             const db = getDatabase();
             const userId = JSON.parse(localStorage.getItem("user")).uid;
             const cardRef = ref(db, `users/${userId}/wordCards/${cardId}`);
@@ -90,7 +90,7 @@ export default {
                 console.log(`Flashcard with ID ${cardId} deleted successfully.`);
             } catch (error) {
                 console.error("Error deleting flashcard: ", error);
-            }
+            }*/
         },
         flipCard(card) {
             card.flipped = !card.flipped;

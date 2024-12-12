@@ -11,7 +11,7 @@
   </template>
   
   <script>
-  import { ref, getDatabase, get } from "firebase/database";
+  //import { ref, getDatabase, get } from "firebase/database";
   
   export default {
     data() {
@@ -33,10 +33,9 @@
       navigateTo(page) {
               this.$router.push({ name: page });
       },
-      async fetchFlashcards() {
+      async fetchFlashcards() { /*
         const db = getDatabase();
         const userId = JSON.parse(localStorage.getItem("user")).uid;
-        //const userId = "testUserId";
         const flashcardsRef = ref(db, `users/${userId}/wordCards`);
   
         try {
@@ -51,7 +50,7 @@
           }
         } catch (error) {
           console.error("Error fetching flashcards: ", error);
-        }
+        }*/
       },
       flipCard(card) {
         card.flipped = !card.flipped;

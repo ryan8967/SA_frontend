@@ -73,7 +73,7 @@ export default {
       this.$router.push({ name: page });
     },
     async fetchFlashcards() {
-      const db = getDatabase();
+      /*const db = getDatabase();
       const userId = JSON.parse(localStorage.getItem("user")).uid;
       const flashcardsRef = ref(db, `users/${userId}/wordCards`);
 
@@ -89,7 +89,7 @@ export default {
         }
       } catch (error) {
         console.error("Error fetching flashcards: ", error);
-      }
+      }*/
     },
     flipCard(card) {
       card.flipped = !card.flipped;
