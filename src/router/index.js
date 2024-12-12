@@ -17,37 +17,18 @@ import FlashcardPage from "@/pages/FlashcardPage.vue";
 import CardAddPage from "@/pages/CardAddPage.vue";
 import GetAllCards from "@/pages/GetAllCards.vue";
 import ChatBot from "@/pages/ChatBot.vue";
-<<<<<<< HEAD
-
-const routes = [
-  { path: "/", name: "Main", component: MainPage },
-  { path: "/main", name: "Main", component: MainPage },
-  { path: "/pet", name: "Pet", component: PetPage },
-  { path: "/shop", name: "Shop", component: ShopPage },
-  { path: "/task", name: "Task", component: TaskPage },
-  { path: "/newtask", name: "NewTask", component: New1TaskPage },
-  { path: "/profile", name: "Profile", component: ProfilePage },
-  { path: "/test", name: "Test", component: Testing1Page },
-  { path: "/test2", name: "Test2", component: New2TaskPage },
-  { path: "/testpopup", name: "TestPopup", component: TestPopup },
-  { path: "/social", name: "Social", component: SocialPage },
-  { path: "/render", name: "Render", component: RenderTest },
-  { path: "/learn", name: "Learn", component: FlashcardPage },
-  { path: "/card", name: "Card", component: CardAddPage },
-  { path: "/all", name: "All", component: GetAllCards },
-  { path: "/chatbot", name: "ChatBot", component: ChatBot },
-=======
 import CardCreateByTopic from "@/components/CardCreateByTopic.vue";
 import learnMenu from "@/pages/LearnMenu.vue";
 import CreateMenu from "@/pages/CreateMenu.vue";
 import CardCreateByFile from "@/components/CardCreateByFile.vue";
 
+
 const routes = [
-  {
+  /*{
     path: "/",
     name: "Welcome",
     component: WelcomePage,
-  },
+  },*/
   {
     path: "/main",
     name: "Main",
@@ -160,7 +141,6 @@ const routes = [
     component: CardCreateByFile,
   },
   
->>>>>>> cfef0b1 (update)
 ];
 
 const router = createRouter({
