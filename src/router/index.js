@@ -21,7 +21,7 @@ import CardCreateByTopic from "@/components/CardCreateByTopic.vue";
 import learnMenu from "@/pages/LearnMenu.vue";
 import CreateMenu from "@/pages/CreateMenu.vue";
 import CardCreateByFile from "@/components/CardCreateByFile.vue";
-
+import WrongPage from "@/pages/WrongPage.vue";
 
 const routes = [
   /*{
@@ -100,6 +100,12 @@ const routes = [
     name: "learn",
     component: FlashcardPage,
     meta: { requiresAuth: true },
+  },
+
+  {
+    path: "/wrong",
+    name: "wrong",
+    component: WrongPage,
   },
   {
     path: "/card",

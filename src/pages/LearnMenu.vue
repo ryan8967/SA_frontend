@@ -10,6 +10,7 @@
         </router-link>
         <button class="create-card-button" @click="navigateTo('createMenu')">創建字卡</button>
         <button class="create-card-button" @click="navigateTo('learn')">立即學習</button>
+        <button class="create-card-button" @click="navigateTo('wrong')">錯題複習</button>
 
     </div>
 </template>
