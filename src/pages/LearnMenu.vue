@@ -23,7 +23,6 @@ export default {
         navigateTo(page) {
             this.$router.push({ name: page });
         },
-        
     },
 };
 </script>

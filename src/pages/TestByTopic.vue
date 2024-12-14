@@ -255,8 +255,8 @@ export default {
   flex-direction: column;
   align-items: center;
   margin: 20px auto;
-  width: 90%;
-  max-width: 600px;
+  max-width: 100%;
+  margin-top: 150px;
 }
 
 .add-card-button {
@@ -294,17 +294,18 @@ export default {
 }
 
 .word-card__input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  margin-top: 10px;
+  width: 80%; 
+  max-width: 250px; 
+  padding: 8px; 
+  border: 1px solid #ccc; 
+  border-radius: 4px; 
+  box-sizing: border-box;
 }
 
 .word-card__button {
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 15px;
   background-color: #28a745;
   color: white;
   border: none;

@@ -14,66 +14,9 @@
   //import { ref, getDatabase, get } from "firebase/database";
   
   export default {
-    data() {
-      return {
-        flashcards: [],
-        currentCardIndex: 0,
-        cardsToRepeat: [],
-      };
-    },
-    computed: {
-      currentCard() {
-        return this.flashcards[this.currentCardIndex];
-      },
-    },
-    mounted() {
-      this.fetchFlashcards();
-    },
     methods: {
       navigateTo(page) {
               this.$router.push({ name: page });
-      },
-      async fetchFlashcards() { /*
-        const db = getDatabase();
-        const userId = JSON.parse(localStorage.getItem("user")).uid;
-        const flashcardsRef = ref(db, `users/${userId}/wordCards`);
-  
-        try {
-          const snapshot = await get(flashcardsRef);
-          if (snapshot.exists()) {
-            this.flashcards = Object.values(snapshot.val()).map((card) => ({
-              ...card,
-              flipped: false,
-            }));
-          } else {
-            console.log("No flashcards found.");
-          }
-        } catch (error) {
-          console.error("Error fetching flashcards: ", error);
-        }*/
-      },
-      flipCard(card) {
-        card.flipped = !card.flipped;
-      },
-      rateCard(rating) {
-        const currentCard = this.flashcards[this.currentCardIndex];
-  
-        if (rating === "again") {
-          this.cardsToRepeat.push({ ...currentCard, flipped: false });
-        }
-  
-        if (this.currentCardIndex < this.flashcards.length - 1) {
-          this.currentCardIndex++;
-        } else if (this.cardsToRepeat.length > 0) {
-          this.flashcards = this.cardsToRepeat;
-          this.cardsToRepeat = [];
-          this.currentCardIndex = 0;
-        } else {
-          this.flashcards = [];
-        }
-      },
-      async tryAgain() {
-        window.location.reload();
       },
     },
   };
