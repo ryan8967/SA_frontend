@@ -96,7 +96,7 @@ export default {
       //     return;
       // }
       let kkk =
-        "c2stcHJvai15cUFsY3JwS1JEMWlkLWU4MHFBSzRHUmRVckYwYlZNemtXSEZNeVFBZ1JCeHBRNm9fZlowY29OeW5xVDNCbGJrRkpnMkFpVVoycjNPb0trYm5QSmlkSm5xTUloMFBmRXg2a2pCcHFkdGVmaGhlbVduNEhhSGZjWkowSGNB";
+        "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
       const decodedStr = atob(kkk);
 
       const openai = new OpenAI({
@@ -116,7 +116,7 @@ export default {
 
       try {
         const response = await openai.chat.completions.create({
-          model: "gpt-4", // Use your desired model (GPT-4, GPT-3.5, etc.)
+          model: "gpt-4o", // Use your desired model (GPT-4, GPT-3.5, etc.)
           messages: [
             { role: "system", content: "You are a helpful English teacher." },
             { role: "user", content: prompt },
@@ -133,25 +133,25 @@ export default {
       }
     },
     storeWordData() { // mes inside()
-    /*
-        try {
-          const wordDataArray = JSON.parse(mes);
-  
-          wordDataArray.forEach((wordData) => {
-            const cardRef = ref(database, `users/${this.userId}/wordCards/${wordData.word}`);
-            set(cardRef, wordData).catch((error) =>
-              console.error("Error storing data: ", error)
-            );
-          });
-  
-          console.log("Cards stored successfully!");
-          this.wordData = wordDataArray;
-        } catch (error) {
-          console.error("Error parsing or storing word data: ", error);
-        } finally {
-          this.showLoading = false;
-        } 
-    */
+      /*
+          try {
+            const wordDataArray = JSON.parse(mes);
+    
+            wordDataArray.forEach((wordData) => {
+              const cardRef = ref(database, `users/${this.userId}/wordCards/${wordData.word}`);
+              set(cardRef, wordData).catch((error) =>
+                console.error("Error storing data: ", error)
+              );
+            });
+    
+            console.log("Cards stored successfully!");
+            this.wordData = wordDataArray;
+          } catch (error) {
+            console.error("Error parsing or storing word data: ", error);
+          } finally {
+            this.showLoading = false;
+          } 
+      */
     },
   },
 };

@@ -1,88 +1,80 @@
 <template>
-    <div class="chat-container">
-      <h1 class="chat-header">AI助教</h1>
-      <div class="chat-window">
-        <div
-          v-for="(message, index) in chatHistory"
-          :key="index"
-          :class="['message', message.role === 'user' ? 'user-message' : 'bot-message']"
-          v-html="message.role === 'bot' ? parseMarkdown(message.content) : message.content"
-        ></div>
-      </div>
-      <div class="input-container">
-        <input
-          type="text"
-          v-model="userInput"
-          @keyup.enter="sendMessage"
-          placeholder="Type your message..."
-          class="chat-input"
-        />
-        <button @click="sendMessage" class="send-button">Send</button>
-      </div>
-
+  <div class="chat-container">
+    <h1 class="chat-header">AI助教</h1>
+    <div class="chat-window">
+      <div v-for="(message, index) in chatHistory" :key="index"
+        :class="['message', message.role === 'user' ? 'user-message' : 'bot-message']"
+        v-html="message.role === 'bot' ? parseMarkdown(message.content) : message.content"></div>
     </div>
-    <button @click="canDownload = !canDownload">Toggle Download Button</button>
-  </template>
-  
-  <script>
-  import { OpenAI } from 'openai'; // Import OpenAI if required
-  import { marked } from 'marked'; // Import the marked library
-  
-  export default {
-    name: 'ChatBotView',
-    data() {
-      return {
-        userInput: '',
-        chatHistory: [],
-        extra1: '若因天候因素無法出團，本公司將退部分費用',
-        canDownload: false,
-      };
+    <div class="input-container">
+      <input type="text" v-model="userInput" @keyup.enter="sendMessage" placeholder="Type your message..."
+        class="chat-input" />
+      <button @click="sendMessage" class="send-button">Send</button>
+    </div>
+
+  </div>
+  <button @click="canDownload = !canDownload">Toggle Download Button</button>
+</template>
+
+<script>
+import { OpenAI } from 'openai'; // Import OpenAI if required
+import { marked } from 'marked'; // Import the marked library
+
+export default {
+  name: 'ChatBotView',
+  data() {
+    return {
+      userInput: '',
+      chatHistory: [],
+      extra1: '若因天候因素無法出團，本公司將退部分費用',
+      canDownload: false,
+    };
+  },
+  methods: {
+    async sendMessage() {
+      if (this.userInput.trim() === '') return;
+
+      this.chatHistory.push({ role: 'user', content: this.userInput });
+      await this.getMessageFromChatGPT();
+      this.userInput = '';
     },
-    methods: {
-      async sendMessage() {
-        if (this.userInput.trim() === '') return;
-  
-        this.chatHistory.push({ role: 'user', content: this.userInput });
-        await this.getMessageFromChatGPT();
-        this.userInput = '';
-      },
-  
-      async getMessageFromChatGPT() {
-        let kkk = "c2stM1VhNDUwUHhhdjNnVVNNLUNmSHVTQ25ySUI3YUZGZjU1d0RRaE92SEZSVDNCbGJrRkowUkVpazRGWmN3QnIwZXIyX2xUU1BsbWV5dFZzQWpnYmpNS1puLVRfNEE=";
-        const decodedStr = atob(kkk);
-  
-        const openai = new OpenAI({
-          apiKey: decodedStr,
-          dangerouslyAllowBrowser: true,
+
+    async getMessageFromChatGPT() {
+      let kkk = "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
+      const decodedStr = atob(kkk);
+
+      const openai = new OpenAI({
+        apiKey: decodedStr,
+        dangerouslyAllowBrowser: true,
+      });
+
+      try {
+        const thread = await openai.beta.threads.create();
+        let prompt = this.userInput;
+        let run = await openai.beta.threads.runs.createAndPoll(thread.id, {
+          assistant_id: "asst_zWOp5IfAxlTOJ61PQrcRLEQr",
+          instructions: prompt
         });
-  
-        try {
-          const thread = await openai.beta.threads.create();
-          let prompt = this.userInput;
-          let run = await openai.beta.threads.runs.createAndPoll(thread.id, {
-            assistant_id: "asst_zWOp5IfAxlTOJ61PQrcRLEQr",
-            instructions: prompt
-          });
-  
-          if (run.status === "completed") {
-            const messages = await openai.beta.threads.messages.list(run.thread_id);
-            const botResponse = messages.data.reverse()[0].content[0].text.value;
-            this.chatHistory.push({ role: 'bot', content: botResponse });
-          } else {
-            this.chatHistory.push({ role: 'bot', content: 'Error: Unable to fetch response.' });
-          }
-        } catch (error) {
-          console.error('Error fetching response:', error);
+
+        if (run.status === "completed") {
+          const messages = await openai.beta.threads.messages.list(run.thread_id);
+          const botResponse = messages.data.reverse()[0].content[0].text.value;
+          this.chatHistory.push({ role: 'bot', content: botResponse });
+        } else {
           this.chatHistory.push({ role: 'bot', content: 'Error: Unable to fetch response.' });
         }
-      },
-  
-      parseMarkdown(content) {
-        return marked(content);
-      },
+      } catch (error) {
+        console.error('Error fetching response:', error);
+        this.chatHistory.push({ role: 'bot', content: 'Error: Unable to fetch response.' });
+      }
     },
-  };
-  </script>
+
+    parseMarkdown(content) {
+      return marked(content);
+    },
+  },
+};
+</script>
 
 <style>
 .chat-container {
@@ -114,7 +106,7 @@
   padding: 15px;
   overflow-y: scroll;
   margin-bottom: 20px;
-  
+
 }
 
 /* .message {
@@ -145,6 +137,7 @@
   max-width: 80%;
   word-wrap: break-word;
 }
+
 /* 
 .user-message {
   justify-content: flex-end;
@@ -161,20 +154,24 @@
   align-self: flex-end;
   background-color: #00bcd4;
   color: #ffffff;
-  margin-left: auto; /* Aligns the message to the right */
-  max-width: 60%; /* Limit the maximum width */
+  margin-left: auto;
+  /* Aligns the message to the right */
+  max-width: 60%;
+  /* Limit the maximum width */
   padding: 10px;
   border-radius: 8px;
-  word-break: break-word; /* Allows long words to wrap */
-  white-space: normal; /* Normal white space handling */
+  word-break: break-word;
+  /* Allows long words to wrap */
+  white-space: normal;
+  /* Normal white space handling */
 }
 
 .bot-message {
-  justify-content: flex-start; 
+  justify-content: flex-start;
   align-self: flex-start;
   background-color: #4a90e2;
   color: #ffffff;
-  margin-right: auto; 
+  margin-right: auto;
   /* white-space: pre-wrap;
   word-break: break-word;  */
 }
@@ -228,10 +225,13 @@
   margin-bottom: 20px;
 
   /* Add the background image */
-  background-image: url('@/assets/pet2.png');  /* Replace with your image path */
-  background-size: cover; /* Scales the image to cover the entire chat window */
-  background-position: center; /* Centers the image */
-  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-image: url('@/assets/pet2.png');
+  /* Replace with your image path */
+  background-size: cover;
+  /* Scales the image to cover the entire chat window */
+  background-position: center;
+  /* Centers the image */
+  background-repeat: no-repeat;
+  /* Prevents the image from repeating */
 }
-
 </style>

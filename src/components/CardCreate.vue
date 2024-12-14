@@ -74,8 +74,8 @@
 
   <div v-if="showExperienceModal" class="modal-overlay">
     <div class="modal">
-                <button class="close-button" @click="closeExperienceModal">×</button>
-                <p>完成新增五個字卡！寵物已獲得20經驗值！</p>
+      <button class="close-button" @click="closeExperienceModal">×</button>
+      <p>完成新增五個字卡！寵物已獲得20經驗值！</p>
     </div>
   </div>
 </template>
@@ -130,80 +130,80 @@ export default {
       this.wordData = null; // 清除單字資料
     },
     editCardData() {
-      
-      this.editCard = { ...this.wordData }; 
-      this.editCardIndex = this.userId; 
+
+      this.editCard = { ...this.wordData };
+      this.editCardIndex = this.userId;
     },
     saveCard() {
-      if(this.savedCardsCount<5){
-          this.savedCardsCount++;
-        }
-        if (this.savedCardsCount == 5) {
-          const task = { id: 2, status: "completed" };
-          console.log(`Task status: ${task.status}`);
-          this.petStore.addExperience(20);
-          this.showExperienceModal = true;
-          this.savedCardsCount++;
-        }
-    /*
-      // Save new card to Firebase
-      const cardRef = ref(database, `users/${this.userId}/wordCards/${this.inputWord}`);
-      const newWordData = {
-        word: this.inputWord,
-        translation: this.wordData.translation,
-        exampleSentence: this.wordData.exampleSentence,
-        partOfSpeech: this.wordData.partOfSpeech,
-      };
-      set(cardRef, newWordData)
-        .then(() => {
-          console.log("Card saved successfully!");
-          this.wordData = newWordData;
-          this.inputWord = "";
-          this.wordData = null;
-        })
-        .catch((error) => {
-          console.error("Error saving data: ", error);
-        }); 
-    */
+      if (this.savedCardsCount < 5) {
+        this.savedCardsCount++;
+      }
+      if (this.savedCardsCount == 5) {
+        const task = { id: 2, status: "completed" };
+        console.log(`Task status: ${task.status}`);
+        this.petStore.addExperience(20);
+        this.showExperienceModal = true;
+        this.savedCardsCount++;
+      }
+      /*
+        // Save new card to Firebase
+        const cardRef = ref(database, `users/${this.userId}/wordCards/${this.inputWord}`);
+        const newWordData = {
+          word: this.inputWord,
+          translation: this.wordData.translation,
+          exampleSentence: this.wordData.exampleSentence,
+          partOfSpeech: this.wordData.partOfSpeech,
+        };
+        set(cardRef, newWordData)
+          .then(() => {
+            console.log("Card saved successfully!");
+            this.wordData = newWordData;
+            this.inputWord = "";
+            this.wordData = null;
+          })
+          .catch((error) => {
+            console.error("Error saving data: ", error);
+          }); 
+      */
     },
-    saveEditedCard() { 
-    /*
-      // Save edited card back to Firebase
-      const cardRef = ref(database, `users/${this.userId}/wordCards/${this.editCard.word}`);
-      set(cardRef, this.editCard)
-        .then(() => {
-          console.log("Card edited successfully!");
-          this.wordData = { ...this.editCard }; // Update word data with edited values
-          this.editCardIndex = null; // Close modal after saving
-        })
-        .catch((error) => {
-          console.error("Error saving edited data: ", error);
-        }); 
-    */
+    saveEditedCard() {
+      /*
+        // Save edited card back to Firebase
+        const cardRef = ref(database, `users/${this.userId}/wordCards/${this.editCard.word}`);
+        set(cardRef, this.editCard)
+          .then(() => {
+            console.log("Card edited successfully!");
+            this.wordData = { ...this.editCard }; // Update word data with edited values
+            this.editCardIndex = null; // Close modal after saving
+          })
+          .catch((error) => {
+            console.error("Error saving edited data: ", error);
+          }); 
+      */
     },
     cancelEdit() {
       this.editCardIndex = null; // Close the modal without saving
     },
-    deleteCard() { 
-    /*
-      // Delete the card from Firebase
-      const cardRef = ref(database, `users/${this.userId}/wordCards/${this.wordData.word}`);
-      remove(cardRef)
-        .then(() => {
-          console.log("Card deleted successfully!");
-          this.inputWord = "";
-          this.wordData = null; // Clear word data
-        })
-        .catch((error) => {
-          console.error("Error deleting card: ", error);
-        }); 
-    */
+    deleteCard() {
+      /*
+        // Delete the card from Firebase
+        const cardRef = ref(database, `users/${this.userId}/wordCards/${this.wordData.word}`);
+        remove(cardRef)
+          .then(() => {
+            console.log("Card deleted successfully!");
+            this.inputWord = "";
+            this.wordData = null; // Clear word data
+          })
+          .catch((error) => {
+            console.error("Error deleting card: ", error);
+          }); 
+      */
     },
     async getCardFromGPT() {
       console.log("getCardFromGPT");
       this.showLoading = true;
 
-      let kkk = "c2stcHJvai15cUFsY3JwS1JEMWlkLWU4MHFBSzRHUmRVckYwYlZNemtXSEZNeVFBZ1JCeHBRNm9fZlowY29OeW5xVDNCbGJrRkpnMkFpVVoycjNPb0trYm5QSmlkSm5xTUloMFBmRXg2a2pCcHFkdGVmaGhlbVduNEhhSGZjWkowSGNB";
+      let kkk = "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
       const decodedStr = atob(kkk);
 
       const openai = new OpenAI({
@@ -221,7 +221,7 @@ export default {
 
       try {
         const response = await openai.chat.completions.create({
-          model: "gpt-4",
+          model: "gpt-4o",
           messages: [
             { role: "system", content: "You are a helpful English teacher." },
             { role: "user", content: prompt },
@@ -237,25 +237,25 @@ export default {
       } catch (error) {
         console.error("Error interacting with OpenAI:", error);
       } finally {
-        this.showLoading = false; 
+        this.showLoading = false;
       }
     },
     storeWordData() {  //mes inside ()
-    /*
-      let wordData = JSON.parse(mes);
-      const cardRef = ref(database, `users/${this.userId}/wordCards/${wordData.word}`);
-      set(cardRef, wordData)
-        .then(() => {
-          console.log("Card stored successfully!");
-          this.wordData = wordData;
-        })
-        .catch((error) => {
-          console.error("Error storing data: ", error);
-        });
-      this.showLoading = false; 
-    */
+      /*
+        let wordData = JSON.parse(mes);
+        const cardRef = ref(database, `users/${this.userId}/wordCards/${wordData.word}`);
+        set(cardRef, wordData)
+          .then(() => {
+            console.log("Card stored successfully!");
+            this.wordData = wordData;
+          })
+          .catch((error) => {
+            console.error("Error storing data: ", error);
+          });
+        this.showLoading = false; 
+      */
     },
-    closeExperienceModal(){
+    closeExperienceModal() {
       this.showExperienceModal = false;
     }
   },
