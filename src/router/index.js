@@ -21,6 +21,7 @@ import CardCreateByTopic from "@/components/CardCreateByTopic.vue";
 import learnMenu from "@/pages/LearnMenu.vue";
 import CreateMenu from "@/pages/CreateMenu.vue";
 import CardCreateByFile from "@/components/CardCreateByFile.vue";
+import TestByTopic from "@/pages/TestByTopic.vue";
 
 
 const routes = [
@@ -140,6 +141,11 @@ const routes = [
     name: "CreateByFile",
     component: CardCreateByFile,
   },
+  {
+    path: "/testByTopic",
+    name: "TestByTopic",
+    component: TestByTopic,
+  }
   
 ];
 
