@@ -22,7 +22,7 @@ import learnMenu from "@/pages/LearnMenu.vue";
 import CreateMenu from "@/pages/CreateMenu.vue";
 import CardCreateByFile from "@/components/CardCreateByFile.vue";
 import WrongPage from "@/pages/WrongPage.vue";
-
+import TestByTopic from "@/pages/TestByTopic.vue";
 const routes = [
   /*{
     path: "/",
@@ -146,6 +146,11 @@ const routes = [
     name: "CreateByFile",
     component: CardCreateByFile,
   },
+  {
+    path: "/testByTopic",
+    name: "TestByTopic",
+    component: TestByTopic,
+  }
   
 ];
 
