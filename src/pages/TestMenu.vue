@@ -1,11 +1,10 @@
 <template>
     <div class="wrapper">
       <div class="header">
-        <div class="title">創建字卡</div>
+        <div class="title">自我測驗</div>
       </div>
-      <button class="create-card-button" @click="navigateTo('CreateByFile')">根據文件生成</button>
-        <button class="create-card-button" @click="navigateTo('Card')">自行輸入字彙</button>
-        <button class="create-card-button" @click="navigateTo('wordsByTopic')">主題字彙生成</button>
+        <button class="create-card-button" @click="navigateTo('wrong')">錯題複習</button>
+        <button class="create-card-button" @click="navigateTo('CardByTopic')">主題測驗</button>
   
     </div>
   </template>

@@ -31,9 +31,9 @@
         <button class="try-again-button" @click.stop="rateCard('again')">再試一次</button>
       </div>
     </div>
-    <div v-else>
+    <div v-else class="after-all">
       <p>No flashcards available.</p>
-      <button @click="tryAgain()">再次學習</button>
+      <button @click="tryAgain()" class="learn-again">再次學習</button>
       <button @click="navigateTo('createMenu')">創建新字卡</button>
     </div>
 
@@ -261,5 +261,13 @@ button:hover {
 
 .try-again-button {
   background-color: #e23b2c;
+}
+
+.after-all {
+  margin-top: 20px;
+}
+
+.learn-again {
+  margin-right: 15px;
 }
 </style>

@@ -23,6 +23,8 @@ import CreateMenu from "@/pages/CreateMenu.vue";
 import CardCreateByFile from "@/components/CardCreateByFile.vue";
 import WrongPage from "@/pages/WrongPage.vue";
 import TestByTopic from "@/pages/TestByTopic.vue";
+import TestMenu from "@/pages/TestMenu.vue";
+import WordsByTopic from "@/pages/WordsByTopic.vue";
 const routes = [
   /*{
     path: "/",
@@ -150,6 +152,16 @@ const routes = [
     path: "/testByTopic",
     name: "TestByTopic",
     component: TestByTopic,
+  },
+  {
+    path: "/testmenu",
+    name: "testmenu",
+    component: TestMenu,
+  },
+  {
+    path: "/wordsByTopic",
+    name: "wordsByTopic",
+    component: WordsByTopic,
   }
   
 ];
