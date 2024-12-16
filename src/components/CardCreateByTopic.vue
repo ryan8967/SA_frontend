@@ -148,10 +148,11 @@ export default {
       console.log("Generating word list from GPT");
       this.showLoading = true;
 
-      const apiKey = process.env.VUE_APP_OPENAI_API_KEY;
+      let kkk = "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
+      const decodedStr = atob(kkk);
 
       const openai = new OpenAI({
-        apiKey: apiKey,
+        apiKey: decodedStr,
         dangerouslyAllowBrowser: true,
       });
 
@@ -222,12 +223,13 @@ export default {
           return;
         }
 
-        const apiKey = process.env.VUE_APP_OPENAI_API_KEY;
+        let kkk = "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
+      const decodedStr = atob(kkk);
 
-        const openai = new OpenAI({
-          apiKey: apiKey,
-          dangerouslyAllowBrowser: true,
-        });
+      const openai = new OpenAI({
+        apiKey: decodedStr,
+        dangerouslyAllowBrowser: true,
+      });
 
         const prompt = `You are an English teacher helping the user create a multiple-choice question.
         Given the word: "${word}", generate a JSON object as follows:

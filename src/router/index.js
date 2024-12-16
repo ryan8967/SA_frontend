@@ -11,7 +11,6 @@ import New1TaskPage from "@/pages/New1TaskPage.vue";
 import Testing1Page from "@/pages/Testing1Page.vue";
 import TestPopup from "@/pages/TestPopup.vue";
 import SocialPage from "@/pages/SocialPage.vue";
-import New2TaskPage from "@/pages/New2TaskPage.vue";
 import RenderTest from "@/pages/RenderTest.vue";
 import FlashcardPage from "@/pages/FlashcardPage.vue";
 import CardAddPage from "@/pages/CardAddPage.vue";
@@ -25,6 +24,8 @@ import WrongPage from "@/pages/WrongPage.vue";
 import TestByTopic from "@/pages/TestByTopic.vue";
 import TestMenu from "@/pages/TestMenu.vue";
 import WordsByTopic from "@/pages/WordsByTopic.vue";
+import NewTask from "@/pages/NewTask.vue";
+import RandomCard from "@/pages/RandomCard.vue";
 const routes = [
   /*{
     path: "/",
@@ -74,9 +75,9 @@ const routes = [
     meta: { requiresAuth: true }, // 需要登入的頁面
   },
   {
-    path: "/test2",
-    name: "test2",
-    component: New2TaskPage,
+    path: "/task",
+    name: "Task",
+    component: NewTask,
     meta: { requiresAuth: true }, // 需要登入的頁面
   },
   {
@@ -162,6 +163,10 @@ const routes = [
     path: "/wordsByTopic",
     name: "wordsByTopic",
     component: WordsByTopic,
+  },{
+    path: "/randomcard",
+    name: "randomcard",
+    component: RandomCard,
   }
   
 ];
