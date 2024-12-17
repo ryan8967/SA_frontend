@@ -1,13 +1,14 @@
 <template>
     <nav class="bottom-bar">
-        <button class="nav-item" @click="navigateTo('Pet')">
-            <font-awesome-icon :icon="['fas', 'paw']" class="icon" />
-        </button>
+
 
         <button class="nav-item" @click="navigateTo('Task')">
             <font-awesome-icon :icon="['fas', 'tasks']" class="icon" />
         </button>
 
+        <button class="nav-item" @click="navigateTo('Pet')">
+            <font-awesome-icon :icon="['fas', 'paw']" class="icon" />
+        </button>
         <!-- 中間圖標換成 tsmc.png -->
         <button class="nav-item home-btn" @click="navigateTo('Main')">
             <!-- <div class="home-icon">
@@ -16,13 +17,14 @@
             <font-awesome-icon :icon="['fas', 'home']" class="icon" />
         </button>
 
+        <button class="nav-item" @click="navigateTo('menu')">
+            <font-awesome-icon :icon="['fas', 'book']" class="icon" />
+        </button>
         <button class="nav-item" @click="navigateTo('Shop')">
             <font-awesome-icon :icon="['fas', 'store']" class="icon" />
         </button>
 
-        <button class="nav-item" @click="navigateTo('menu')">
-            <font-awesome-icon :icon="['fas', 'book']" class="icon" />
-        </button>
+
     </nav>
 </template>
 

@@ -295,4 +295,121 @@ export default {
     filter: grayscale(100%);
     cursor: not-allowed;
 }
+
+@media only screen and (min-width: 1024px) {
+    .pet-page {
+        max-width: 1200px;
+        /* 限制頁面最大寬度 */
+        margin: 0 auto;
+        /* 置中頁面內容 */
+        gap: 30px;
+        /* 增加區塊間距 */
+        padding: 40px;
+        /* 增加頁面內邊距 */
+    }
+
+    .pet-feature {
+        height: 600px;
+        /* 提高主區塊高度 */
+        max-width: 800px;
+        /* 限制主區塊寬度 */
+        padding: 30px;
+        /* 增加內部留白 */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        /* 增強陰影效果 */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .pet-feature:hover {
+        transform: translateY(-5px);
+        /* 鼠標懸停時輕微上移 */
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        /* 懸停時加強陰影 */
+    }
+
+    .main-pet,
+    .overlay {
+        width: 350px;
+        /* 提高主圖片大小 */
+        height: 350px;
+    }
+
+    .pet-details {
+        font-size: 18px;
+        /* 增大文字字體 */
+        padding: 15px 20px;
+        /* 增加內容內邊距 */
+        border: 1px solid #ddd;
+        /* 增加淡色邊框 */
+    }
+
+    .pet-gallery {
+        margin-top: 30px;
+        /* 增加上方間距 */
+    }
+
+    .pet-thumbnails {
+        grid-template-columns: repeat(4, 1fr);
+        /* 增加每列顯示的圖片數量 */
+        gap: 15px;
+        /* 提高圖片間距 */
+    }
+
+    .pet-thumbnail {
+        border-radius: 12px;
+        /* 提升圓角 */
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        /* 增加圖片陰影 */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .pet-thumbnail:hover {
+        transform: scale(1.1);
+        /* 放大效果 */
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        /* 增強陰影 */
+    }
+
+    .exp-bar {
+        height: 25px;
+        /* 增加經驗條高度 */
+        margin-top: 15px;
+        /* 增加間距 */
+    }
+
+    .exp-fill {
+        background-color: #4caf50;
+        /* 使用更鮮明的綠色 */
+        transition: width 0.4s ease;
+        /* 平滑過渡 */
+    }
+
+    .experience-text {
+        font-size: 16px;
+        /* 提高字體大小 */
+        margin-top: 10px;
+        /* 增加文字與條的間距 */
+    }
+
+    .initialize-button {
+        font-size: 18px;
+        /* 增大按鈕字體 */
+        padding: 15px 30px;
+        /* 增加按鈕大小 */
+        background-color: #007bff;
+        /* 改用亮色背景 */
+        color: white;
+        border: none;
+        border-radius: 15px;
+        /* 增加按鈕圓角 */
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .initialize-button:hover {
+        background-color: #0056b3;
+        /* 懸停變更按鈕顏色 */
+        transform: scale(1.1);
+        /* 懸停放大效果 */
+    }
+}
 </style>

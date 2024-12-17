@@ -44,7 +44,8 @@
           </div>
         </div>
         <div class="result-buttons">
-          <button @click="goToMenu" class="menu-button">回選單</button>
+          <button @click="goToHome" class="menu-button">回主頁</button>
+          <button @click="goToMenu" class="menu-button">其他字卡學習</button>
           <button @click="restartWrongQuiz" class="continue-button">繼續錯題測驗</button>
         </div>
 
@@ -271,6 +272,10 @@ export default {
 
     goToMenu() {
       this.$router.push('/menu');
+    },
+
+    goToHome() {
+      this.$router.push('/');
     },
 
     async restartWrongQuiz() {

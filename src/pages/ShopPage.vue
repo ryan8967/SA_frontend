@@ -1,19 +1,25 @@
 <template>
   <div id="shop-page">
+    <!-- 切換按鈕 -->
     <button class="switch-btn" @click="switchPage">
       <font-awesome-icon :icon="['fas', 'exchange-alt']" class="icon" />
       {{ pageName }}
     </button>
-    <div v-if="internalPage">
-      <div class="diamond-exchange">
-        <p class="diamond-desc" style="margin: 0 0; margin-top: 5%;">10 Diamonds for 100 coins</p>
-        <button class="buy-btn" @click="purchaseDiamonds">100 coins</button>
+
+    <!-- 內部商城 -->
+    <div v-if="internalPage" class="shop-container">
+      <!-- 鑽石兌換 -->
+      <div class="card diamond-exchange" @click="purchaseDiamonds">
+        <p class="diamond-desc">10 Diamonds for 100 coins</p>
+        <button class="buy-btn">100 coins</button>
       </div>
-      <div class="stuff">
-        <div class="product" v-for="product in stuff" :key="product.id">
+
+      <!-- 產品區塊 -->
+      <div class="product-container">
+        <div class="card product" v-for="product in stuff" :key="product.id">
           <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
-          <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
-          <p style="font-size: small; margin: 1px; padding: 0%;">
+          <h2 class="product-name">{{ product.name }}</h2>
+          <p class="product-price">
             <font-awesome-icon :icon="['fas', 'coins']" class="icon" />
             {{ product.price }}
           </p>
@@ -21,12 +27,14 @@
         </div>
       </div>
     </div>
-    <div v-else>
-      <div class="stuff external">
-        <div class="product external-stuff" v-for="product in outStuff" :key="product.id">
+
+    <!-- 外部商城 -->
+    <div v-else class="shop-container">
+      <div class="product-container">
+        <div class="card product" v-for="product in outStuff" :key="product.id">
           <img class="product-img" :src="`product_img/${product.img}`" alt="Image" />
-          <h2 class="product-name" style="font-size: large; margin: 0; margin-bottom: 2px;">{{ product.name }}</h2>
-          <p style="font-size: small; margin: 1px; padding: 0%;">
+          <h2 class="product-name">{{ product.name }}</h2>
+          <p class="product-price">
             <font-awesome-icon :icon="['fas', 'gem']" class="icon" />
             {{ product.price }}
           </p>
@@ -34,10 +42,13 @@
         </div>
       </div>
     </div>
+
+    <!-- 成就彈窗 -->
     <AchievementPopup v-if="isPopupVisible" :title="stuffTitle" :description="stuffDescription" :image="stuffImage"
       @close="isPopupVisible = false" />
   </div>
 </template>
+
 
 <script>
 import AchievementPopup from '../components/AchievementPopup.vue';
@@ -109,173 +120,115 @@ export default {
 </script>
 
 <style scoped>
+/* 整體頁面設計 */
 #shop-page {
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
-  /*justify-content: center;*/
-  margin-top: 20px;
-  padding: 10px;
-  box-sizing: border-box;
-  background-color: #d3dadb;
-  height: 80%;
-  width: 90%;
   align-items: center;
-  border-radius: 30px;
+  padding: 20px;
+  background-color: #f4f6f9;
+  min-height: 100vh;
 }
 
+/* 切換按鈕設計 */
 .switch-btn {
   display: flex;
-  flex-direction: raw;
   align-items: center;
   justify-content: center;
-  height: 55px;
-  width: 80%;
-  background-color: #ecf0f1;
-  border-radius: 10px;
-  margin-bottom: 1%;
-}
-
-.switch-btn,
-.switch-btn:focus {
-  position: relative;
-  min-width: 200px;
-  height: 50px;
-  background-color: #e28b6c;
-  border-radius: 4em;
-  color: white;
-  font-size: 1rem;
+  padding: 12px 30px;
+  font-size: 18px;
   font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition-duration: 0.4s;
-  padding: 10px 20px;
+  background-color: #e28b6c;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  margin-bottom: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .switch-btn:hover {
-  background-color: #e28b6c;
-  color: white;
-  transition-duration: 0.1s;
+  background-color: #d6755a;
+  transform: scale(1.05);
 }
 
-.switch-btn:after {
-  content: "";
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
+/* 商城容器 */
+.shop-container {
   width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: all 0.5s;
-  box-shadow: 0 0 10px 40px #df4e19;
-  border-radius: 4em;
+  max-width: 1200px;
 }
 
-.switch-btn:active:after {
-  opacity: 1;
-  transition: 0s;
-  box-shadow: 0 0 0 0 white;
-}
-
-.switch-btn:active {
-  top: 1px;
-}
-
-.stuff {
-  margin-top: 5%;
+/* 產品卡片區 */
+.product-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  width: 100%;
-  gap: 10px;
-  align-items: stretch;
-  ;
+  grid-template-columns: repeat(3, 1fr);
+  /* 3列網格 */
+  gap: 20px;
 }
 
-.product {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  border-radius: 10px;
-  background-color: #2c3e50;
-  color: white;
-  box-sizing: border-box;
-  padding: 5px;
+.card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
-  object-fit: cover;
-  height: 100%;
-  align-items: center;
+  padding: 20px;
+  color: #333;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .product-img {
-  width: 40%;
-  height: auto;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 5px;
-  align-self: center;
-  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.product-name {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-size: 16px;
+  margin-bottom: 15px;
 }
 
 .buy-btn {
-  width: 40%;
-  border-radius: 10px;
+  padding: 10px 20px;
   background-color: #1e587e;
   color: white;
-  border: 1px solid #3498db;
-  padding: 5px 5px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 5%;
-  margin-bottom: 5%;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .buy-btn:hover {
   background-color: #2980b9;
+  transform: scale(1.05);
 }
 
-.external-stuff {
-  display: flex;
-  align-items: center;
-}
-
+/* 鑽石兌換卡片 */
 .diamond-exchange {
-  width: 100%;
-  height: 23%;
   background: linear-gradient(135deg, #3498db, #8e44ad);
+  color: white;
+  text-align: center;
+  padding: 30px;
   border-radius: 15px;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
-  justify-content: center;
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  align-items: center;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-  position: relative;
-  cursor: pointer;
-  overflow: hidden;
-  margin-top: 5%;
-}
-
-.diamond-exchange::before {
-  content: '';
-  position: absolute;
-  background: rgba(255, 255, 255, 0.2);
-  transform: rotate(45deg);
-  transition: all 0.5s ease;
-}
-
-.diamond-exchange:hover::before {
-  top: -20%;
-  left: -20%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  margin-bottom: 30px;
+  transition: all 0.3s ease;
 }
 
 .diamond-exchange:hover {
-  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3);
-
-}
-
-.icon {
-  margin-right: 15px;
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 </style>

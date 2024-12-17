@@ -1,22 +1,41 @@
 <template>
     <div class="wrapper">
+        <!-- 標題區 -->
         <div class="header">
             <div class="title">學習選單</div>
         </div>
-        <router-link to="/all">
-            <button class="all-cards-button" @click="navigateTo('AllCards')">
-                查看字卡
-            </button>
-        </router-link>
-        <button class="create-card-button" @click="navigateTo('createMenu')">創建字卡</button>
-        <button class="create-card-button" @click="navigateTo('learn')">立即學習</button>
-        <button class="create-card-button" @click="navigateTo('testmenu')">自我測驗</button>
 
+        <!-- 卡片區 -->
+        <div class="card-container">
+            <div class="card" @click="navigateTo('AllCards')">
+                <div class="card-content">
+                    <h3>查看字卡</h3>
+                    <p>探索所有字卡，輕鬆進行複習。</p>
+                </div>
+            </div>
+            <div class="card" @click="navigateTo('createMenu')">
+                <div class="card-content">
+                    <h3>創建字卡</h3>
+                    <p>創建自己的學習字卡，按步驟完成。</p>
+                </div>
+            </div>
+            <div class="card" @click="navigateTo('learn')">
+                <div class="card-content">
+                    <h3>立即學習</h3>
+                    <p>進入學習模式，快速提升知識。</p>
+                </div>
+            </div>
+            <div class="card" @click="navigateTo('testmenu')">
+                <div class="card-content">
+                    <h3>自我測驗</h3>
+                    <p>測試您的學習成果，挑戰自己！</p>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
-
 export default {
     methods: {
         navigateTo(page) {
@@ -26,73 +45,93 @@ export default {
 };
 </script>
 
-
 <style scoped>
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    margin-top: 150px;
-    gap: 50px;
-}
-
-
-.title {
-    font-size: 35px;
-    text-align: center;
-    margin-top: 4px;
-}
-
-.options {
-    vertical-align: middle;
-}
-
+/* 整體頁面設計 */
 .wrapper {
-    position: relative;
-    padding-top: 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-}
-
-.content {
-    display: flex;
-    align-items: center;
     justify-content: center;
+    padding: 20px;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+    /* 背景灰白色 */
+}
+
+/* 標題區 */
+.header {
+    margin-bottom: 40px;
     text-align: center;
-    cursor: pointer;
 }
 
-button:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+.title {
+    font-size: 48px;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-button {
-    background-color: #ff6f61;
-    padding: 10px 25px;
-    border-radius: 10px;
-    font-size: 15px;
-    border: none;
+/* 卡片區 */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2x2布局 */
+    gap: 20px;
+    /* 卡片之間的間距 */
+    width: 100%;
+    max-width: 900px;
+    /* 最大寬度 */
+}
+
+/* 卡片設計 */
+.card {
+    background: linear-gradient(135deg, #ff6f61, #ff9671);
+    /* 漸層背景 */
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 30px;
     color: white;
     cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.all-cards-button {
-    padding: 10px 20px;
+.card:hover {
+    transform: translateY(-8px);
+    /* 懸停時上移 */
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+    /* 加強陰影 */
+}
+
+.card-content h3 {
+    margin: 0 0 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.card-content p {
     font-size: 16px;
-    cursor: pointer;
-    border: none;
-    border-radius: 10px;
-    background-color: #ff6f61;
-    color: white;
-    margin-top: 4px;
+    line-height: 1.4;
+    opacity: 0.9;
 }
 
-.create-card-button {
-    padding: 10px 20px;
-    margin-top: 10px;
+/* 響應式設計 */
+@media only screen and (max-width: 768px) {
+    .card-container {
+        grid-template-columns: 1fr;
+        /* 小螢幕改成單列 */
+        gap: 15px;
+    }
+
+    .title {
+        font-size: 36px;
+    }
+
+    .card-content h3 {
+        font-size: 20px;
+    }
+
+    .card-content p {
+        font-size: 14px;
+    }
 }
 </style>

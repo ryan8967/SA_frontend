@@ -58,7 +58,7 @@
             <button class="continue-button" @click="goToCreateCard">主題單字</button>
             <button class="continue-button" @click="navigateTo('randomcard')">字卡測驗</button>
         </div>
-<!--         <div class="card task-status">
+        <!--         <div class="card task-status">
             <h2>Task Status</h2>
             <p class="task-intro">Complete tasks to level up your pet!</p>
             <ul>
@@ -168,6 +168,12 @@ export default {
             }
         },
         */
+        showClickGif() {
+            this.isClickGif = true; // 點擊時設為 true
+            setTimeout(() => {
+                this.isClickGif = false; // 兩秒後改回 false
+            }, 2000); // 延遲 2 秒（2000 毫秒）
+        },
         navigateTo(page) {
             this.$router.push({ name: page });
         },
@@ -181,7 +187,7 @@ export default {
             if (task.id == 1) {
                 this.$router.push("/learn");
             }
-            else if(task.id == 2) {
+            else if (task.id == 2) {
                 this.$router.push("/card");
             }
             else {
@@ -434,6 +440,7 @@ button:hover {
 .close-button {
     margin-left: 0;
 }
+
 .button-container {
     display: flex;
     justify-content: space-between;
@@ -470,6 +477,104 @@ button:hover {
     .continue-button {
         width: 100%;
         max-width: 300px;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+    #main-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        margin-top: 8vh;
+        /* 讓內容居中 */
+        gap: 30px;
+        /* 增加區塊之間的間距 */
+    }
+
+    .card {
+        max-width: 800px;
+        /* 卡片在桌面最大寬度 */
+        padding: 30px;
+        /* 增加內部留白 */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        /* 強化陰影效果 */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        /* 鼠標懸停輕微上移 */
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        /* 懸停時陰影更明顯 */
+    }
+
+    .pet-info {
+        height: 400px;
+        /* 提高圖片顯示區域高度 */
+    }
+
+    .pet-image,
+    .overlay {
+        width: 100%;
+        height: auto;
+        /* 確保圖片不失真 */
+        max-width: 400px;
+        transition: transform 0.3s ease;
+    }
+
+    .pet-details {
+        font-size: 18px;
+        /* 提高文字大小 */
+        padding: 10px 15px;
+        background-color: rgba(255, 255, 255, 0.9);
+        /* 增加背景透明度 */
+        border: 1px solid #ddd;
+        /* 增加邊框 */
+    }
+
+    .button-container {
+        justify-content: space-evenly;
+        /* 按鈕均勻排列 */
+        gap: 20px;
+        /* 按鈕之間增加間距 */
+    }
+
+    .create-card-button,
+    .continue-button {
+        padding: 15px 25px;
+        /* 增加按鈕大小 */
+        font-size: 16px;
+        border-radius: 12px;
+        /* 圓角更明顯 */
+        max-width: 250px;
+        /* 限制按鈕最大寬度 */
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .create-card-button:hover,
+    .continue-button:hover {
+        background-color: #d9473e;
+        /* 深化顏色 */
+        transform: scale(1.05);
+        /* 懸停時稍微放大 */
+    }
+
+    .modal {
+        width: 500px;
+        padding: 40px;
+        /* 增加對話框內部留白 */
+        font-size: 18px;
+        /* 提高對話框文字大小 */
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        /* 強化陰影 */
+    }
+
+    .task-status li {
+        font-size: 16px;
+        /* 增加文字可讀性 */
+        padding: 15px 20px;
+        /* 增加內部留白 */
+        margin: 15px 0;
+        /* 加大項目間距 */
     }
 }
 </style>

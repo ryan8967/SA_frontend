@@ -54,7 +54,8 @@
           </div>
         </div>
         <div class="result-buttons">
-          <button @click="goToMenu" class="menu-button">回選單</button>
+          <button @click="goToHome" class="menu-button">回主頁</button>
+          <button @click="goToMenu" class="menu-button">其他字卡學習</button>
           <button @click="startNewTopic" class="continue-button">練習新主題</button>
         </div>
 
@@ -320,6 +321,9 @@ export default {
       this.$router.push('/menu');
     },
 
+    goToHome() {
+      this.$router.push('/');
+    },
     startNewTopic() {
       this.show = true;
       this.showResult = false;
