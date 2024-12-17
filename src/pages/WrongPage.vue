@@ -10,7 +10,8 @@
         <button @click="goToCreateCard" class="continue-button">前往主題單字</button>
       </div>
     </div>
-
+    <PopupComponent v-if="showResult && showPopup" :title="popupData.title" :description="popupData.description"
+      :image="popupData.image" @close="handlePopupClose" />
     <!-- Quiz Content -->
     <template v-else>
       <div v-if="currentQuestion && !showResult" class="quiz-question">
@@ -97,9 +98,13 @@
 
 <script>
 import OpenAI from "openai";
+import PopupComponent from "../components/AchievementPopup.vue"; // 根據實際路徑調整
 
 
 export default {
+  components: {
+    PopupComponent,
+  },
   data() {
     return {
       incorrectWords: [],
@@ -114,6 +119,12 @@ export default {
       answeredQuestions: [],
       noQuestionsAvailable: false,
       totalQuestions: 0,
+      showPopup: true, // 控制彈窗顯示（可不需要單獨此屬性）
+      popupData: {
+        title: "測驗完成！",
+        description: "",
+        image: "pet/pet3.gif", // 替換為成就圖片
+      },
     };
   },
   computed: {
@@ -248,10 +259,14 @@ export default {
         this.selectedOptionIndex = null;
         if (this.processedQuestions >= this.totalQuestions) {
           this.showResult = true;
+          this.popupData.description = `你答對了 ${this.correctCount} 題，共 ${this.totalQuestions} 題！正確率為 ${(this.correctCount / this.totalQuestions * 100).toFixed(1)}%。`;
         } else {
           await this.loadNextQuestion();
         }
       }, 2000);
+    },
+    handlePopupClose() {
+      this.showPopup = false; // 關閉彈窗後隱藏
     },
 
     goToMenu() {
