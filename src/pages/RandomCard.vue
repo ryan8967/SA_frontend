@@ -11,14 +11,34 @@
         <button @click="goToCreateCard" class="continue-button">前往主題單字</button>
       </div>
     </div>
-
+        <!-- Type Selection -->
+    <div v-else-if="showTypeSelection" class="quiz-card">
+    <h2 class="selection-title">選擇題目類型</h2>
+    <div class="type-selection">
+        <button 
+        class="type-button" 
+        :class="{ 'selected': questionType === 'zhToEn', 'disabled': questionType === 'enToZh' }"
+        @click="selectQuestionType('zhToEn')"
+        >
+        中翻英
+        </button>
+        <button 
+        class="type-button" 
+        :class="{ 'selected': questionType === 'enToZh', 'disabled': questionType === 'zhToEn' }"
+        @click="selectQuestionType('enToZh')"
+        >
+        英翻中
+        </button>
+    </div>
+    <button class="start-button" @click="startQuiz">開始測驗</button>
+    </div>
     <AchievementPopup v-if="showResult && showPopup" :title="popupData.title" :description="popupData.description"
       :image="popupData.image" @close="handlePopupClose" />
 
     <!-- Quiz Content -->
-    <template v-else>
+    <template v-else-if="!showTypeSelection">
       <div v-if="currentQuestion && !showResult" class="quiz-question">
-        <h2 class="quiz-question-title">{{ currentQuestion.chineseTranslation }}</h2>
+        <h2 class="quiz-question-title">{{ questionType === 'zhToEn' ? currentQuestion.chineseTranslation : currentQuestion.englishWord }}</h2>
         <div class="quiz-options">
           <div class="option" v-for="(option, index) in currentQuestion.options" :key="index">
             <button :class="{
@@ -119,6 +139,8 @@ export default {
       showResult: false,
       correctCount: 0,
       answeredQuestions: [],
+      showTypeSelection: true, 
+      questionType: 'zhToEn', 
       showPopup: true, // 控制彈窗顯示（可不需要單獨此屬性）
       popupData: {
         title: "測驗完成！",
@@ -133,7 +155,7 @@ export default {
     }
   },
   mounted() {
-    this.startQuiz();
+    this.loadWords();
   },
   methods: {
     shuffleArray(array) {
@@ -144,34 +166,44 @@ export default {
       return array;
     },
 
-    async startQuiz() {
-      this.showLoading = true;
-      try {
-        // 從API獲取隨機單字
-        const response = await fetch("http://localhost:8080/api/cards/random", {
-          method: "GET",
-        });
+    async loadWords() {
+  this.showLoading = true;
+  try {
+    const response = await fetch("http://localhost:8080/api/cards/random", {
+      method: "GET",
+    });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-        const data = await response.json();
-        if (!data || data.length === 0) {
-          console.error("No words available");
-          this.showLoading = false;
-          return;
-        }
+    const data = await response.json();
+    if (!data || data.length === 0) {
+      console.error("No words available");
+      this.showLoading = false;
+      return;
+    }
 
-        await this.generateQuestion(data[0].word);
-        this.remainingWords = data.slice(1);
+    this.remainingWords = data;
+    this.showTypeSelection = true;
+  } catch (error) {
+    console.error("Error loading words:", error);
+  } finally {
+    this.showLoading = false;
+  }
+},
 
-      } catch (error) {
-        console.error("Error starting quiz:", error);
-        this.showLoading = false;
-      }
-    },
+selectQuestionType(type) {
+  if (this.questionType !== type) {
+    this.questionType = type;
+  }
+},
 
+async startQuiz() {
+  this.showTypeSelection = false;
+  await this.generateQuestion(this.remainingWords[0].word);
+  this.remainingWords = this.remainingWords.slice(1);
+},
     async loadNextQuestion() {
       if (this.questionsAnswered >= 10) {
         this.showResult = true;
@@ -200,16 +232,26 @@ export default {
           dangerouslyAllowBrowser: true,
         });
 
-        const prompt = `You are an English teacher helping the user create a multiple-choice question.
-        Given the word: "${word}", generate a JSON object as follows:
-        {
-          "chineseTranslation": "", 
-          "options": ["", "", "", ""],
-          "correctAnswer": ""
-        }.
-        The "options" should include three incorrect english words as distractors along with the correct english word.
-        The distractors should be plausible but clearly incorrect.
-        Return only the JSON object without any additional text or explanation. The "chineseTranslation" should be the Chinese translation of the word, use zh-tw.`;
+        const prompt = this.questionType === 'zhToEn'
+  ? `You are an English teacher helping the user create a multiple-choice question.
+    Given the word: "${word}", generate a JSON object as follows:
+    {
+      "chineseTranslation": "", 
+      "options": ["", "", "", ""],
+      "correctAnswer": ""
+    }.
+    The "options" should include three incorrect english words as distractors along with the correct english word.
+    The distractors should be plausible but clearly incorrect.
+    Return only the JSON object without any additional text or explanation. The "chineseTranslation" should be the Chinese translation of the word, use zh-tw.`
+  : `You are an English teacher helping the user create a multiple-choice question.
+    Given the English word: "${word}", generate a JSON object as follows:
+    {
+      "englishWord": "${word}",
+      "options": ["", "", "", ""],
+      "correctAnswer": ""
+    }.
+    The "options" should include four Chinese translations, use zh-tw,where one is correct and three are plausible but incorrect.
+    Return only the JSON object without any additional text or explanation.`;
 
         const gptResponse = await openai.chat.completions.create({
           model: "gpt-4",
@@ -271,12 +313,25 @@ export default {
         // this.showResult = true;
         if (this.questionsAnswered >= 10) {
 
-          this.popupData.description = `你答對了 ${this.correctCount} 題，共 ${this.questionsAnswered} 題！正確率為 ${(this.correctCount / this.questionsAnswered * 100).toFixed(1)}%。`;
+          this.popupData.description = `你答對了 ${this.correctCount} 題，共 ${this.questionsAnswered} 題！正確率為 ${(this.correctCount / this.questionsAnswered * 100).toFixed(1)}%，Exp + ${this.correctCount*10}`;
           this.showResult = true;
+        try {
+        const expToAdd = this.correctCount * 10;
+        const response = await fetch(`http://localhost:8080/api/pet/addExp?exp=${expToAdd}`, {
+            method: 'POST',
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to add experience points');
+        }
+        
+        console.log(`Successfully added ${expToAdd} experience points`);
+        } catch (error) {
+        console.error('Error adding experience points:', error);
+        }
         } else {
           await this.loadNextQuestion();
         }
-        await this.loadNextQuestion();
       }, 2000);
     },
     handlePopupClose() {
@@ -734,5 +789,74 @@ export default {
   .progress-text {
     font-size: 12px;
   }
+}
+.quiz-card {
+  background-color: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.selection-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.type-selection {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.type-button {
+  padding: 15px 30px;
+  font-size: 18px;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  background-color: white;
+  color: #4CAF50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 150px;
+}
+
+.type-button:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.type-button.selected {
+  background-color: #4CAF50;
+  color: white;
+  transform: scale(1.05);
+}
+
+.type-button.disabled {
+  border-color: #ccc;
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+.start-button {
+  width: 100%;
+  background: linear-gradient(135deg, #4caf50, #81c784);
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  margin-top: 20px;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
 }
 </style>

@@ -16,8 +16,9 @@
                     <img v-if="isClickGif" :src="clickGifImage" alt="Clicked Pet" class="pet-image overlay" />
                 </transition>
                 <div class="pet-details">
-                    <p class="pet-level">Level: {{ petLevel }}</p>
                     <p class="pet-name">Name: {{ petName }}</p>
+                    <p class="pet-level">Level: {{ petLevel }}</p>
+                    <p class="pet-exp">EXP: {{ petExp }}</p>
                 </div>
             </div>
         </div>
@@ -52,14 +53,8 @@ export default {
     },
     data() {
         return {
-            // Comment out login-related data
-            /*
-            user: null,
-            showLoginModal: true,
-            loginUsername: "",
-            loginPassword: "",
-            */
             isClickGif: false,
+            petInfo: null,
             tasks: [
                 { id: 1, description: "記起來5個字卡", status: "in progress" },
                 { id: 2, description: "新增5個字卡", status: "in progress" },
@@ -76,10 +71,13 @@ export default {
             return this.petStore.selectedPet;
         },
         petName() {
-            return this.selectedPet.name || "Fluffy";
+            return this.petInfo?.petname || "Fluffy";
         },
         petLevel() {
-            return this.selectedPet.level || 1;
+            return this.petInfo?.level || 1;
+        },
+        petExp() {
+            return this.petInfo?.exp || 0;
         },
         mainPetImage() {
             const petFileName = this.selectedPet.src.split("/").pop().split(".")[0];
@@ -97,37 +95,25 @@ export default {
         },
     },
     methods: {
-        // Comment out login-related methods
-        /*
-        handleLogin() {
-            if (this.loginUsername && this.loginPassword) {
-                const mockUser = {
-                    username: this.loginUsername,
-                    password: this.loginPassword,
-                };
-                localStorage.setItem("user", JSON.stringify(mockUser));
-                this.user = mockUser;
-                this.showLoginModal = false;
-            } else {
-                alert("Please enter valid credentials.");
+        async fetchPetInfo() {
+            try {
+                const response = await fetch('http://localhost:8080/api/pet/get');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch pet info');
+                }
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    this.petInfo = data[0];
+                }
+            } catch (error) {
+                console.error('Error fetching pet info:', error);
             }
         },
-        loadUserData() {
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                this.user = JSON.parse(storedUser);
-                this.showLoginModal = false;
-            } else {
-                this.user = null;
-                this.showLoginModal = true;
-            }
-        },
-        */
         showClickGif() {
-            this.isClickGif = true; // 點擊時設為 true
+            this.isClickGif = true;
             setTimeout(() => {
-                this.isClickGif = false; // 兩秒後改回 false
-            }, 2000); // 延遲 2 秒（2000 毫秒）
+                this.isClickGif = false;
+            }, 2000);
         },
         navigateTo(page) {
             this.$router.push({ name: page });
@@ -151,31 +137,15 @@ export default {
                 this.showExperienceModal = true;
             }
         },
-        async fetchTaskStatus() {
-            //取得status
-            /*
-            try {
-                const db = getDatabase();
-                const userId = JSON.parse(localStorage.getItem('user')).username;
-                for (let task of this.tasks) {
-                    const taskRef = ref(db, `users/${userId}/tasks/${task.id}`);
-                    const snapshot = await get(taskRef);
-                    if (snapshot.exists()) {
-                        task.status = snapshot.val().status;
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching task status: ", error);
-            }
-            */
-        },
         closeExperienceModal() {
             this.showExperienceModal = false;
         },
     },
+    mounted() {
+        this.fetchPetInfo();
+    }
 };
 </script>
-
 
 <style scoped>
 #main-page {
@@ -252,11 +222,9 @@ button:hover {
     padding: 20px;
     text-align: center;
     width: 90%;
-
     margin-bottom: 20px;
 }
 
-/* 寵物顯示區域樣式 */
 .pet-info {
     position: relative;
     height: 250px;
@@ -297,13 +265,14 @@ button:hover {
 }
 
 .pet-level,
-.pet-name {
+.pet-name,
+.pet-exp {
     font-size: 18px;
     font-weight: bold;
     color: #2c3e50;
+    margin: 5px 0;
 }
 
-/* 任務區塊 */
 .task-status ul {
     list-style-type: none;
     padding: 0;
@@ -324,41 +293,9 @@ button:hover {
     color: #7f8c8d;
 }
 
-button {
-    padding: 8px 12px;
-    background-color: #ff5349;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #ff5349;
-}
-
 .task-intro {
     color: #7f8c8d;
     margin-bottom: 10px;
-}
-
-@media only screen and (max-width: 600px) {
-    .pet-image {
-        width: 300px;
-        height: 300px;
-    }
-
-    .card {
-        padding: 15px;
-    }
-
-    .task-status li {
-        font-size: 14px;
-    }
-
-    #main-page {
-        padding-top: 100px;
-    }
 }
 
 .floating-text {
@@ -373,7 +310,6 @@ button:hover {
     opacity: 0;
     max-width: 80%;
     z-index: 1000;
-    /* Limit the maximum width to keep it readable */
 }
 
 @keyframes fadeOut {
@@ -381,19 +317,13 @@ button:hover {
         opacity: 1;
         transform: translateY(-100px);
     }
-
     90% {
         opacity: 0.5;
     }
-
     100% {
         opacity: 0;
         transform: translateY(-240px);
     }
-}
-
-.close-button {
-    margin-left: 0;
 }
 
 .button-container {
@@ -433,6 +363,23 @@ button:hover {
         width: 100%;
         max-width: 300px;
     }
+
+    .pet-image {
+        width: 300px;
+        height: 300px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .task-status li {
+        font-size: 14px;
+    }
+
+    #main-page {
+        padding-top: 100px;
+    }
 }
 
 @media only screen and (min-width: 1024px) {
@@ -443,13 +390,10 @@ button:hover {
     .card-container {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        /* 每行三個卡片 */
         gap: 30px;
-        /* 增加卡片間距 */
         margin-top: 20px;
         width: 100%;
         max-width: 1200px;
-        /* 最大寬度限制 */
     }
 
     .card.action-card {
@@ -468,9 +412,7 @@ button:hover {
 
     .card.action-card:hover {
         transform: translateY(-5px);
-        /* 懸停時微微上移 */
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        /* 增強陰影 */
         background: linear-gradient(135deg, #ff9671, #ff6f61);
     }
 

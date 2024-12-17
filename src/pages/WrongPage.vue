@@ -10,12 +10,35 @@
         <button @click="goToCreateCard" class="continue-button">前往主題單字</button>
       </div>
     </div>
+      <!-- Type Selection -->
+      <div v-else-if="showTypeSelection" class="quiz-card">
+      <h2 class="selection-title">選擇題目類型</h2>
+      <div class="type-selection">
+        <button 
+          class="type-button" 
+          :class="{ 'selected': questionType === 'zhToEn', 'disabled': questionType === 'enToZh' }"
+          @click="selectQuestionType('zhToEn')"
+        >
+          中翻英
+        </button>
+        <button 
+          class="type-button" 
+          :class="{ 'selected': questionType === 'enToZh', 'disabled': questionType === 'zhToEn' }"
+          @click="selectQuestionType('enToZh')"
+        >
+          英翻中
+        </button>
+      </div>
+      <button class="start-button" @click="startQuiz">開始測驗</button>
+    </div>
     <PopupComponent v-if="showResult && showPopup" :title="popupData.title" :description="popupData.description"
       :image="popupData.image" @close="handlePopupClose" />
     <!-- Quiz Content -->
-    <template v-else>
+    <template v-else-if="!showTypeSelection">
       <div v-if="currentQuestion && !showResult" class="quiz-question">
-        <h2 class="quiz-question-title">{{ currentQuestion.chineseTranslation }}</h2>
+        <h2 class="quiz-question-title">
+          {{ questionType === 'zhToEn' ? currentQuestion.chineseTranslation : currentQuestion.word }}
+        </h2>
         <div class="quiz-options">
           <div class="option" v-for="(option, index) in currentQuestion.options" :key="index">
             <button :class="{
@@ -121,6 +144,8 @@ export default {
       noQuestionsAvailable: false,
       totalQuestions: 0,
       showPopup: true, // 控制彈窗顯示（可不需要單獨此屬性）
+      showTypeSelection: false,
+      questionType: 'zhToEn', 
       popupData: {
         title: "測驗完成！",
         description: "",
@@ -158,11 +183,23 @@ export default {
 
         this.incorrectWords = data;
         this.totalQuestions = Math.min(this.maxQuestions, data.length);
-        await this.loadNextQuestion();
+        this.showTypeSelection = true; 
       } catch (error) {
         console.error("Error fetching incorrect words:", error);
+        
+      } finally{
         this.showLoading = false;
       }
+    },
+    selectQuestionType(type) {
+      if (this.questionType !== type) {
+        this.questionType = type;
+      }
+    },
+
+    async startQuiz() {
+      this.showTypeSelection = false;
+      await this.loadNextQuestion();
     },
 
     async loadNextQuestion() {
@@ -187,16 +224,26 @@ export default {
           apiKey: decodedStr,
           dangerouslyAllowBrowser: true,
         });
-        const prompt = `You are an English teacher helping the user create a multiple-choice question.
-        Given the word: "${word}", generate a JSON object as follows:
-        {
-          "chineseTranslation": "", 
-          "options": ["", "", "", ""],
-          "correctAnswer": ""
-        }.
-        The "options" should include three english incorrect words as distractors along with the correct english word.
-        The distractors should be plausible but clearly incorrect.
-        Return only the JSON object without any additional text or explanation. The "chineseTranslation" should be the Chinese translation of the word, use zh-tw.`;
+        const prompt = this.questionType === 'zhToEn' 
+          ? `You are an English teacher helping the user create a multiple-choice question.
+            Given the word: "${word}", generate a JSON object as follows:
+            {
+              "chineseTranslation": "", 
+              "options": ["", "", "", ""],
+              "correctAnswer": ""
+            }.
+            The "options" should include three incorrect english words as distractors along with the correct english word.
+            The distractors should be plausible but clearly incorrect.
+            Return only the JSON object without any additional text or explanation. The "chineseTranslation" should be the Chinese translation of the word, use zh-tw.`
+          : `You are an English teacher helping the user create a multiple-choice question.
+            Given the English word: "${word}", generate a JSON object as follows:
+            {
+              "englishWord": "${word}",
+              "options": ["", "", "", ""],
+              "correctAnswer": ""
+            }.
+            The "options" should include four Chinese translations, use zh-tw,where one is correct and three are plausible but incorrect.
+            Return only the JSON object without any additional text or explanation.`;
 
         const gptResponse = await openai.chat.completions.create({
           model: "gpt-4",
@@ -208,7 +255,17 @@ export default {
 
         const message = gptResponse.choices[0].message.content;
         try {
-          this.currentQuestion = JSON.parse(message);
+          const questionData = JSON.parse(message);
+          const shuffledOptions = this.shuffleArray([...questionData.options]);
+
+          if (this.questionType === 'zhToEn' && !shuffledOptions.includes(questionData.correctAnswer)) {
+            const randomIndex = Math.floor(Math.random() * shuffledOptions.length);
+            shuffledOptions[randomIndex] = questionData.correctAnswer;
+          }
+          this.currentQuestion = {
+            ...questionData,
+            word 
+          };
           this.processedQuestions += 1;
         } catch (jsonError) {
           console.error("JSON Parsing Error:", jsonError);
@@ -221,23 +278,33 @@ export default {
         this.showLoading = false;
       }
     },
-
+    shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+},
     async handleAnswer(selectedOption, index) {
       this.selectedOptionIndex = index;
       this.isSelectedCorrect = selectedOption === this.currentQuestion.correctAnswer;
 
       this.answeredQuestions.push({
-        chineseTranslation: this.currentQuestion.chineseTranslation,
-        userAnswer: selectedOption,
-        correctAnswer: this.currentQuestion.correctAnswer,
-        isCorrect: this.isSelectedCorrect
-      });
+  chineseTranslation: this.questionType === 'zhToEn' 
+    ? this.currentQuestion.chineseTranslation 
+    : this.currentQuestion.englishWord,
+  userAnswer: selectedOption,
+  correctAnswer: this.currentQuestion.correctAnswer,
+  isCorrect: this.isSelectedCorrect
+});
 
       if (this.isSelectedCorrect) {
         this.correctCount++;
       }
 
-      const word = this.currentQuestion.correctAnswer;
+      const word = this.questionType === 'zhToEn' 
+    ? this.currentQuestion.correctAnswer 
+    : this.currentQuestion.word;
 
       if (this.isSelectedCorrect) {
         try {
@@ -260,7 +327,21 @@ export default {
         this.selectedOptionIndex = null;
         if (this.processedQuestions >= this.totalQuestions) {
           this.showResult = true;
-          this.popupData.description = `你答對了 ${this.correctCount} 題，共 ${this.totalQuestions} 題！正確率為 ${(this.correctCount / this.totalQuestions * 100).toFixed(1)}%。`;
+          this.popupData.description = `你答對了 ${this.correctCount} 題，共 ${this.totalQuestions} 題！正確率為 ${(this.correctCount / this.totalQuestions * 100).toFixed(1)}%，Exp + ${this.correctCount*10}`;
+          try {
+        const expToAdd = this.correctCount * 10; 
+        const response = await fetch(`http://localhost:8080/api/pet/addExp?exp=${expToAdd}`, {
+          method: 'POST',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to add experience points');
+        }
+        
+        console.log(`Successfully added ${expToAdd} experience points`);
+      } catch (error) {
+        console.error('Error adding experience points:', error);
+      }
         } else {
           await this.loadNextQuestion();
         }
@@ -292,6 +373,75 @@ export default {
 };
 </script>
 <style scoped>
+.quiz-card {
+  background-color: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.selection-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.type-selection {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.type-button {
+  padding: 15px 30px;
+  font-size: 18px;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  background-color: white;
+  color: #4CAF50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 150px;
+}
+
+.type-button:hover:not(.disabled) {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.type-button.selected {
+  background-color: #4CAF50;
+  color: white;
+  transform: scale(1.05);
+}
+
+.type-button.disabled {
+  border-color: #ccc;
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: pointer;
+}
+
+.start-button {
+  width: 100%;
+  background: linear-gradient(135deg, #4caf50, #81c784);
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  margin-top: 20px;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+}
+
 .quiz-block {
   display: flex;
   justify-content: center;
