@@ -1,85 +1,40 @@
 <template>
     <div id="main-page">
-        <!-- Comment out Login Modal
-        <div v-if="showLoginModal" class="modal-overlay">
-            <div class="modal">
-                <h2>Login</h2>
-                <form @submit.prevent="handleLogin">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" v-model="loginUsername" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" v-model="loginPassword" required />
-                    </div>
-                    <button type="submit">Login</button>
-                </form>
-            </div>
-        </div>
-        -->
-
-        <!-- Remove user check condition
-        <div v-if="!user">
-            <p>Loading user information...</p>
-        </div>
-        -->
-
-        <!-- Remove v-if="user" from Pet Display -->
+        <!-- Pet Display Card -->
         <div class="card pet-display" @click="showClickGif">
             <h2 class="hh">Your Pet</h2>
-
             <div v-if="showBubble" :key="floatingTextIndex" class="floating-text">
                 {{ floatingTexts[floatingTextIndex] }}
             </div>
-            <div v-else style="height: 48px;">
-                &nbsp;
-            </div>
+            <div v-else style="height: 48px;">&nbsp;</div>
 
-            <!-- Pet Images -->
             <div class="pet-info">
                 <transition name="fade" mode="out-in">
                     <img :src="mainPetImage" alt="Main Pet" class="pet-image" v-if="!isClickGif" />
                 </transition>
-
                 <transition name="fade" mode="out-in">
-                    <img v-if="isClickGif" :src="clickGifImage" alt="Clicked Pet" class="pet-image overlay"
-                        @click="showTextBubble" />
+                    <img v-if="isClickGif" :src="clickGifImage" alt="Clicked Pet" class="pet-image overlay" />
                 </transition>
-
                 <div class="pet-details">
                     <p class="pet-level">Level: {{ petLevel }}</p>
                     <p class="pet-name">Name: {{ petName }}</p>
                 </div>
             </div>
         </div>
-        <div class="button-container">
-            <button class="create-card-button" @click="navigateTo('wrong')">錯題複習</button>
-            <button class="continue-button" @click="goToCreateCard">主題單字</button>
-            <button class="continue-button" @click="navigateTo('randomcard')">字卡測驗</button>
-        </div>
-        <!--         <div class="card task-status">
-            <h2>Task Status</h2>
-            <p class="task-intro">Complete tasks to level up your pet!</p>
-            <ul>
-                <li v-for="task in tasks" :key="task.id">
-                    <span>{{ task.description }}</span>
-                    <span class="task-status-text">Status: {{ task.status }}</span>
-                    <button v-if="task.status === 'not started'" @click="acceptTask(task)">
-                        Accept Task
-                    </button>
-                    <button v-if="task.status === 'in progress'" @click="completeTask(task)">
-                        做任務
-                    </button>
-                </li>
-            </ul>
-        </div> -->
 
-        <!-- Pop-Out Modal -->
-        <div class="modal-overlay" v-if="showExperienceModal">
-            <div class="modal">
-                <button class="close-button" @click="closeExperienceModal">×</button>
-                <p>寵物已獲得20經驗值</p>
+        <!-- Buttons as Cards -->
+        <div class="card-container">
+            <div class="card action-card" @click="navigateTo('wrong')">
+                <h3>錯題複習</h3>
+                <p>Review your incorrect answers to improve!</p>
+            </div>
+            <div class="card action-card" @click="goToCreateCard">
+                <h3>主題單字</h3>
+                <p>Explore new words and themes to learn.</p>
+            </div>
+            <div class="card action-card" @click="navigateTo('randomcard')">
+                <h3>字卡測驗</h3>
+                <p>Test your vocabulary knowledge with flashcards.</p>
             </div>
         </div>
     </div>
@@ -482,99 +437,51 @@ button:hover {
 
 @media only screen and (min-width: 1024px) {
     #main-page {
-        max-width: 1200px;
-        margin: 0 auto;
-        margin-top: 8vh;
-        /* 讓內容居中 */
+        padding-top: 150px;
+    }
+
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        /* 每行三個卡片 */
         gap: 30px;
-        /* 增加區塊之間的間距 */
-    }
-
-    .card {
-        max-width: 800px;
-        /* 卡片在桌面最大寬度 */
-        padding: 30px;
-        /* 增加內部留白 */
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        /* 強化陰影效果 */
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        /* 鼠標懸停輕微上移 */
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-        /* 懸停時陰影更明顯 */
-    }
-
-    .pet-info {
-        height: 400px;
-        /* 提高圖片顯示區域高度 */
-    }
-
-    .pet-image,
-    .overlay {
+        /* 增加卡片間距 */
+        margin-top: 20px;
         width: 100%;
-        height: auto;
-        /* 確保圖片不失真 */
-        max-width: 400px;
-        transition: transform 0.3s ease;
+        max-width: 1200px;
+        /* 最大寬度限制 */
     }
 
-    .pet-details {
-        font-size: 18px;
-        /* 提高文字大小 */
-        padding: 10px 15px;
-        background-color: rgba(255, 255, 255, 0.9);
-        /* 增加背景透明度 */
-        border: 1px solid #ddd;
-        /* 增加邊框 */
+    .card.action-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ff6f61, #ff9671);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        padding: 30px;
+        text-align: center;
+        color: white;
     }
 
-    .button-container {
-        justify-content: space-evenly;
-        /* 按鈕均勻排列 */
-        gap: 20px;
-        /* 按鈕之間增加間距 */
+    .card.action-card:hover {
+        transform: translateY(-5px);
+        /* 懸停時微微上移 */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        /* 增強陰影 */
+        background: linear-gradient(135deg, #ff9671, #ff6f61);
     }
 
-    .create-card-button,
-    .continue-button {
-        padding: 15px 25px;
-        /* 增加按鈕大小 */
+    .card.action-card h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    .card.action-card p {
         font-size: 16px;
-        border-radius: 12px;
-        /* 圓角更明顯 */
-        max-width: 250px;
-        /* 限制按鈕最大寬度 */
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .create-card-button:hover,
-    .continue-button:hover {
-        background-color: #d9473e;
-        /* 深化顏色 */
-        transform: scale(1.05);
-        /* 懸停時稍微放大 */
-    }
-
-    .modal {
-        width: 500px;
-        padding: 40px;
-        /* 增加對話框內部留白 */
-        font-size: 18px;
-        /* 提高對話框文字大小 */
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        /* 強化陰影 */
-    }
-
-    .task-status li {
-        font-size: 16px;
-        /* 增加文字可讀性 */
-        padding: 15px 20px;
-        /* 增加內部留白 */
-        margin: 15px 0;
-        /* 加大項目間距 */
+        line-height: 1.5;
     }
 }
 </style>
