@@ -10,6 +10,8 @@
           </button>
         </div>
       </div>
+      <AchievementPopup v-if="showResult && showPopup" :title="popupData.title" :description="popupData.description"
+        :image="popupData.image" @close="handlePopupClose" />
 
       <!-- Only show question and progress if not showing results -->
       <template v-if="!showResult">
@@ -98,8 +100,12 @@
 <script>
 import OpenAI from "openai";
 import { useRouter } from 'vue-router';
+import AchievementPopup from "./AchievementPopup.vue";
 
 export default {
+  components: {
+    AchievementPopup,
+  },
   data() {
     return {
       inputWord: "",
@@ -113,6 +119,12 @@ export default {
       showResult: false,
       correctCount: 0,
       answeredQuestions: [],
+      showPopup: true, // 控制彈窗顯示（可不需要單獨此屬性）
+      popupData: {
+        title: "測驗完成！",
+        description: "",
+        image: "pet/pet3.gif", // 替換為成就圖片
+      },
     };
   },
   computed: {
@@ -294,10 +306,14 @@ export default {
         this.selectedOptionIndex = null;
         if (this.questionsAnswered >= 10) {
           this.showResult = true;
+          this.popupData.description = `你答對了 ${this.correctCount} 題，共 ${this.questionsAnswered} 題！正確率為 ${(this.correctCount / this.questionsAnswered * 100).toFixed(1)}%。`;
         } else {
           await this.loadNextQuestion();
         }
       }, 2000);
+    },
+    handlePopupClose() {
+      this.showPopup = false; // 關閉彈窗後隱藏
     },
 
     goToMenu() {

@@ -1,113 +1,115 @@
 <template>
-    <div class="quiz-block" :class="{ 'result-padding': showResult }">
-      <!-- No Wrong Questions Message -->
-      <div v-if="noQuestionsAvailable" class="result-card">
-        <h2 class="result-title">太棒了！</h2>
-        <div class="result-content">
-          <p class="result-message">目前沒有錯題需要複習！</p>
-        </div>
-        <div class="result-buttons">
-          <button @click="goToMenu" class="menu-button">回選單</button>
-          <button @click="goToCreateCard" class="continue-button">前往主題單字</button>
+  <div class="quiz-block" :class="{ 'result-padding': showResult }">
+    <!-- No Wrong Questions Message -->
+    <div v-if="noQuestionsAvailable" class="result-card">
+      <h2 class="result-title">太棒了！</h2>
+      <div class="result-content">
+        <p class="result-message">目前沒有字卡需要複習！</p>
+      </div>
+      <div class="result-buttons">
+        <button @click="goToMenu" class="menu-button">回選單</button>
+        <button @click="goToCreateCard" class="continue-button">前往主題單字</button>
+      </div>
+    </div>
+
+    <AchievementPopup v-if="showResult && showPopup" :title="popupData.title" :description="popupData.description"
+      :image="popupData.image" @close="handlePopupClose" />
+
+    <!-- Quiz Content -->
+    <template v-else>
+      <div v-if="currentQuestion && !showResult" class="quiz-question">
+        <h2 class="quiz-question-title">{{ currentQuestion.chineseTranslation }}</h2>
+        <div class="quiz-options">
+          <div class="option" v-for="(option, index) in currentQuestion.options" :key="index">
+            <button :class="{
+              'correct': isSelectedCorrect && selectedOptionIndex === index,
+              'incorrect': !isSelectedCorrect && selectedOptionIndex === index
+            }" @click="handleAnswer(option, index)">
+              {{ option }}
+              <img v-if="selectedOptionIndex === index"
+                :src="isSelectedCorrect ? '/cardimg/correct.png' : '/cardimg/wrong.png'" class="result-icon" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Quiz Content -->
-      <template v-else>
-        <div v-if="currentQuestion && !showResult" class="quiz-question">
-          <h2 class="quiz-question-title">{{ currentQuestion.chineseTranslation }}</h2>
-          <div class="quiz-options">
-            <div class="option" 
-                 v-for="(option, index) in currentQuestion.options" 
-                 :key="index">
-              <button 
-                :class="{
-                  'correct': isSelectedCorrect && selectedOptionIndex === index,
-                  'incorrect': !isSelectedCorrect && selectedOptionIndex === index
-                }" 
-                @click="handleAnswer(option, index)">
-                {{ option }}
-                <img v-if="selectedOptionIndex === index" 
-                     :src="isSelectedCorrect ? '/cardimg/correct.png' : '/cardimg/wrong.png'" 
-                     class="result-icon" />
-              </button>
-            </div>
+      <!-- Progress Bar -->
+      <div v-if="!showResult" class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
+        </div>
+        <div class="progress-text">{{ questionsAnswered }} / 10</div>
+      </div>
+
+      <!-- Result Card -->
+      <div v-if="showResult" class="result-card">
+        <h2 class="result-title">測驗完成！</h2>
+        <div class="result-content">
+          <p class="result-score">你答對了 {{ correctCount }} 題，共 {{ questionsAnswered }} 題</p>
+          <p class="result-percentage">正確率: {{ (correctCount / questionsAnswered * 100).toFixed(1) }}%</p>
+          <div class="result-message">
+            <p v-if="correctCount === totalQuestions">太棒了！完美的表現！</p>
+            <p v-else-if="correctCount >= totalQuestions * 0.8">做得很好！繼續保持！</p>
+            <p v-else-if="correctCount >= totalQuestions * 0.6">表現不錯！還可以再進步！</p>
+            <p v-else>繼續加油！通過練習一定會進步的！</p>
           </div>
         </div>
-
-        <!-- Progress Bar -->
-        <div v-if="!showResult" class="progress-container">
-          <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
-          </div>
-          <div class="progress-text">{{  questionsAnswered }} / 10</div>
+        <div class="result-buttons">
+          <button @click="goToMenu" class="menu-button">回選單</button>
+          <button @click="navigateTo('wrong')" class="continue-button">前往錯題測驗</button>
         </div>
 
-        <!-- Result Card -->
-        <div v-if="showResult" class="result-card">
-          <h2 class="result-title">測驗完成！</h2>
-          <div class="result-content">
-            <p class="result-score">你答對了 {{ correctCount }} 題，共 {{  questionsAnswered }} 題</p>
-            <p class="result-percentage">正確率: {{ (correctCount /  questionsAnswered * 100).toFixed(1) }}%</p>
-            <div class="result-message">
-              <p v-if="correctCount === totalQuestions">太棒了！完美的表現！</p>
-              <p v-else-if="correctCount >= totalQuestions * 0.8">做得很好！繼續保持！</p>
-              <p v-else-if="correctCount >= totalQuestions * 0.6">表現不錯！還可以再進步！</p>
-              <p v-else>繼續加油！通過練習一定會進步的！</p>
-            </div>
-          </div>
-          <div class="result-buttons">
-            <button @click="goToMenu" class="menu-button">回選單</button>
-            <button @click="navigateTo('wrong')" class="continue-button">前往錯題測驗</button>
-          </div>
-
-          <!-- Answer Review Section -->
-          <div class="answer-review">
-            <h3 class="review-title">答題記錄</h3>
-            <div class="review-list">
-              <div v-for="(question, index) in answeredQuestions" 
-                   :key="index" 
-                   class="review-item"
-                   :class="{ 'correct-answer': question.isCorrect }">
-                <div class="review-question">
-                  <span class="question-number">Q{{ index + 1 }}.</span>
-                  <span class="chinese-text">{{ question.chineseTranslation }}</span>
+        <!-- Answer Review Section -->
+        <div class="answer-review">
+          <h3 class="review-title">答題記錄</h3>
+          <div class="review-list">
+            <div v-for="(question, index) in answeredQuestions" :key="index" class="review-item"
+              :class="{ 'correct-answer': question.isCorrect }">
+              <div class="review-question">
+                <span class="question-number">Q{{ index + 1 }}.</span>
+                <span class="chinese-text">{{ question.chineseTranslation }}</span>
+              </div>
+              <div class="review-answers">
+                <div class="user-answer">
+                  你的答案: <span :class="{ 'correct-text': question.isCorrect, 'incorrect-text': !question.isCorrect }">
+                    {{ question.userAnswer }}
+                  </span>
                 </div>
-                <div class="review-answers">
-                  <div class="user-answer">
-                    你的答案: <span :class="{ 'correct-text': question.isCorrect, 'incorrect-text': !question.isCorrect }">
-                      {{ question.userAnswer }}
-                    </span>
-                  </div>
-                  <div class="correct-answer" v-if="!question.isCorrect">
-                    正確答案: <span class="correct-text">{{ question.correctAnswer }}</span>
-                  </div>
+                <div class="correct-answer" v-if="!question.isCorrect">
+                  正確答案: <span class="correct-text">{{ question.correctAnswer }}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </template>
+      </div>
+    </template>
 
-      <!-- Loading State -->
-      <div v-if="showLoading" class="loading-modal">
-        <div class="loading-content">
-          <div class="loading-spinner">
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-          </div>
-          <p class="loading-text">Loading...</p>
+    <!-- Loading State -->
+    <div v-if="showLoading" class="loading-modal">
+      <div class="loading-content">
+        <div class="loading-spinner">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
         </div>
+        <p class="loading-text">Loading...</p>
       </div>
     </div>
+  </div>
 </template>
-  
-  <script>
-  import OpenAI from "openai";
-  export default {
+
+<script>
+import OpenAI from "openai";
+import AchievementPopup from "../components/AchievementPopup.vue";
+export default {
+  components: {
+    AchievementPopup,
+  },
   data() {
+
     return {
+
       currentQuestion: null,
       showLoading: false,
       selectedOptionIndex: null,
@@ -116,6 +118,12 @@
       showResult: false,
       correctCount: 0,
       answeredQuestions: [],
+      showPopup: true, // 控制彈窗顯示（可不需要單獨此屬性）
+      popupData: {
+        title: "測驗完成！",
+        description: "",
+        image: "pet/pet3.gif", // 替換為成就圖片
+      },
     };
   },
   computed: {
@@ -259,8 +267,19 @@
       setTimeout(async () => {
         this.isSelectedCorrect = false;
         this.selectedOptionIndex = null;
+        // this.showResult = true;
+        if (this.questionsAnswered >= 10) {
+
+          this.popupData.description = `你答對了 ${this.correctCount} 題，共 ${this.questionsAnswered} 題！正確率為 ${(this.correctCount / this.questionsAnswered * 100).toFixed(1)}%。`;
+          this.showResult = true;
+        } else {
+          await this.loadNextQuestion();
+        }
         await this.loadNextQuestion();
       }, 2000);
+    },
+    handlePopupClose() {
+      this.showPopup = false; // 關閉彈窗後隱藏
     },
 
     goToMenu() {
@@ -268,7 +287,7 @@
     },
 
     navigateTo(page) {
-            this.$router.push({ name: page });
+      this.$router.push({ name: page });
     },
     async restartQuiz() {
       this.questionsAnswered = 0;
@@ -279,7 +298,7 @@
     }
   }
 };
-  </script>
+</script>
 <style scoped>
 .quiz-block {
   display: flex;
@@ -410,7 +429,8 @@
   margin-bottom: 20px;
 }
 
-.menu-button, .continue-button {
+.menu-button,
+.continue-button {
   padding: 12px 25px;
   font-size: 16px;
   border: none;
@@ -429,7 +449,8 @@
   color: white;
 }
 
-.menu-button:hover, .continue-button:hover {
+.menu-button:hover,
+.continue-button:hover {
   transform: translateY(-2px);
 }
 
@@ -481,7 +502,8 @@
   padding-left: 25px;
 }
 
-.user-answer, .correct-answer {
+.user-answer,
+.correct-answer {
   margin: 5px 0;
   font-size: 14px;
 }
@@ -612,6 +634,7 @@
     transform: translateY(0);
     opacity: 0.6;
   }
+
   100% {
     transform: translateY(-15px);
     opacity: 1;
@@ -622,16 +645,16 @@
   .quiz-options {
     grid-template-columns: 1fr;
   }
-  
+
   .quiz-question {
     padding: 20px;
     margin: 0 15px;
   }
-  
+
   .quiz-question-title {
     font-size: 20px;
   }
-  
+
   .quiz-options button {
     font-size: 16px;
     padding: 12px 15px;
@@ -663,7 +686,8 @@
     flex-direction: column;
   }
 
-  .menu-button, .continue-button {
+  .menu-button,
+  .continue-button {
     width: 100%;
     margin-bottom: 10px;
   }
@@ -689,18 +713,19 @@
     padding-left: 20px;
   }
 
-  .user-answer, .correct-answer {
+  .user-answer,
+  .correct-answer {
     font-size: 13px;
   }
 
   .progress-container {
     padding: 10px;
   }
-  
+
   .progress-bar {
     width: 85%;
   }
-  
+
   .progress-text {
     font-size: 12px;
   }

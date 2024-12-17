@@ -38,12 +38,12 @@ const routes = [
     component: MainPage,
     meta: { requiresAuth: true }, // 需要登入的頁面
   },
-  {
-    path: "/main",
-    name: "Main",
-    component: MainPage,
-    meta: { requiresAuth: true }, // 需要登入的頁面
-  },
+  // {
+  //   path: "/main",
+  //   name: "Main",
+  //   component: MainPage,
+  //   meta: { requiresAuth: true }, // 需要登入的頁面
+  // },
   {
     path: "/pet",
     name: "Pet",

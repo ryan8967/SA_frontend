@@ -9,7 +9,7 @@
             <div ref="addDimondAnime" class="add-dimond-anime">+ {{ addDimondAmount }}</div>
         </div> <!-- 顯示鑽石 -->
         <div class="nav-item username">
-            Hi, {{ user ? user.displayName : 'Guest' }}
+            Hi, User{{ user ? user.displayName : 'Guest' }}
         </div>
         <!-- <button class="logout-btn" @click="handleLogout" v-if="user">Logout</button> -->
         <button class="nav-item2" @click="navigateTo('Profile')">

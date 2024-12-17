@@ -21,7 +21,7 @@
         </button>
 
         <button class="nav-item" @click="navigateTo('menu')">
-            <font-awesome-icon :icon="['fas', 'users']" class="icon" />
+            <font-awesome-icon :icon="['fas', 'book']" class="icon" />
         </button>
     </nav>
 </template>
