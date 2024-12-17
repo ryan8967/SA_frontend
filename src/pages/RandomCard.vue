@@ -1,134 +1,145 @@
 <template>
-  <div class="quiz-block" :class="{ 'result-padding': showResult }">
-    <!-- No Wrong Questions Message -->
-    <div v-if="noQuestionsAvailable" class="result-card">
-      <h2 class="result-title">太棒了！</h2>
-      <div class="result-content">
-        <p class="result-message">目前沒有錯題需要複習！</p>
-      </div>
-      <div class="result-buttons">
-        <button @click="goToCreateCard" class="continue-button">前往主題單字</button>
-      </div>
-    </div>
-
-    <!-- Quiz Content -->
-    <template v-else>
-      <div v-if="currentQuestion && !showResult" class="quiz-question">
-        <h2 class="quiz-question-title">{{ currentQuestion.chineseTranslation }}</h2>
-        <div class="quiz-options">
-          <div class="option" v-for="(option, index) in currentQuestion.options" :key="index">
-            <button :class="{
-              'correct': isSelectedCorrect && selectedOptionIndex === index,
-              'incorrect': !isSelectedCorrect && selectedOptionIndex === index
-            }" @click="handleAnswer(option, index)">
-              {{ option }}
-              <img v-if="selectedOptionIndex === index"
-                :src="isSelectedCorrect ? '/cardimg/correct.png' : '/cardimg/wrong.png'" class="result-icon" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Result Card -->
-      <div v-if="showResult" class="result-card">
-        <h2 class="result-title">測驗完成！</h2>
+    <div class="quiz-block" :class="{ 'result-padding': showResult }">
+      <!-- No Wrong Questions Message -->
+      <div v-if="noQuestionsAvailable" class="result-card">
+        <h2 class="result-title">太棒了！</h2>
         <div class="result-content">
-          <p class="result-score">你答對了 {{ correctCount }} 題，共 {{ totalQuestions }} 題</p>
-          <p class="result-percentage">正確率: {{ (correctCount / totalQuestions * 100).toFixed(1) }}%</p>
-          <div class="result-message">
-            <p v-if="correctCount === totalQuestions">太棒了！完美的表現！</p>
-            <p v-else-if="correctCount >= totalQuestions * 0.8">做得很好！繼續保持！</p>
-            <p v-else-if="correctCount >= totalQuestions * 0.6">表現不錯！還可以再進步！</p>
-            <p v-else>繼續加油！通過練習一定會進步的！</p>
-          </div>
+          <p class="result-message">目前沒有錯題需要複習！</p>
         </div>
         <div class="result-buttons">
           <button @click="goToMenu" class="menu-button">回選單</button>
-          <button @click="restartWrongQuiz" class="continue-button">繼續錯題測驗</button>
+          <button @click="goToCreateCard" class="continue-button">前往主題單字</button>
+        </div>
+      </div>
+
+      <!-- Quiz Content -->
+      <template v-else>
+        <div v-if="currentQuestion && !showResult" class="quiz-question">
+          <h2 class="quiz-question-title">{{ currentQuestion.chineseTranslation }}</h2>
+          <div class="quiz-options">
+            <div class="option" 
+                 v-for="(option, index) in currentQuestion.options" 
+                 :key="index">
+              <button 
+                :class="{
+                  'correct': isSelectedCorrect && selectedOptionIndex === index,
+                  'incorrect': !isSelectedCorrect && selectedOptionIndex === index
+                }" 
+                @click="handleAnswer(option, index)">
+                {{ option }}
+                <img v-if="selectedOptionIndex === index" 
+                     :src="isSelectedCorrect ? '/cardimg/correct.png' : '/cardimg/wrong.png'" 
+                     class="result-icon" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        <!-- Answer Review Section -->
-        <div class="answer-review">
-          <h3 class="review-title">答題記錄</h3>
-          <div class="review-list">
-            <div v-for="(question, index) in answeredQuestions" :key="index" class="review-item"
-              :class="{ 'correct-answer': question.isCorrect }">
-              <div class="review-question">
-                <span class="question-number">Q{{ index + 1 }}.</span>
-                <span class="chinese-text">{{ question.chineseTranslation }}</span>
-              </div>
-              <div class="review-answers">
-                <div class="user-answer">
-                  你的答案: <span :class="{ 'correct-text': question.isCorrect, 'incorrect-text': !question.isCorrect }">
-                    {{ question.userAnswer }}
-                  </span>
+        <!-- Progress Bar -->
+        <div v-if="!showResult" class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
+          </div>
+          <div class="progress-text">{{  questionsAnswered }} / 10</div>
+        </div>
+
+        <!-- Result Card -->
+        <div v-if="showResult" class="result-card">
+          <h2 class="result-title">測驗完成！</h2>
+          <div class="result-content">
+            <p class="result-score">你答對了 {{ correctCount }} 題，共 {{  questionsAnswered }} 題</p>
+            <p class="result-percentage">正確率: {{ (correctCount /  questionsAnswered * 100).toFixed(1) }}%</p>
+            <div class="result-message">
+              <p v-if="correctCount === totalQuestions">太棒了！完美的表現！</p>
+              <p v-else-if="correctCount >= totalQuestions * 0.8">做得很好！繼續保持！</p>
+              <p v-else-if="correctCount >= totalQuestions * 0.6">表現不錯！還可以再進步！</p>
+              <p v-else>繼續加油！通過練習一定會進步的！</p>
+            </div>
+          </div>
+          <div class="result-buttons">
+            <button @click="goToMenu" class="menu-button">回選單</button>
+            <button @click="navigateTo('wrong')" class="continue-button">前往錯題測驗</button>
+          </div>
+
+          <!-- Answer Review Section -->
+          <div class="answer-review">
+            <h3 class="review-title">答題記錄</h3>
+            <div class="review-list">
+              <div v-for="(question, index) in answeredQuestions" 
+                   :key="index" 
+                   class="review-item"
+                   :class="{ 'correct-answer': question.isCorrect }">
+                <div class="review-question">
+                  <span class="question-number">Q{{ index + 1 }}.</span>
+                  <span class="chinese-text">{{ question.chineseTranslation }}</span>
                 </div>
-                <div class="correct-answer" v-if="!question.isCorrect">
-                  正確答案: <span class="correct-text">{{ question.correctAnswer }}</span>
+                <div class="review-answers">
+                  <div class="user-answer">
+                    你的答案: <span :class="{ 'correct-text': question.isCorrect, 'incorrect-text': !question.isCorrect }">
+                      {{ question.userAnswer }}
+                    </span>
+                  </div>
+                  <div class="correct-answer" v-if="!question.isCorrect">
+                    正確答案: <span class="correct-text">{{ question.correctAnswer }}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
-      <!-- Progress Bar -->
-      <div v-if="!showResult" class="progress-container">
-        <div class="progress-bar">
-          <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
+      <!-- Loading State -->
+      <div v-if="showLoading" class="loading-modal">
+        <div class="loading-content">
+          <div class="loading-spinner">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+          </div>
+          <p class="loading-text">Loading...</p>
         </div>
-        <div class="progress-text">{{ processedQuestions }} / {{ totalQuestions }}</div>
-      </div>
-    </template>
-
-    <!-- Loading State -->
-    <div v-if="showLoading" class="loading-modal">
-      <div class="loading-content">
-        <div class="loading-spinner">
-          <div class="loading-dot"></div>
-          <div class="loading-dot"></div>
-          <div class="loading-dot"></div>
-        </div>
-        <p class="loading-text">Loading...</p>
       </div>
     </div>
-  </div>
 </template>
-
-<script>
-import OpenAI from "openai";
-
-
-export default {
+  
+  <script>
+  import OpenAI from "openai";
+  export default {
   data() {
     return {
-      incorrectWords: [],
       currentQuestion: null,
       showLoading: false,
       selectedOptionIndex: null,
       isSelectedCorrect: false,
-      processedQuestions: 0,
-      maxQuestions: 10,
-      correctCount: 0,
+      questionsAnswered: 0,
       showResult: false,
+      correctCount: 0,
       answeredQuestions: [],
-      noQuestionsAvailable: false,
-      totalQuestions: 0,
     };
   },
   computed: {
     progressPercentage() {
-      return (this.processedQuestions / this.totalQuestions) * 100;
+      return (this.questionsAnswered / 10) * 100;
     }
   },
   mounted() {
-    this.fetchIncorrectWords();
+    this.startQuiz();
   },
   methods: {
-    async fetchIncorrectWords() {
+    shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    },
+
+    async startQuiz() {
       this.showLoading = true;
       try {
-        const response = await fetch("http://localhost:8080/api/incorrect/get", {
+        // 從API獲取隨機單字
+        const response = await fetch("http://localhost:8080/api/cards/random", {
           method: "GET",
         });
 
@@ -137,36 +148,40 @@ export default {
         }
 
         const data = await response.json();
-
         if (!data || data.length === 0) {
-          this.noQuestionsAvailable = true;
+          console.error("No words available");
           this.showLoading = false;
           return;
         }
 
-        this.incorrectWords = data;
-        this.totalQuestions = Math.min(this.maxQuestions, data.length);
-        await this.loadNextQuestion();
+        await this.generateQuestion(data[0].word);
+        this.remainingWords = data.slice(1);
+
       } catch (error) {
-        console.error("Error fetching incorrect words:", error);
+        console.error("Error starting quiz:", error);
         this.showLoading = false;
       }
     },
 
     async loadNextQuestion() {
-      this.showLoading = true;
-
-      if (this.processedQuestions >= this.totalQuestions || this.incorrectWords.length === 0) {
-        console.log("No more questions.");
-        this.currentQuestion = null;
-        this.showLoading = false;
+      if (this.questionsAnswered >= 10) {
         this.showResult = true;
+        this.showLoading = false;
         return;
       }
 
-      const wordObj = this.incorrectWords.shift();
-      const word = wordObj.word;
+      if (!this.remainingWords || this.remainingWords.length === 0) {
+        this.showResult = true;
+        this.showLoading = false;
+        return;
+      }
 
+      const nextWord = this.remainingWords.shift();
+      await this.generateQuestion(nextWord.word);
+    },
+
+    async generateQuestion(word) {
+      this.showLoading = true;
       try {
         let kkk = "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
         const decodedStr = atob(kkk);
@@ -175,6 +190,7 @@ export default {
           apiKey: decodedStr,
           dangerouslyAllowBrowser: true,
         });
+
         const prompt = `You are an English teacher helping the user create a multiple-choice question.
         Given the word: "${word}", generate a JSON object as follows:
         {
@@ -182,7 +198,7 @@ export default {
           "options": ["", "", "", ""],
           "correctAnswer": ""
         }.
-        The "options" should include three english incorrect words as distractors along with the correct english word.
+        The "options" should include three incorrect english words as distractors along with the correct english word.
         The distractors should be plausible but clearly incorrect.
         Return only the JSON object without any additional text or explanation. The "chineseTranslation" should be the Chinese translation of the word, use zh-tw.`;
 
@@ -195,16 +211,14 @@ export default {
         });
 
         const message = gptResponse.choices[0].message.content;
-        try {
-          this.currentQuestion = JSON.parse(message);
-          this.processedQuestions += 1;
-        } catch (jsonError) {
-          console.error("JSON Parsing Error:", jsonError);
-          await this.loadNextQuestion();
-        }
+        let questionData = JSON.parse(message);
+        questionData.options = this.shuffleArray([...questionData.options]);
+        questionData.originalWord = word; // 保存原始單字
+        this.currentQuestion = questionData;
+        this.questionsAnswered += 1;
+
       } catch (error) {
         console.error("Error generating question:", error);
-        await this.loadNextQuestion();
       } finally {
         this.showLoading = false;
       }
@@ -225,32 +239,27 @@ export default {
         this.correctCount++;
       }
 
-      const word = this.currentQuestion.correctAnswer;
+      try {
+        const endpoint = this.isSelectedCorrect
+          ? "http://localhost:8080/api/correct/add"
+          : "http://localhost:8080/api/incorrect/add";
 
-      if (this.isSelectedCorrect) {
-        try {
-          const response = await fetch(`http://localhost:8080/api/incorrect/reviewed?word=${encodeURIComponent(word)}`, {
-            method: "POST",
-          });
+        await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ word: this.currentQuestion.originalWord }),
+        });
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          console.log(`Marked as reviewed: ${word}`);
-        } catch (error) {
-          console.error("Error marking word as reviewed:", error);
-        }
+      } catch (error) {
+        console.error("Error updating word database:", error);
       }
 
       setTimeout(async () => {
         this.isSelectedCorrect = false;
         this.selectedOptionIndex = null;
-        if (this.processedQuestions >= this.totalQuestions) {
-          this.showResult = true;
-        } else {
-          await this.loadNextQuestion();
-        }
+        await this.loadNextQuestion();
       }, 2000);
     },
 
@@ -258,19 +267,19 @@ export default {
       this.$router.push('/menu');
     },
 
-    async restartWrongQuiz() {
-      await this.$router.push('/');
-      this.$nextTick(() => {
-        this.$router.push('/wrong');
-      });
+    navigateTo(page) {
+            this.$router.push({ name: page });
     },
-
-    goToCreateCard() {
-      this.$router.push('/cardByTopic');
+    async restartQuiz() {
+      this.questionsAnswered = 0;
+      this.correctCount = 0;
+      this.answeredQuestions = [];
+      this.showResult = false;
+      await this.startQuiz();
     }
-  },
+  }
 };
-</script>
+  </script>
 <style scoped>
 .quiz-block {
   display: flex;
@@ -401,8 +410,7 @@ export default {
   margin-bottom: 20px;
 }
 
-.menu-button,
-.continue-button {
+.menu-button, .continue-button {
   padding: 12px 25px;
   font-size: 16px;
   border: none;
@@ -421,8 +429,7 @@ export default {
   color: white;
 }
 
-.menu-button:hover,
-.continue-button:hover {
+.menu-button:hover, .continue-button:hover {
   transform: translateY(-2px);
 }
 
@@ -474,8 +481,7 @@ export default {
   padding-left: 25px;
 }
 
-.user-answer,
-.correct-answer {
+.user-answer, .correct-answer {
   margin: 5px 0;
   font-size: 14px;
 }
@@ -606,7 +612,6 @@ export default {
     transform: translateY(0);
     opacity: 0.6;
   }
-
   100% {
     transform: translateY(-15px);
     opacity: 1;
@@ -617,16 +622,16 @@ export default {
   .quiz-options {
     grid-template-columns: 1fr;
   }
-
+  
   .quiz-question {
     padding: 20px;
     margin: 0 15px;
   }
-
+  
   .quiz-question-title {
     font-size: 20px;
   }
-
+  
   .quiz-options button {
     font-size: 16px;
     padding: 12px 15px;
@@ -658,8 +663,7 @@ export default {
     flex-direction: column;
   }
 
-  .menu-button,
-  .continue-button {
+  .menu-button, .continue-button {
     width: 100%;
     margin-bottom: 10px;
   }
@@ -685,19 +689,18 @@ export default {
     padding-left: 20px;
   }
 
-  .user-answer,
-  .correct-answer {
+  .user-answer, .correct-answer {
     font-size: 13px;
   }
 
   .progress-container {
     padding: 10px;
   }
-
+  
   .progress-bar {
     width: 85%;
   }
-
+  
   .progress-text {
     font-size: 12px;
   }

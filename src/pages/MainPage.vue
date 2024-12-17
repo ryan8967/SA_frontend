@@ -1,6 +1,6 @@
 <template>
     <div id="main-page">
-        <!-- Login Modal -->
+        <!-- Comment out Login Modal
         <div v-if="showLoginModal" class="modal-overlay">
             <div class="modal">
                 <h2>Login</h2>
@@ -17,14 +17,16 @@
                 </form>
             </div>
         </div>
+        -->
 
-        <!-- If user data is not loaded -->
+        <!-- Remove user check condition
         <div v-if="!user">
             <p>Loading user information...</p>
         </div>
+        -->
 
-        <!-- Pet Display -->
-        <div class="card pet-display" v-if="user" @click="showClickGif">
+        <!-- Remove v-if="user" from Pet Display -->
+        <div class="card pet-display" @click="showClickGif">
             <h2 class="hh">Your Pet</h2>
 
             <div v-if="showBubble" :key="floatingTextIndex" class="floating-text">
@@ -51,9 +53,12 @@
                 </div>
             </div>
         </div>
-
-        <!-- Task Status -->
-        <div class="card task-status" v-if="user">
+        <div class="button-container">
+            <button class="create-card-button" @click="navigateTo('wrong')">錯題複習</button>
+            <button class="continue-button" @click="goToCreateCard">主題單字</button>
+            <button class="continue-button" @click="navigateTo('randomcard')">字卡測驗</button>
+        </div>
+<!--         <div class="card task-status">
             <h2>Task Status</h2>
             <p class="task-intro">Complete tasks to level up your pet!</p>
             <ul>
@@ -68,7 +73,7 @@
                     </button>
                 </li>
             </ul>
-        </div>
+        </div> -->
 
         <!-- Pop-Out Modal -->
         <div class="modal-overlay" v-if="showExperienceModal">
@@ -92,10 +97,13 @@ export default {
     },
     data() {
         return {
+            // Comment out login-related data
+            /*
             user: null,
             showLoginModal: true,
             loginUsername: "",
             loginPassword: "",
+            */
             isClickGif: false,
             tasks: [
                 { id: 1, description: "記起來5個字卡", status: "in progress" },
@@ -105,7 +113,7 @@ export default {
             showBubble: false,
             floatingTexts: ["你超棒", "明日新星就是你", "又完成一個任務了", "加油加油", "你是最棒的"],
             floatingTextIndex: 0,
-            showExperienceModal: false, // New state for experience modal
+            showExperienceModal: false,
         };
     },
     computed: {
@@ -134,6 +142,8 @@ export default {
         },
     },
     methods: {
+        // Comment out login-related methods
+        /*
         handleLogin() {
             if (this.loginUsername && this.loginPassword) {
                 const mockUser = {
@@ -157,6 +167,13 @@ export default {
                 this.showLoginModal = true;
             }
         },
+        */
+        navigateTo(page) {
+            this.$router.push({ name: page });
+        },
+        goToCreateCard() {
+            this.$router.push('/cardByTopic');
+        },
         acceptTask(task) {
             task.status = "in progress";
         },
@@ -167,26 +184,29 @@ export default {
             else if(task.id == 2) {
                 this.$router.push("/card");
             }
-            else {task.status = "completed";
-            this.petStore.addExperience(20);
-            this.showExperienceModal = true;
+            else {
+                task.status = "completed";
+                this.petStore.addExperience(20);
+                this.showExperienceModal = true;
             }
         },
         async fetchTaskStatus() {
             //取得status
-/*            try {
+            /*
+            try {
                 const db = getDatabase();
-                const userId = JSON.parse(localStorage.getItem('user')).username; // Assuming you have a username for user identification
+                const userId = JSON.parse(localStorage.getItem('user')).username;
                 for (let task of this.tasks) {
                     const taskRef = ref(db, `users/${userId}/tasks/${task.id}`);
                     const snapshot = await get(taskRef);
                     if (snapshot.exists()) {
-                        task.status = snapshot.val().status;  // Update the task status from the DB
+                        task.status = snapshot.val().status;
                     }
                 }
             } catch (error) {
                 console.error("Error fetching task status: ", error);
-            } */
+            }
+            */
         },
         closeExperienceModal() {
             this.showExperienceModal = false;
@@ -196,14 +216,9 @@ export default {
 </script>
 
 
-
 <style scoped>
-.hh {
-    padding-bottom: 150px;
-}
-
 #main-page {
-    padding-top: 80px;
+    padding-top: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -368,8 +383,8 @@ button:hover {
 
 @media only screen and (max-width: 600px) {
     .pet-image {
-        width: 150px;
-        height: 150px;
+        width: 300px;
+        height: 300px;
     }
 
     .card {
@@ -381,7 +396,7 @@ button:hover {
     }
 
     #main-page {
-        padding: 10px;
+        padding-top: 100px;
     }
 }
 
@@ -418,5 +433,43 @@ button:hover {
 
 .close-button {
     margin-left: 0;
+}
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.create-card-button,
+.continue-button {
+    padding: 8px 12px;
+    background-color: #ff5349;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.create-card-button:hover,
+.continue-button:hover {
+    background-color: #ff5349;
+}
+
+@media only screen and (max-width: 600px) {
+    .button-container {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .create-card-button,
+    .continue-button {
+        width: 100%;
+        max-width: 300px;
+    }
 }
 </style>

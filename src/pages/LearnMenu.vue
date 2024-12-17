@@ -10,8 +10,7 @@
         </router-link>
         <button class="create-card-button" @click="navigateTo('createMenu')">創建字卡</button>
         <button class="create-card-button" @click="navigateTo('learn')">立即學習</button>
-        <button class="create-card-button" @click="navigateTo('wrong')">錯題複習</button>
-        <button class="create-card-button" @click="navigateTo('CardByTopic')">主題測驗</button>
+        <button class="create-card-button" @click="navigateTo('testmenu')">自我測驗</button>
 
     </div>
 </template>
