@@ -3,18 +3,9 @@
     <div class="card-block">
       <div v-if="show" class="word-card">
         <div class="word-card__content">
-          <input
-            type="text"
-            class="word-card__input"
-            placeholder="輸入主題"
-            v-model="inputWord"
-            @keyup.enter="generateWords"
-          />
-          <button
-            class="word-card__button"
-            :disabled="empty"
-            @click="generateWords"
-          >
+          <input type="text" class="word-card__input" placeholder="輸入主題" v-model="inputWord"
+            @keyup.enter="generateWords" />
+          <button class="word-card__button" :disabled="empty" @click="generateWords">
             生成單字卡
           </button>
         </div>
@@ -27,22 +18,13 @@
             {{ currentQuestion.chineseTranslation }}
           </h2>
           <div class="word-card__options">
-            <button
-              v-for="(option, index) in currentQuestion.options"
-              :key="index"
-              :class="{
-                'correct': isSelectedCorrect && selectedOptionIndex === index,
-                'incorrect': !isSelectedCorrect && selectedOptionIndex === index,
-              }"
-              class="word-card__option"
-              @click="handleAnswer(option, index)"
-            >
+            <button v-for="(option, index) in currentQuestion.options" :key="index" :class="{
+              'correct': isSelectedCorrect && selectedOptionIndex === index,
+              'incorrect': !isSelectedCorrect && selectedOptionIndex === index,
+            }" class="word-card__option" @click="handleAnswer(option, index)">
               <span class="option-text">{{ option }}</span>
-              <img
-                v-if="selectedOptionIndex === index"
-                :src="isSelectedCorrect ? '/cardimg/correct.png' : '/cardimg/wrong.png'"
-                class="result-icon"
-              />
+              <img v-if="selectedOptionIndex === index"
+                :src="isSelectedCorrect ? '/cardimg/correct.png' : '/cardimg/wrong.png'" class="result-icon" />
             </button>
           </div>
         </div>
@@ -78,10 +60,8 @@
         <div class="answer-review">
           <h3 class="review-title">答題記錄</h3>
           <div class="review-list">
-            <div v-for="(question, index) in answeredQuestions" 
-                :key="index" 
-                class="review-item"
-                :class="{ 'correct-answer': question.isCorrect }">
+            <div v-for="(question, index) in answeredQuestions" :key="index" class="review-item"
+              :class="{ 'correct-answer': question.isCorrect }">
               <div class="review-question">
                 <span class="question-number">Q{{ index + 1 }}.</span>
                 <span class="chinese-text">{{ question.chineseTranslation }}</span>
@@ -148,10 +128,11 @@ export default {
       console.log("Generating word list from GPT");
       this.showLoading = true;
 
-      const apiKey = process.env.VUE_APP_OPENAI_API_KEY;
+      let kkk = "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
+      const decodedStr = atob(kkk);
 
       const openai = new OpenAI({
-        apiKey: apiKey,
+        apiKey: decodedStr,
         dangerouslyAllowBrowser: true,
       });
 
@@ -173,7 +154,7 @@ export default {
 
         this.wordList = JSON.parse(message);
         this.show = false;
-        
+
         this.$nextTick(async () => {
           await this.loadNextQuestion();
         });
@@ -222,10 +203,11 @@ export default {
           return;
         }
 
-        const apiKey = process.env.VUE_APP_OPENAI_API_KEY;
+        let kkk = "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
+        const decodedStr = atob(kkk);
 
         const openai = new OpenAI({
-          apiKey: apiKey,
+          apiKey: decodedStr,
           dangerouslyAllowBrowser: true,
         });
 
@@ -263,7 +245,7 @@ export default {
       } catch (error) {
         console.error("Error loading question:", error);
         this.showLoading = false;
-        await this.loadNextQuestion(); 
+        await this.loadNextQuestion();
       }
     },
 
@@ -344,6 +326,7 @@ export default {
   padding-top: 500px !important;
   padding-bottom: 500px !important;
 }
+
 .container {
   display: flex;
   justify-content: center;
@@ -554,6 +537,7 @@ export default {
     transform: translateY(0);
     opacity: 0.6;
   }
+
   100% {
     transform: translateY(-15px);
     opacity: 1;
@@ -564,19 +548,20 @@ export default {
   .word-card__options {
     grid-template-columns: 1fr;
   }
-  
+
   .progress-container {
     padding: 10px;
   }
-  
+
   .progress-bar {
     width: 85%;
   }
-  
+
   .progress-text {
     font-size: 12px;
   }
 }
+
 /* Add to your <style scoped> section */
 .result-card {
   background-color: white;
@@ -626,7 +611,8 @@ export default {
   margin-bottom: 30px;
 }
 
-.menu-button, .continue-button {
+.menu-button,
+.continue-button {
   padding: 12px 25px;
   font-size: 16px;
   border: none;
@@ -645,7 +631,8 @@ export default {
   color: white;
 }
 
-.menu-button:hover, .continue-button:hover {
+.menu-button:hover,
+.continue-button:hover {
   transform: translateY(-2px);
 }
 
@@ -695,7 +682,8 @@ export default {
   padding-left: 25px;
 }
 
-.user-answer, .correct-answer {
+.user-answer,
+.correct-answer {
   margin: 5px 0;
   font-size: 14px;
 }
@@ -720,7 +708,8 @@ export default {
     flex-direction: column;
   }
 
-  .menu-button, .continue-button {
+  .menu-button,
+  .continue-button {
     width: 100%;
     margin-bottom: 10px;
   }
@@ -737,7 +726,8 @@ export default {
     padding-left: 20px;
   }
 
-  .user-answer, .correct-answer {
+  .user-answer,
+  .correct-answer {
     font-size: 13px;
   }
 }

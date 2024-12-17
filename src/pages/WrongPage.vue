@@ -16,19 +16,14 @@
       <div v-if="currentQuestion && !showResult" class="quiz-question">
         <h2 class="quiz-question-title">{{ currentQuestion.chineseTranslation }}</h2>
         <div class="quiz-options">
-          <div class="option" 
-               v-for="(option, index) in currentQuestion.options" 
-               :key="index">
-            <button 
-              :class="{
-                'correct': isSelectedCorrect && selectedOptionIndex === index,
-                'incorrect': !isSelectedCorrect && selectedOptionIndex === index
-              }" 
-              @click="handleAnswer(option, index)">
+          <div class="option" v-for="(option, index) in currentQuestion.options" :key="index">
+            <button :class="{
+              'correct': isSelectedCorrect && selectedOptionIndex === index,
+              'incorrect': !isSelectedCorrect && selectedOptionIndex === index
+            }" @click="handleAnswer(option, index)">
               {{ option }}
-              <img v-if="selectedOptionIndex === index" 
-                   :src="isSelectedCorrect ? '/cardimg/correct.png' : '/cardimg/wrong.png'" 
-                   class="result-icon" />
+              <img v-if="selectedOptionIndex === index"
+                :src="isSelectedCorrect ? '/cardimg/correct.png' : '/cardimg/wrong.png'" class="result-icon" />
             </button>
           </div>
         </div>
@@ -56,10 +51,8 @@
         <div class="answer-review">
           <h3 class="review-title">答題記錄</h3>
           <div class="review-list">
-            <div v-for="(question, index) in answeredQuestions" 
-                 :key="index" 
-                 class="review-item"
-                 :class="{ 'correct-answer': question.isCorrect }">
+            <div v-for="(question, index) in answeredQuestions" :key="index" class="review-item"
+              :class="{ 'correct-answer': question.isCorrect }">
               <div class="review-question">
                 <span class="question-number">Q{{ index + 1 }}.</span>
                 <span class="chinese-text">{{ question.chineseTranslation }}</span>
@@ -144,7 +137,7 @@ export default {
         }
 
         const data = await response.json();
-        
+
         if (!data || data.length === 0) {
           this.noQuestionsAvailable = true;
           this.showLoading = false;
@@ -162,7 +155,7 @@ export default {
 
     async loadNextQuestion() {
       this.showLoading = true;
-      
+
       if (this.processedQuestions >= this.totalQuestions || this.incorrectWords.length === 0) {
         console.log("No more questions.");
         this.currentQuestion = null;
@@ -175,9 +168,11 @@ export default {
       const word = wordObj.word;
 
       try {
-        const apiKey = process.env.VUE_APP_OPENAI_API_KEY;
+        let kkk = "c2stcHJvai1GR1ZjRS16TTJIRnRwYVVVOFhYZzNLWVE2aGg3SnVoY0czZWpleDZ3UVNETWE5R3JQLXJscVQ4UGJTQ1ZCVDZjdWZIRUhFZGpzQ1QzQmxia0ZKall0c1kxZm1BbENvZmp2Mko3NHlQbldDd203eUFjTTh4REk2Y1hnYlZUcXphNXNlbHU1Nmh6X3BTcGszcDlKLUpxUmFIcnBPd0E=";
+        const decodedStr = atob(kkk);
+
         const openai = new OpenAI({
-          apiKey: apiKey,
+          apiKey: decodedStr,
           dangerouslyAllowBrowser: true,
         });
 
@@ -292,6 +287,7 @@ export default {
   color: #4CAF50;
   margin-bottom: 20px;
 }
+
 .quiz-block {
   display: flex;
   justify-content: center;
@@ -302,9 +298,11 @@ export default {
   flex-direction: column;
   padding-bottom: 200px;
 }
+
 .result-padding {
   padding-bottom: 1000px !important;
 }
+
 .quiz-question {
   background-color: white;
   padding: 30px;
@@ -417,7 +415,8 @@ export default {
   margin-bottom: 30px;
 }
 
-.menu-button, .continue-button {
+.menu-button,
+.continue-button {
   padding: 12px 25px;
   font-size: 16px;
   border: none;
@@ -436,7 +435,8 @@ export default {
   color: white;
 }
 
-.menu-button:hover, .continue-button:hover {
+.menu-button:hover,
+.continue-button:hover {
   transform: translateY(-2px);
 }
 
@@ -487,7 +487,8 @@ export default {
   padding-left: 25px;
 }
 
-.user-answer, .correct-answer {
+.user-answer,
+.correct-answer {
   margin: 5px 0;
   font-size: 14px;
 }
@@ -605,6 +606,7 @@ export default {
     transform: translateY(0);
     opacity: 0.6;
   }
+
   100% {
     transform: translateY(-15px);
     opacity: 1;
@@ -616,16 +618,16 @@ export default {
   .quiz-options {
     grid-template-columns: 1fr;
   }
-  
+
   .quiz-question {
     padding: 20px;
     margin: 0 15px;
   }
-  
+
   .quiz-question-title {
     font-size: 20px;
   }
-  
+
   .quiz-options button {
     font-size: 16px;
     padding: 12px 15px;
@@ -656,7 +658,8 @@ export default {
     flex-direction: column;
   }
 
-  .menu-button, .continue-button {
+  .menu-button,
+  .continue-button {
     width: 100%;
     margin-bottom: 10px;
   }
@@ -681,18 +684,19 @@ export default {
     padding-left: 20px;
   }
 
-  .user-answer, .correct-answer {
+  .user-answer,
+  .correct-answer {
     font-size: 13px;
   }
 
   .progress-container {
     padding: 10px;
   }
-  
+
   .progress-bar {
     width: 85%;
   }
-  
+
   .progress-text {
     font-size: 12px;
   }

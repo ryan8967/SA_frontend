@@ -36,6 +36,12 @@ const routes = [
     meta: { requiresAuth: true }, // 需要登入的頁面
   },
   {
+    path: "/main",
+    name: "Main",
+    component: MainPage,
+    meta: { requiresAuth: true }, // 需要登入的頁面
+  },
+  {
     path: "/pet",
     name: "Pet",
     component: PetPage,
@@ -132,7 +138,7 @@ const routes = [
     //meta: { requiresAuth: true },
   },
   {
-    path:"/cardByTopic",
+    path: "/cardByTopic",
     name: "CardByTopic",
     component: CardCreateByTopic,
   },
@@ -150,8 +156,7 @@ const routes = [
     path: "/testByTopic",
     name: "TestByTopic",
     component: TestByTopic,
-  }
-  
+  },
 ];
 
 const router = createRouter({
