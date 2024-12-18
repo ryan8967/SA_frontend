@@ -6,7 +6,14 @@
         </div>
 
         <!-- 卡片區 -->
+
         <div class="card-container">
+            <div class="card" @click="navigateTo('testmenu')">
+                <div class="card-content">
+                    <h3>自我測驗</h3>
+                    <p>測試您的學習成果，挑戰自己！</p>
+                </div>
+            </div>
             <div class="card" @click="navigateTo('AllCards')">
                 <div class="card-content">
                     <h3>查看字卡</h3>
@@ -25,12 +32,7 @@
                     <p>進入學習模式，快速提升知識。</p>
                 </div>
             </div>
-            <div class="card" @click="navigateTo('testmenu')">
-                <div class="card-content">
-                    <h3>自我測驗</h3>
-                    <p>測試您的學習成果，挑戰自己！</p>
-                </div>
-            </div>
+
         </div>
     </div>
 </template>
