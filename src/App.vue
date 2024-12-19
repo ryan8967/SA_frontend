@@ -1,9 +1,9 @@
 <template>
   <div id="app" @click="createParticles">
     <NavBar v-if="!isWelcomePage" />
-    <router-view></router-view> <!-- 渲染當前路由的頁面 -->
+    <router-view></router-view>
     <BottomBar v-if="!isWelcomePage" />
-    <div class="particles" id="particles-js"></div> <!-- 添加粒子容器 -->
+    <div class="particles" id="particles-js"></div> 
   </div>
 </template>
 
@@ -11,9 +11,9 @@
 import BottomBar from '@/components/BottomBar.vue';
 import NavBar from '@/components/NavBar.vue';
 import { useUserStore } from '@/stores/userStore';
-import { usePetStore } from './stores/petStore';
+// import { usePetStore } from './stores/petStore';
 import gsap from 'gsap'; // 引入 gsap
-import axios from 'axios';
+// import axios from 'axios';
 
 export default {
   name: 'App',
@@ -26,10 +26,10 @@ export default {
       return this.$route && this.$route.name === 'Welcome';
     }
   },
-  mounted() {
-    this.initializeUserData();
-    this.setupPassiveIncome(); // 被動產生虛擬幣和鑽石
-  },
+  // mounted() {
+  //   this.initializeUserData();
+  //   this.setupPassiveIncome(); // 被動產生虛擬幣和鑽石
+  // },
   methods: {
     initializeUserData() {
       const userStore = useUserStore();
@@ -41,49 +41,49 @@ export default {
         this.setupApiSync(user.uid);
       }
     },
-    setupApiSync(userId) {
-      const userStore = useUserStore();
-      const petStore = usePetStore();
+    // setupApiSync(userId) {
+    //   const userStore = useUserStore();
+    //   const petStore = usePetStore();
 
-      // 假設你有 API 提供用戶數據
-      setInterval(async () => {
-        try {
-          const response = await axios.get(`/api/users/${userId}`);
-          const data = response.data;
+    //   // 假設你有 API 提供用戶數據
+    //   setInterval(async () => {
+    //     try {
+    //       const response = await axios.get(`/api/users/${userId}`);
+    //       const data = response.data;
 
-          if (data) {
-            userStore.setVirtualCoins(data.virtualCoins);
-            userStore.setDiamonds(data.diamonds || 0); // 同步鑽石
-            userStore.setPetLevel(data.petLevel || 1);
-            petStore.selectPet(data.selectedPetIndex);
-            console.log('Data updated from API:', data.virtualCoins, data.diamonds);
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      }, 3000); // 每 3 秒抓取一次資料
-    },
-    setupPassiveIncome() {
-      const userStore = useUserStore();
-      const userId = userStore.user ? userStore.user.uid : null;
+    //       if (data) {
+    //         userStore.setVirtualCoins(data.virtualCoins);
+    //         userStore.setDiamonds(data.diamonds || 0); // 同步鑽石
+    //         userStore.setPetLevel(data.petLevel || 1);
+    //         petStore.selectPet(data.selectedPetIndex);
+    //         console.log('Data updated from API:', data.virtualCoins, data.diamonds);
+    //       }
+    //     } catch (error) {
+    //       console.error('Error fetching user data:', error);
+    //     }
+    //   }, 3000); 
+    // },
+    // setupPassiveIncome() {
+    //   const userStore = useUserStore();
+    //   const userId = userStore.user ? userStore.user.uid : null;
 
-      if (userId) {
-        // 每隔 3 秒自動增加虛擬幣
-        setInterval(async () => {
-          const newCoins = userStore.virtualCoins + 1;
-          userStore.setVirtualCoins(newCoins);
+    //   if (userId) {
+    //     // 每隔 3 秒自動增加虛擬幣
+    //     setInterval(async () => {
+    //       const newCoins = userStore.virtualCoins + 1;
+    //       userStore.setVirtualCoins(newCoins);
 
-          try {
-            // 同步到後端 API
-            await axios.put(`/api/users/${userId}`, {
-              virtualCoins: newCoins,
-            });
-          } catch (error) {
-            console.error('Error updating virtual coins:', error);
-          }
-        }, 3000);
-      }
-    },
+    //       try {
+    //         // 同步到後端 API
+    //         await axios.put(`/api/users/${userId}`, {
+    //           virtualCoins: newCoins,
+    //         });
+    //       } catch (error) {
+    //         console.error('Error updating virtual coins:', error);
+    //       }
+    //     }, 3000);
+    //   }
+    // },
     // 創建粒子效果
     createParticles(event) {
       console.log('createParticles');
